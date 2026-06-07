@@ -12,6 +12,8 @@ export interface AndroidProjectConfig {
   versionName?: string;
   iconPath?: string;
   gradle?: boolean;
+  runGradle?: boolean;
+  gradleTask?: string;
   foundationLibPath?: string;
 }
 
@@ -32,6 +34,11 @@ export interface CxxProjectConfig {
   target?: "windows" | "linux";
   executableName?: string;
   useCmake?: boolean;
+  runCmake?: boolean;
+  cmakeCommand?: string;
+  cmakeGenerator?: string;
+  cmakeBuildType?: string;
+  cmakeBuildDirectory?: string;
 }
 
 export interface HtmlProjectConfig {

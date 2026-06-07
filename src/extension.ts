@@ -3,9 +3,10 @@ import { registerBuildCommands } from "./tiecode/build";
 import { TiecodeCompilerService } from "./tiecode/compilerService";
 import { TiecodeDiagnostics } from "./tiecode/diagnostics";
 import { applyTlyLayout, exportTlyLayout } from "./tiecode/layoutCommands";
-import { generateEventAtCursor, registerTiecodeProviders } from "./tiecode/providers";
+import { openTiecodeProject } from "./tiecode/projectLifecycle";
+import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
 import { registerTemplateCommands } from "./tiecode/templates";
-import { isTiecodeDocument } from "./tiecode/workspace";
+import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from "./tiecode/workspace";
 
 export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel("结绳");
@@ -23,18 +24,21 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("tiecode.reloadProject", async () => {
-      await compilerService.reload(vscode.window.activeTextEditor?.document.uri);
-      await diagnostics.refreshWorkspace(vscode.window.activeTextEditor?.document.uri);
-      void vscode.window.showInformationMessage("结绳工程已重新加载。");
+      await openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
     }),
     vscode.commands.registerCommand("tiecode.lintWorkspace", () => diagnostics.refreshWorkspace(vscode.window.activeTextEditor?.document.uri)),
     vscode.commands.registerCommand("tiecode.generateEvent", () => generateEventAtCursor(compilerService)),
+    vscode.commands.registerCommand("tiecode.smartEnter", () => smartEnterAtCursor(compilerService)),
+    vscode.commands.registerCommand("tiecode.scanUiClasses", () => scanUiClasses(compilerService, output)),
+    vscode.commands.registerCommand("tiecode.showSyncedSource", () => showSyncedSource(compilerService)),
     vscode.commands.registerCommand("tiecode.exportTlyLayout", () => exportTlyLayout(compilerService)),
     vscode.commands.registerCommand("tiecode.applyTlyLayout", () => applyTlyLayout(compilerService)),
     vscode.workspace.onDidOpenTextDocument(document => diagnostics.schedule(document)),
     vscode.workspace.onDidChangeTextDocument(event => {
       if (isTiecodeDocument(event.document)) {
-        void compilerService.call(event.document, () => undefined);
+        void compilerService.syncTextDocumentChange(event);
+      }
+      if (isTiecodeRelatedDocument(event.document)) {
         diagnostics.schedule(event.document);
       }
     }),
@@ -42,27 +46,67 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.workspace.onDidCloseTextDocument(document => diagnostics.clear(document.uri)),
     vscode.workspace.onDidChangeConfiguration(event => {
       if (event.affectsConfiguration("tiecode")) {
-        void compilerService.reload(vscode.window.activeTextEditor?.document.uri);
+        void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
+      }
+    }),
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      void openTiecodeProject(compilerService, diagnostics, undefined, "open");
+    }),
+    vscode.workspace.onDidRenameFiles(event => {
+      for (const file of event.files) {
+        if (isTiecodeSourceUri(file.oldUri) || isTiecodeSourceUri(file.newUri)) {
+          void compilerService.notifyRename(file.oldUri, file.newUri);
+        }
+        if (isProjectConfigUri(file.oldUri) || isProjectConfigUri(file.newUri)) {
+          void openTiecodeProject(compilerService, diagnostics, file.newUri, "reload");
+        }
       }
     })
   );
 
-  const watcher = vscode.workspace.createFileSystemWatcher("**/*.t");
+  const sourceWatcher = vscode.workspace.createFileSystemWatcher("**/*.{t,tly}");
+  const configWatcher = vscode.workspace.createFileSystemWatcher("**/{project.json,tiecode.project.json,lib.json}");
   context.subscriptions.push(
-    watcher,
-    watcher.onDidCreate(async uri => {
-      const document = await vscode.workspace.openTextDocument(uri);
-      await compilerService.notifyCreate(uri, document.getText());
-      diagnostics.schedule(document);
-    }),
-    watcher.onDidDelete(uri => {
-      void compilerService.notifyDelete(uri);
-      diagnostics.clear(uri);
-    }),
-    watcher.onDidChange(async uri => {
+    sourceWatcher,
+    sourceWatcher.onDidCreate(async uri => {
+      const text = await readWorkspaceText(uri);
+      if (uri.fsPath.toLocaleLowerCase().endsWith(".t")) {
+        await compilerService.notifyCreate(uri, text);
+      }
       const document = vscode.workspace.textDocuments.find(item => item.uri.toString() === uri.toString());
       if (document) {
         diagnostics.schedule(document);
+      }
+    }),
+    sourceWatcher.onDidDelete(uri => {
+      if (uri.fsPath.toLocaleLowerCase().endsWith(".t")) {
+        void compilerService.notifyDelete(uri);
+      }
+      diagnostics.clear(uri);
+    }),
+    sourceWatcher.onDidChange(async uri => {
+      if (uri.fsPath.toLocaleLowerCase().endsWith(".t")) {
+        void compilerService.notifyChange(uri, await readWorkspaceText(uri));
+      }
+      const document = vscode.workspace.textDocuments.find(item => item.uri.toString() === uri.toString());
+      if (document) {
+        diagnostics.schedule(document);
+      }
+    }),
+    configWatcher,
+    configWatcher.onDidCreate(uri => {
+      if (isProjectConfigUri(uri)) {
+        void openTiecodeProject(compilerService, diagnostics, uri, "reload");
+      }
+    }),
+    configWatcher.onDidChange(uri => {
+      if (isProjectConfigUri(uri)) {
+        void openTiecodeProject(compilerService, diagnostics, uri, "reload");
+      }
+    }),
+    configWatcher.onDidDelete(uri => {
+      if (isProjectConfigUri(uri)) {
+        void openTiecodeProject(compilerService, diagnostics, uri, "reload");
       }
     })
   );
@@ -70,6 +114,19 @@ export function activate(context: vscode.ExtensionContext): void {
   for (const document of vscode.workspace.textDocuments) {
     diagnostics.schedule(document);
   }
+  void openTiecodeProject(compilerService, diagnostics, undefined, "open");
 }
 
 export function deactivate(): void {}
+
+async function readWorkspaceText(uri: vscode.Uri): Promise<string> {
+  try {
+    return Buffer.from(await vscode.workspace.fs.readFile(uri)).toString("utf8");
+  } catch {
+    return "";
+  }
+}
+
+function isTiecodeSourceUri(uri: vscode.Uri): boolean {
+  return uri.fsPath.toLocaleLowerCase().endsWith(".t");
+}

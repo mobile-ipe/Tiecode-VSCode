@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { EXTENSION_CONFIG_FILE, LIB_DIR_NAME, PROJECT_CONFIG_FILE, ProjectKind, SOURCE_DIR_NAME, TiecodeProjectConfig } from "./types";
-import { ensureDirectory, writeProjectConfig, writeTextFile } from "./workspace";
+import { basicLibraryFolderName, ensureDirectory, resolveCompilerPaths, resolveStdlibSourceRoot, writeProjectConfig, writeTextFile } from "./workspace";
 
 export function registerTemplateCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
@@ -30,16 +30,22 @@ export async function createProject(kind: ProjectKind): Promise<void> {
 
   const rootPath = path.join(baseRoot, sanitizeFileName(name));
   if (fs.existsSync(rootPath) && fs.readdirSync(rootPath).length > 0) {
-    const answer = await vscode.window.showWarningMessage("目标目录不是空目录，继续会覆盖同名模板文件。", "继续");
+    const answer = await vscode.window.showWarningMessage("目标目录不是空目录，继续会覆盖同名模板文件和基本库。", "继续");
     if (answer !== "继续") {
       return;
     }
   }
 
-  ensureDirectory(path.join(rootPath, SOURCE_DIR_NAME));
-  ensureDirectory(path.join(rootPath, LIB_DIR_NAME));
-  writeProjectConfig(rootPath, createProjectConfig(kind, name));
-  writeTemplateFiles(rootPath, kind, name);
+  try {
+    ensureDirectory(path.join(rootPath, SOURCE_DIR_NAME));
+    ensureDirectory(path.join(rootPath, LIB_DIR_NAME));
+    copyProjectBasicLibrary(rootPath, kind);
+    writeProjectConfig(rootPath, createProjectConfig(kind, name));
+    writeTemplateFiles(rootPath, kind, name);
+  } catch (error) {
+    void vscode.window.showErrorMessage(`创建结绳工程失败: ${String(error instanceof Error ? error.message : error)}`);
+    return;
+  }
 
   const openFolder = await vscode.window.showInformationMessage(`结绳工程已创建: ${rootPath}`, "打开工程");
   if (openFolder === "打开工程") {
@@ -102,6 +108,20 @@ function writeTemplateFiles(rootPath: string, kind: ProjectKind, name: string): 
 
   writeTextFile(path.join(rootPath, SOURCE_DIR_NAME, "启动类.t"), cxxTemplate());
   writeTextFile(path.join(rootPath, "CMakeLists.txt"), cmakeTemplate(name));
+}
+
+function copyProjectBasicLibrary(rootPath: string, kind: ProjectKind): void {
+  const compiler = resolveCompilerPaths(rootPath, {});
+  const stdlibSourceRoot = resolveStdlibSourceRoot(compiler.stdlibsPath, kind);
+  const libraryName = basicLibraryFolderName(kind);
+  if (!stdlibSourceRoot) {
+    throw new Error(`未找到${libraryName}，请检查 tiecode.compiler.stdlibsPath: ${compiler.stdlibsPath}`);
+  }
+
+  const libraryRoot = path.dirname(stdlibSourceRoot);
+  const targetRoot = path.join(rootPath, LIB_DIR_NAME, libraryName);
+  fs.rmSync(targetRoot, { recursive: true, force: true });
+  fs.cpSync(libraryRoot, targetRoot, { recursive: true });
 }
 
 async function pickBaseRoot(): Promise<string | undefined> {

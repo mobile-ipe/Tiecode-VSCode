@@ -6,8 +6,9 @@
 
 - `.t` 和 `.tly` 语法高亮、语言配置和片段。
 - 通过结绳编译器 WASM IDE Service 提供补全、诊断、悬停、语义高亮、格式化、定义、引用、重命名、签名帮助和符号。
-- 支持创建安卓工程、CXX 工程和网页工程。
-- 支持调用本地 `tiec` 构建安卓、CXX 和网页工程。
+- `.tly` 支持布局诊断、格式化，以及基于安卓可视化组件扫描结果的组件名和属性名补全。
+- 支持创建安卓工程、CXX 工程和网页工程，并复制对应基本库到工程 `绳包` 目录。
+- 支持调用本地 `tiec` 构建安卓、CXX 和网页工程；安卓工程会在生成 Gradle 工程后自动执行 Gradle task，CXX 工程会自动执行 CMake 配置和构建。
 
 ## 工程结构
 
@@ -16,6 +17,8 @@
 - `源代码`
 - `绳包/*/源代码`
 - 编译器自带标准库中的 `安卓基本库`、`CXX基本库`、`网页基本库`
+
+创建新工程时，插件会从 `tiecode.compiler.stdlibsPath` 复制对应的 `安卓基本库`、`CXX基本库` 或 `网页基本库` 到工程 `绳包` 目录，保持和 Mobile-IPE 工程结构一致。
 
 工程优先读取 Mobile-IPE 的 `project.json`，会识别 `app_name`、`app_pkg`、`min_sdk`、`target_sdk`、`version_code`、`version_name`、`icon_path`、`source_version`、`project_version` 等字段。`tiecode.project.json` 可作为 VSCode 专用覆盖配置。
 
@@ -28,3 +31,8 @@
 - `tiecode.compiler.stdlibsPath`
 - `tiecode.sourceVersion`
 - `tiecode.project.platform`
+- `tiecode.android.runGradle`
+- `tiecode.android.gradleTask`
+- `tiecode.cxx.runCmake`
+- `tiecode.cxx.cmakeGenerator`
+- `tiecode.cxx.cmakeBuildType`

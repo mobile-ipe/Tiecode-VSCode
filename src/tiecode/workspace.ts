@@ -46,8 +46,11 @@ export function getProjectInfo(uri?: vscode.Uri, overrideKind?: ProjectKind): Pr
   const outputDir = resolveOutputDirectory(rootPath);
   const lineMapPath = path.join(outputDir, "mapping.bin");
   const projectSourceRoots = collectProjectSourceRoots(rootPath);
-  const stdlibSourceRoot = resolveStdlibSourceRoot(compiler.stdlibsPath, kind);
-  const sourceRoots = dedupe([...projectSourceRoots, ...(stdlibSourceRoot ? [stdlibSourceRoot] : [])]);
+  const projectStdlibSourceRoot = resolveProjectStdlibSourceRoot(rootPath, kind);
+  const compilerStdlibSourceRoot = resolveStdlibSourceRoot(compiler.stdlibsPath, kind);
+  const stdlibSourceRoot = projectStdlibSourceRoot ?? compilerStdlibSourceRoot;
+  const fallbackStdlibRoots = projectStdlibSourceRoot ? [] : (compilerStdlibSourceRoot ? [compilerStdlibSourceRoot] : []);
+  const sourceRoots = dedupe([...projectSourceRoots, ...fallbackStdlibRoots]);
   const sourceFiles = scanTiecodeFiles(sourceRoots);
 
   return {
@@ -211,6 +214,16 @@ export function resolveStdlibSourceRoot(stdlibsPath: string, kind: ProjectKind):
   return fs.existsSync(sourceRoot) ? sourceRoot : undefined;
 }
 
+export function resolveProjectStdlibSourceRoot(rootPath: string, kind: ProjectKind): string | undefined {
+  for (const folderName of projectBasicLibraryFolderNames(kind)) {
+    const sourceRoot = path.join(rootPath, LIB_DIR_NAME, folderName, SOURCE_DIR_NAME);
+    if (fs.existsSync(sourceRoot)) {
+      return sourceRoot;
+    }
+  }
+  return undefined;
+}
+
 export function collectProjectSourceRoots(rootPath: string): string[] {
   const roots: string[] = [];
   const sourceRoot = path.join(rootPath, SOURCE_DIR_NAME);
@@ -245,6 +258,46 @@ export function scanTiecodeFiles(roots: string[]): string[] {
 
 export function isTiecodeDocument(document: vscode.TextDocument): boolean {
   return document.languageId === "tiecode" || document.fileName.toLocaleLowerCase().endsWith(".t");
+}
+
+export function isTlyDocument(document: vscode.TextDocument): boolean {
+  return document.languageId === "tly" || document.fileName.toLocaleLowerCase().endsWith(".tly");
+}
+
+export function isTiecodeRelatedDocument(document: vscode.TextDocument): boolean {
+  return isTiecodeDocument(document) || isTlyDocument(document);
+}
+
+export function isProjectConfigUri(uri: vscode.Uri): boolean {
+  const fileName = path.basename(uri.fsPath);
+  return fileName === PROJECT_CONFIG_FILE || fileName === EXTENSION_CONFIG_FILE || fileName === "lib.json";
+}
+
+export function projectKindDisplayName(kind: ProjectKind): string {
+  if (kind === "android") {
+    return "结绳安卓工程";
+  }
+  if (kind === "html") {
+    return "结绳网页工程";
+  }
+  return "结绳 CXX 工程";
+}
+
+export function basicLibraryFolderName(kind: ProjectKind): string {
+  if (kind === "android") {
+    return "安卓基本库";
+  }
+  if (kind === "html") {
+    return "网页基本库";
+  }
+  return "CXX基本库";
+}
+
+function projectBasicLibraryFolderNames(kind: ProjectKind): string[] {
+  if (kind === "cxx") {
+    return ["CXX基本库", "Linux基本库"];
+  }
+  return [basicLibraryFolderName(kind)];
 }
 
 export function isInsideRoot(filePath: string, rootPath: string): boolean {

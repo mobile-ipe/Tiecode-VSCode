@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { TiecodeCompilerService } from "./compilerService";
-import { nativeListToArray, parseNativeResult, toVscodeRange, toVscodeUri } from "./interop";
-import { isTiecodeDocument } from "./workspace";
+import { nativeListToArray, parseNativeResult, toVscodeRange, tryToVscodeUri } from "./interop";
+import { isTiecodeDocument, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
 
 export class TiecodeDiagnostics {
   private readonly timers = new Map<string, NodeJS.Timeout>();
@@ -21,7 +21,7 @@ export class TiecodeDiagnostics {
   }
 
   schedule(document: vscode.TextDocument): void {
-    if (!isTiecodeDocument(document) || !this.isEnabled()) {
+    if (!isTiecodeRelatedDocument(document) || !this.isEnabled()) {
       return;
     }
 
@@ -38,12 +38,17 @@ export class TiecodeDiagnostics {
   }
 
   async refreshDocument(document: vscode.TextDocument): Promise<void> {
-    if (!isTiecodeDocument(document) || !this.isEnabled()) {
+    if (!isTiecodeRelatedDocument(document) || !this.isEnabled()) {
       return;
     }
 
     try {
-      const result = await this.service.call(document, session => session.service.lintFile(document.uri.toString()));
+      if (isTlyDocument(document)) {
+        await this.refreshTlyDocument(document);
+        return;
+      }
+
+      const result = await this.service.call(document, session => session.service.lintFile(this.service.createUri(session.tiec, document.uri)));
       const parsed = parseNativeResult(result) as any;
       this.collection.set(document.uri, toDiagnostics(parsed?.diagnostics));
     } catch (error) {
@@ -66,7 +71,11 @@ export class TiecodeDiagnostics {
       const grouped = new Map<string, vscode.Diagnostic[]>();
       for (const item of nativeListToArray(parsed?.diagnostics)) {
         const diagnostic = toDiagnostic(item);
-        const target = toVscodeUri((item as any)?.uri).toString();
+        const uri = tryToVscodeUri((item as any)?.uri);
+        if (!uri) {
+          continue;
+        }
+        const target = uri.toString();
         grouped.set(target, [...(grouped.get(target) ?? []), diagnostic]);
       }
 
@@ -85,6 +94,17 @@ export class TiecodeDiagnostics {
 
   private isEnabled(): boolean {
     return vscode.workspace.getConfiguration("tiecode").get<boolean>("diagnostics.enabled", true);
+  }
+
+  private async refreshTlyDocument(document: vscode.TextDocument): Promise<void> {
+    const session = await this.service.getSession(document.uri);
+    if (!session?.service?.parseTLYEntity) {
+      this.collection.delete(document.uri);
+      return;
+    }
+
+    const parsed = parseNativeResult(session.service.parseTLYEntity(document.getText())) as any;
+    this.collection.set(document.uri, toDiagnostics(parsed?.diagnostics));
   }
 }
 

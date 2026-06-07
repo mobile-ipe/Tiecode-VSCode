@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { BuildRequest, PlatformName, ProjectInfo, ProjectKind } from "./types";
-import { ensureDirectory, getProjectInfo } from "./workspace";
+import { ensureDirectory, getProjectInfo, resolveMaybeRelative } from "./workspace";
 
 export function registerBuildCommands(context: vscode.ExtensionContext, output: vscode.OutputChannel): void {
   context.subscriptions.push(
@@ -41,11 +41,87 @@ export async function buildProject(request: BuildRequest, output: vscode.OutputC
   }, async () => {
     try {
       await runProcess(project.compiler.tiecPath, args, project.rootPath, output);
+      await runGeneratedProjectBuild(buildProjectInfo, output);
       void vscode.window.showInformationMessage(`结绳构建完成: ${buildProjectInfo.outputDir}`);
     } catch (error) {
       void vscode.window.showErrorMessage(`结绳构建失败: ${String(error)}`);
     }
   });
+}
+
+async function runGeneratedProjectBuild(project: ProjectInfo, output: vscode.OutputChannel): Promise<void> {
+  if (project.kind === "android") {
+    await runAndroidGradleBuild(project, output);
+    return;
+  }
+
+  if (project.kind === "cxx") {
+    await runCxxCMakeBuild(project, output);
+  }
+}
+
+async function runAndroidGradleBuild(project: ProjectInfo, output: vscode.OutputChannel): Promise<void> {
+  const settings = vscode.workspace.getConfiguration("tiecode");
+  const androidConfig = project.config.android ?? {};
+  const generateGradleProject = androidConfig.gradle ?? settings.get<boolean>("android.gradle") ?? true;
+  const runGradle = androidConfig.runGradle ?? settings.get<boolean>("android.runGradle") ?? true;
+  if (!generateGradleProject || !runGradle) {
+    return;
+  }
+
+  const gradleRoot = project.outputDir;
+  if (!fs.existsSync(path.join(gradleRoot, "settings.gradle")) && !fs.existsSync(path.join(gradleRoot, "build.gradle"))) {
+    throw new Error(`未找到 Gradle 工程: ${gradleRoot}`);
+  }
+
+  const task = androidConfig.gradleTask ?? settings.get<string>("android.gradleTask") ?? "assembleDebug";
+  const wrapper = process.platform === "win32"
+    ? path.join(gradleRoot, "gradlew.bat")
+    : path.join(gradleRoot, "gradlew");
+  if (fs.existsSync(wrapper)) {
+    await runGradleWrapper(wrapper, [task], gradleRoot, output);
+    return;
+  }
+
+  await runTool("gradle", [task], gradleRoot, output);
+}
+
+async function runCxxCMakeBuild(project: ProjectInfo, output: vscode.OutputChannel): Promise<void> {
+  const settings = vscode.workspace.getConfiguration("tiecode");
+  const cxxConfig = project.config.cxx ?? {};
+  const runCmake = cxxConfig.runCmake ?? cxxConfig.useCmake ?? settings.get<boolean>("cxx.runCmake") ?? true;
+  if (!runCmake) {
+    return;
+  }
+
+  const sourceDir = resolveCMakeSourceDirectory(project);
+  if (!sourceDir) {
+    throw new Error(`未找到 CMakeLists.txt: ${path.join(project.outputDir, "src")} 或 ${project.rootPath}`);
+  }
+
+  const cmakeCommand = cxxConfig.cmakeCommand ?? settings.get<string>("cxx.cmakeCommand") ?? "cmake";
+  const generator = cxxConfig.cmakeGenerator ?? settings.get<string | null>("cxx.cmakeGenerator");
+  const buildType = cxxConfig.cmakeBuildType ?? settings.get<string>("cxx.cmakeBuildType") ?? "Debug";
+  const buildDirectory = resolveMaybeRelative(
+    project.rootPath,
+    cxxConfig.cmakeBuildDirectory ?? settings.get<string>("cxx.cmakeBuildDirectory") ?? "${workspaceFolder}\\build\\cmake"
+  );
+  ensureDirectory(buildDirectory);
+
+  const configureArgs = ["-S", sourceDir, "-B", buildDirectory];
+  if (generator) {
+    configureArgs.push("-G", generator);
+  }
+  if (buildType) {
+    configureArgs.push(`-DCMAKE_BUILD_TYPE=${buildType}`);
+  }
+  await runTool(cmakeCommand, configureArgs, project.rootPath, output);
+
+  const buildArgs = ["--build", buildDirectory];
+  if (buildType) {
+    buildArgs.push("--config", buildType);
+  }
+  await runTool(cmakeCommand, buildArgs, project.rootPath, output);
 }
 
 function createTiecArgs(project: ProjectInfo): string[] {
@@ -117,8 +193,48 @@ function runProcess(command: string, args: string[], cwd: string, output: vscode
   });
 }
 
+function runTool(command: string, args: string[], cwd: string, output: vscode.OutputChannel, shell = process.platform === "win32"): Promise<void> {
+  output.appendLine(`> ${quoteArg(command)} ${args.map(quoteArg).join(" ")}`);
+  return new Promise((resolve, reject) => {
+    const child = cp.spawn(command, args, { cwd, shell });
+    child.stdout.on("data", data => output.append(data.toString()));
+    child.stderr.on("data", data => output.append(data.toString()));
+    child.on("error", reject);
+    child.on("close", code => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`${path.basename(command)} 退出码 ${code ?? "unknown"}`));
+      }
+    });
+  });
+}
+
+function runGradleWrapper(wrapper: string, args: string[], cwd: string, output: vscode.OutputChannel): Promise<void> {
+  if (process.platform === "win32") {
+    const commandLine = [wrapper, ...args].map(quoteWindowsCommandLineArg).join(" ");
+    return runTool("cmd.exe", ["/d", "/s", "/c", commandLine], cwd, output, false);
+  }
+  return runTool("sh", [wrapper, ...args], cwd, output);
+}
+
+function resolveCMakeSourceDirectory(project: ProjectInfo): string | undefined {
+  const generatedSourceDir = path.join(project.outputDir, "src");
+  if (fs.existsSync(path.join(generatedSourceDir, "CMakeLists.txt"))) {
+    return generatedSourceDir;
+  }
+  if (fs.existsSync(path.join(project.rootPath, "CMakeLists.txt"))) {
+    return project.rootPath;
+  }
+  return undefined;
+}
+
 function quoteArg(value: string): string {
   return /\s/.test(value) ? `"${value.replace(/"/g, "\\\"")}"` : value;
+}
+
+function quoteWindowsCommandLineArg(value: string): string {
+  return `"${value.replace(/"/g, "\\\"")}"`;
 }
 
 function platformNumber(platformName: PlatformName): number {

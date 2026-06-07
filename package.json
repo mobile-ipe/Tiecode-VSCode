@@ -5,6 +5,10 @@
   "version": "0.1.0",
   "publisher": "tiecode",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobile-ipe/Tiecode-VSCode.git"
+  },
   "engines": {
     "vscode": "^1.89.0"
   },
@@ -13,6 +17,10 @@
     "Other"
   ],
   "activationEvents": [
+    "workspaceContains:project.json",
+    "workspaceContains:tiecode.project.json",
+    "workspaceContains:**/project.json",
+    "workspaceContains:**/tiecode.project.json",
     "onLanguage:tiecode",
     "onLanguage:tly",
     "onCommand:tiecode.reloadProject",
@@ -24,6 +32,9 @@
     "onCommand:tiecode.createCxxProject",
     "onCommand:tiecode.createHtmlProject",
     "onCommand:tiecode.generateEvent",
+    "onCommand:tiecode.smartEnter",
+    "onCommand:tiecode.scanUiClasses",
+    "onCommand:tiecode.showSyncedSource",
     "onCommand:tiecode.exportTlyLayout",
     "onCommand:tiecode.applyTlyLayout"
   ],
@@ -118,6 +129,18 @@
         "title": "结绳: 生成事件方法"
       },
       {
+        "command": "tiecode.smartEnter",
+        "title": "结绳: 智能键入"
+      },
+      {
+        "command": "tiecode.scanUiClasses",
+        "title": "结绳: 扫描可视化组件"
+      },
+      {
+        "command": "tiecode.showSyncedSource",
+        "title": "结绳: 查看 IDE 同步源码"
+      },
+      {
         "command": "tiecode.exportTlyLayout",
         "title": "结绳: 导出 TLY 布局"
       },
@@ -156,6 +179,15 @@
           "command": "tiecode.generateEvent"
         },
         {
+          "command": "tiecode.smartEnter"
+        },
+        {
+          "command": "tiecode.scanUiClasses"
+        },
+        {
+          "command": "tiecode.showSyncedSource"
+        },
+        {
           "command": "tiecode.exportTlyLayout"
         },
         {
@@ -169,12 +201,25 @@
           "group": "navigation"
         },
         {
+          "command": "tiecode.showSyncedSource",
+          "when": "editorLangId == tiecode",
+          "group": "navigation"
+        },
+        {
           "command": "tiecode.exportTlyLayout",
           "when": "editorLangId == tiecode",
           "group": "navigation"
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "tiecode.smartEnter",
+        "key": "ctrl+alt+enter",
+        "mac": "cmd+alt+enter",
+        "when": "editorTextFocus && editorLangId == tiecode"
+      }
+    ],
     "configuration": {
       "title": "结绳",
       "properties": {
@@ -240,6 +285,44 @@
           "type": "boolean",
           "default": true,
           "description": "安卓构建是否输出 Gradle 工程结构。"
+        },
+        "tiecode.android.runGradle": {
+          "type": "boolean",
+          "default": true,
+          "description": "安卓工程执行 tiec 后是否自动运行 Gradle 构建。"
+        },
+        "tiecode.android.gradleTask": {
+          "type": "string",
+          "default": "assembleDebug",
+          "description": "安卓工程自动运行的 Gradle 任务。"
+        },
+        "tiecode.cxx.runCmake": {
+          "type": "boolean",
+          "default": true,
+          "description": "CXX 工程执行 tiec 后是否自动运行 CMake 配置和构建。"
+        },
+        "tiecode.cxx.cmakeCommand": {
+          "type": "string",
+          "default": "cmake",
+          "description": "CMake 命令路径或命令名。"
+        },
+        "tiecode.cxx.cmakeGenerator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "CMake generator。为空时使用 CMake 默认 generator。"
+        },
+        "tiecode.cxx.cmakeBuildType": {
+          "type": "string",
+          "default": "Debug",
+          "description": "CXX 工程 CMake 构建类型。"
+        },
+        "tiecode.cxx.cmakeBuildDirectory": {
+          "type": "string",
+          "default": "${workspaceFolder}\\build\\cmake",
+          "description": "CXX 工程 CMake 构建目录。"
         }
       }
     }
@@ -248,5 +331,8 @@
     "@types/node": "^20.14.10",
     "@types/vscode": "1.89.0",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "pinyin-pro": "^3.28.1"
   }
 }

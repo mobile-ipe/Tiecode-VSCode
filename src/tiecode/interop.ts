@@ -19,15 +19,25 @@ export function nativeListToArray<T = any>(value: any): T[] {
   if (!value) {
     return [];
   }
-  if (Array.isArray(value)) {
-    return value as T[];
+  const parsed = parseNativeResult(value) as any;
+  if (parsed && parsed !== value) {
+    return nativeListToArray(parsed);
   }
-  if (typeof value.size === "function" && typeof value.get === "function") {
+  if (Array.isArray(parsed)) {
+    return parsed as T[];
+  }
+  if (typeof parsed.size === "function" && typeof parsed.get === "function") {
     const result: T[] = [];
-    for (let index = 0; index < value.size(); index += 1) {
-      result.push(value.get(index) as T);
+    for (let index = 0; index < parsed.size(); index += 1) {
+      result.push(parsed.get(index) as T);
     }
     return result;
+  }
+  if (Array.isArray(parsed?.items)) {
+    return parsed.items as T[];
+  }
+  if (Array.isArray(parsed?.values)) {
+    return parsed.values as T[];
   }
   return [];
 }
@@ -62,11 +72,24 @@ export function toVscodeTextEdit(edit: any): vscode.TextEdit {
 }
 
 export function toVscodeTextEdits(edits: any): vscode.TextEdit[] {
-  return nativeListToArray(edits).map(toVscodeTextEdit);
+  const parsed = parseNativeResult(edits) as any;
+  const items = parsed?.edits ?? parsed?.textEdits ?? parsed;
+  return nativeListToArray(items).map(toVscodeTextEdit);
 }
 
 export function toVscodeUri(value: any): vscode.Uri {
+  const uri = tryToVscodeUri(value);
+  if (uri) {
+    return uri;
+  }
+  return vscode.Uri.file(path.normalize(String(value ?? "")));
+}
+
+export function tryToVscodeUri(value: any): vscode.Uri | undefined {
   const raw = uriToString(value);
+  if (!raw) {
+    return undefined;
+  }
   if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) {
     return vscode.Uri.parse(raw);
   }
@@ -80,14 +103,19 @@ export function uriToString(value: any): string {
   if (typeof value === "string") {
     return value;
   }
+  if (typeof value.getLocalPath === "function") {
+    return value.getLocalPath();
+  }
+  for (const key of ["uri", "fsPath", "localPath", "path"]) {
+    if (typeof value[key] === "string") {
+      return value[key];
+    }
+  }
   if (typeof value.toString === "function" && value.toString !== Object.prototype.toString) {
     const text = value.toString();
     if (text && text !== "[object Object]") {
       return text;
     }
-  }
-  if (typeof value.getLocalPath === "function") {
-    return value.getLocalPath();
   }
   if (typeof value.path === "string") {
     return value.path;
@@ -99,27 +127,17 @@ export function toVscodeLocation(location: any): vscode.Location | undefined {
   if (!location?.uri || !location?.range) {
     return undefined;
   }
-  return new vscode.Location(toVscodeUri(location.uri), toVscodeRange(location.range));
+  const uri = tryToVscodeUri(location.uri);
+  return uri ? new vscode.Location(uri, toVscodeRange(location.range)) : undefined;
 }
 
 export function toWorkspaceEdit(projectEdit: any): vscode.WorkspaceEdit {
   const workspaceEdit = new vscode.WorkspaceEdit();
   const parsed = parseNativeResult(projectEdit) as any;
-  const fileEdits = parsed?.fileEdits;
-
-  if (fileEdits && !isNativeMap(fileEdits) && typeof fileEdits === "object") {
-    for (const [uri, edits] of Object.entries(fileEdits)) {
-      workspaceEdit.set(toVscodeUri(uri), toVscodeTextEdits(edits));
-    }
-    return workspaceEdit;
+  addFileEdits(workspaceEdit, parsed?.fileEdits ?? parsed?.changes ?? parsed);
+  if (workspaceEdit.size === 0 && projectEdit !== parsed) {
+    addFileEdits(workspaceEdit, projectEdit?.fileEdits ?? projectEdit?.changes ?? projectEdit);
   }
-
-  if (isNativeMap(fileEdits)) {
-    for (const uri of nativeListToArray(fileEdits.keys())) {
-      workspaceEdit.set(toVscodeUri(uri), toVscodeTextEdits(fileEdits.get(uri)));
-    }
-  }
-
   return workspaceEdit;
 }
 
@@ -131,4 +149,71 @@ export function textEditsToWorkspaceEdit(uri: vscode.Uri, edits: vscode.TextEdit
 
 function isNativeMap(value: any): boolean {
   return Boolean(value && typeof value.keys === "function" && typeof value.get === "function");
+}
+
+function addFileEdits(workspaceEdit: vscode.WorkspaceEdit, fileEdits: any): boolean {
+  if (!fileEdits) {
+    return false;
+  }
+  const parsed = parseNativeResult(fileEdits) as any;
+  if (parsed && parsed !== fileEdits) {
+    return addFileEdits(workspaceEdit, parsed);
+  }
+
+  if (isNativeMap(parsed)) {
+    for (const uri of nativeListToArray(parsed.keys())) {
+      setFileEdits(workspaceEdit, uri, parsed.get(uri));
+    }
+    return true;
+  }
+
+  if (Array.isArray(parsed)) {
+    let handled = false;
+    for (const entry of parsed) {
+      handled = addFileEditEntry(workspaceEdit, entry) || handled;
+    }
+    return handled;
+  }
+
+  if (typeof parsed !== "object") {
+    return false;
+  }
+
+  for (const key of ["entries", "items", "fileEdits", "changes"]) {
+    if (parsed[key] && addFileEdits(workspaceEdit, parsed[key])) {
+      return true;
+    }
+  }
+
+  let handled = false;
+  for (const [uri, edits] of Object.entries(parsed)) {
+    if (uri === "size" || uri === "keys") {
+      continue;
+    }
+    handled = setFileEdits(workspaceEdit, uri, edits) || handled;
+  }
+  return handled;
+}
+
+function addFileEditEntry(workspaceEdit: vscode.WorkspaceEdit, entry: any): boolean {
+  if (!entry) {
+    return false;
+  }
+  if (Array.isArray(entry) && entry.length >= 2) {
+    return setFileEdits(workspaceEdit, entry[0], entry[1]);
+  }
+
+  const uri = entry.uri ?? entry.key ?? entry.file ?? entry.fileUri ?? entry.path;
+  const edits = entry.edits ?? entry.value ?? entry.textEdits ?? entry.changes;
+  return setFileEdits(workspaceEdit, uri, edits);
+}
+
+function setFileEdits(workspaceEdit: vscode.WorkspaceEdit, uriValue: any, editsValue: any): boolean {
+  const uri = tryToVscodeUri(uriValue);
+  const edits = toVscodeTextEdits(editsValue);
+  if (!uri || edits.length === 0) {
+    return false;
+  }
+  workspaceEdit.set(uri, edits);
+  return true;
 }
