@@ -1,0 +1,15 @@
+.vscode/**
+.git/**
+.gitignore
+node_modules/**
+src/**
+*.log
+tsconfig.json
+!out/**
+*.map
+**/*.map
+!assets/**
+!syntaxes/**
+!snippets/**
+!language-configuration.json
+!tly-language-configuration.json

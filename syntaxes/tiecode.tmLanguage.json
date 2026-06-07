@@ -1,0 +1,109 @@
+{
+  "name": "Tiecode",
+  "scopeName": "source.tiecode",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#embedded"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#numbers"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.tiecode",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.tiecode",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tiecode",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tiecode",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "embedded": {
+      "patterns": [
+        {
+          "name": "keyword.control.embedded.tiecode",
+          "match": "^\\s*(@code|@end)\\b|\\bcode\\b"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "storage.modifier.annotation.tiecode",
+          "match": "@[\\p{L}_][\\p{L}\\p{N}_]*"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.tiecode",
+          "match": "\\b(如果|否则|循环|假如|返回|跳出循环|继续循环|结束|订阅事件|创建|等待|导入|包名)\\b"
+        },
+        {
+          "name": "storage.type.tiecode",
+          "match": "\\b(类|方法|变量|常量|事件|定义事件|属性读|属性写|属性|参数)\\b"
+        },
+        {
+          "name": "storage.modifier.tiecode",
+          "match": "\\b(公开|私有|保护|静态|虚拟|重写)\\b"
+        },
+        {
+          "name": "constant.language.tiecode",
+          "match": "\\b(真|假|空)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.tiecode",
+          "match": "\\b(对象|文本|整数|长整数|小数|单精度小数|字节|字符|逻辑型|集合|哈希表|窗口|网页|线性布局|文本框|按钮)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.tiecode",
+          "match": "\\b(0x[0-9A-Fa-f]+|\\d+(?:\\.\\d+)?)\\b"
+        }
+      ]
+    }
+  }
+}

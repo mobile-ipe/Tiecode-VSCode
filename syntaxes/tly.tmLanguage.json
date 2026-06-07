@@ -1,0 +1,68 @@
+{
+  "name": "TLY",
+  "scopeName": "source.tly",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "name": "entity.name.type.tly",
+      "match": "^[\\t ]*[\\p{L}_][\\p{L}\\p{N}_]*"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.tly",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.tly",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tly",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tly",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "storage.modifier.annotation.tly",
+          "match": "@[\\p{L}_][\\p{L}\\p{N}_]*"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.tly",
+          "match": "\\b(0x[0-9A-Fa-f]+|\\d+(?:\\.\\d+)?)\\b"
+        }
+      ]
+    }
+  }
+}

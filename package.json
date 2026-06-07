@@ -1,0 +1,252 @@
+{
+  "name": "tiecode-vscode",
+  "displayName": "结绳开发工具",
+  "description": "为结绳语言提供 VSCode 语言服务、工程模板和构建命令。",
+  "version": "0.1.0",
+  "publisher": "tiecode",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.89.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:tiecode",
+    "onLanguage:tly",
+    "onCommand:tiecode.reloadProject",
+    "onCommand:tiecode.lintWorkspace",
+    "onCommand:tiecode.buildAndroid",
+    "onCommand:tiecode.buildCxx",
+    "onCommand:tiecode.buildHtml",
+    "onCommand:tiecode.createAndroidProject",
+    "onCommand:tiecode.createCxxProject",
+    "onCommand:tiecode.createHtmlProject",
+    "onCommand:tiecode.generateEvent",
+    "onCommand:tiecode.exportTlyLayout",
+    "onCommand:tiecode.applyTlyLayout"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "tiecode",
+        "aliases": [
+          "Tiecode",
+          "结绳"
+        ],
+        "extensions": [
+          ".t"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "tly",
+        "aliases": [
+          "TLY",
+          "结绳布局"
+        ],
+        "extensions": [
+          ".tly"
+        ],
+        "configuration": "./tly-language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tiecode",
+        "scopeName": "source.tiecode",
+        "path": "./syntaxes/tiecode.tmLanguage.json"
+      },
+      {
+        "language": "tly",
+        "scopeName": "source.tly",
+        "path": "./syntaxes/tly.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "tiecode",
+        "path": "./snippets/tiecode.json"
+      },
+      {
+        "language": "tly",
+        "path": "./snippets/tly.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "tiecode.reloadProject",
+        "title": "结绳: 重新加载工程"
+      },
+      {
+        "command": "tiecode.lintWorkspace",
+        "title": "结绳: 检查整个工程"
+      },
+      {
+        "command": "tiecode.buildAndroid",
+        "title": "结绳: 构建安卓工程"
+      },
+      {
+        "command": "tiecode.buildCxx",
+        "title": "结绳: 构建 CXX 工程"
+      },
+      {
+        "command": "tiecode.buildHtml",
+        "title": "结绳: 构建网页工程"
+      },
+      {
+        "command": "tiecode.createAndroidProject",
+        "title": "结绳: 创建安卓工程"
+      },
+      {
+        "command": "tiecode.createCxxProject",
+        "title": "结绳: 创建 CXX 工程"
+      },
+      {
+        "command": "tiecode.createHtmlProject",
+        "title": "结绳: 创建网页工程"
+      },
+      {
+        "command": "tiecode.generateEvent",
+        "title": "结绳: 生成事件方法"
+      },
+      {
+        "command": "tiecode.exportTlyLayout",
+        "title": "结绳: 导出 TLY 布局"
+      },
+      {
+        "command": "tiecode.applyTlyLayout",
+        "title": "结绳: 应用 TLY 布局"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "tiecode.reloadProject"
+        },
+        {
+          "command": "tiecode.lintWorkspace"
+        },
+        {
+          "command": "tiecode.buildAndroid"
+        },
+        {
+          "command": "tiecode.buildCxx"
+        },
+        {
+          "command": "tiecode.buildHtml"
+        },
+        {
+          "command": "tiecode.createAndroidProject"
+        },
+        {
+          "command": "tiecode.createCxxProject"
+        },
+        {
+          "command": "tiecode.createHtmlProject"
+        },
+        {
+          "command": "tiecode.generateEvent"
+        },
+        {
+          "command": "tiecode.exportTlyLayout"
+        },
+        {
+          "command": "tiecode.applyTlyLayout"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "tiecode.generateEvent",
+          "when": "editorLangId == tiecode",
+          "group": "navigation"
+        },
+        {
+          "command": "tiecode.exportTlyLayout",
+          "when": "editorLangId == tiecode",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "结绳",
+      "properties": {
+        "tiecode.compiler.root": {
+          "type": "string",
+          "default": "D:\\Projects\\CrossPlatform\\Tiecode-Compiler",
+          "description": "结绳编译器根目录。"
+        },
+        "tiecode.compiler.tiecPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "tiec 可执行文件路径。为空时从编译器根目录推断。"
+        },
+        "tiecode.compiler.stdlibsPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "结绳标准库目录。为空时使用编译器根目录下的 stdlibs。"
+        },
+        "tiecode.languageService.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启用编译器 WASM IDE Service。"
+        },
+        "tiecode.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启用结绳代码诊断。"
+        },
+        "tiecode.sourceVersion": {
+          "type": "number",
+          "default": 47,
+          "enum": [
+            40,
+            46,
+            47
+          ],
+          "description": "默认结绳源码版本。"
+        },
+        "tiecode.project.platform": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "android",
+            "windows",
+            "linux",
+            "html"
+          ],
+          "description": "未声明工程类型时的目标平台。"
+        },
+        "tiecode.build.outputDirectory": {
+          "type": "string",
+          "default": "${workspaceFolder}\\build",
+          "description": "构建输出目录。"
+        },
+        "tiecode.android.gradle": {
+          "type": "boolean",
+          "default": true,
+          "description": "安卓构建是否输出 Gradle 工程结构。"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/vscode": "1.89.0",
+    "typescript": "^5.5.4"
+  }
+}
