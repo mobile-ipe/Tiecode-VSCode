@@ -17,7 +17,7 @@
 - `绳包/*/源代码`
 - 编译器自带标准库中的 `安卓基本库`、`CXX基本库`、`网页基本库`
 
-工程可通过 `tiecode.project.json` 声明类型、包名、源码版本和平台配置。
+工程优先读取 Mobile-IPE 的 `project.json`，会识别 `app_name`、`app_pkg`、`min_sdk`、`target_sdk`、`version_code`、`version_name`、`icon_path`、`source_version`、`project_version` 等字段。`tiecode.project.json` 可作为 VSCode 专用覆盖配置。
 
 ## 配置
 

@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import {
   BUILD_DIR_NAME,
   CompilerPaths,
+  EXTENSION_CONFIG_FILE,
   LIB_DIR_NAME,
   PlatformName,
   PROJECT_CONFIG_FILE,
@@ -15,6 +16,11 @@ import {
 } from "./types";
 
 const DEFAULT_COMPILER_ROOT = "D:\\Projects\\CrossPlatform\\Tiecode-Compiler";
+
+interface ProjectConfigLoadResult {
+  configPath: string;
+  config: TiecodeProjectConfig;
+}
 
 export function getWorkspaceRoot(uri?: vscode.Uri): string | undefined {
   if (uri) {
@@ -32,8 +38,7 @@ export function getProjectInfo(uri?: vscode.Uri, overrideKind?: ProjectKind): Pr
     return undefined;
   }
 
-  const configPath = path.join(rootPath, PROJECT_CONFIG_FILE);
-  const config = readProjectConfig(configPath);
+  const { configPath, config } = readProjectConfig(rootPath);
   const kind = overrideKind ?? detectProjectKind(rootPath, config);
   const platformName = detectPlatformName(kind, config);
   const sourceVersion = normalizeSourceVersion(config.sourceVersion);
@@ -64,7 +69,19 @@ export function getProjectInfo(uri?: vscode.Uri, overrideKind?: ProjectKind): Pr
   };
 }
 
-export function readProjectConfig(configPath: string): TiecodeProjectConfig {
+export function readProjectConfig(rootPath: string): ProjectConfigLoadResult {
+  const ipeConfigPath = path.join(rootPath, PROJECT_CONFIG_FILE);
+  const extensionConfigPath = path.join(rootPath, EXTENSION_CONFIG_FILE);
+  const ipeConfig = normalizeProjectConfig(readJsonFile(ipeConfigPath));
+  const extensionConfig = normalizeProjectConfig(readJsonFile(extensionConfigPath));
+
+  return {
+    configPath: fs.existsSync(ipeConfigPath) ? ipeConfigPath : extensionConfigPath,
+    config: mergeProjectConfig(ipeConfig, extensionConfig)
+  };
+}
+
+function readJsonFile(configPath: string): TiecodeProjectConfig {
   if (!fs.existsSync(configPath)) {
     return {};
   }
@@ -75,6 +92,88 @@ export function readProjectConfig(configPath: string): TiecodeProjectConfig {
     void vscode.window.showWarningMessage(`结绳工程配置读取失败: ${String(error)}`);
     return {};
   }
+}
+
+function normalizeProjectConfig(raw: TiecodeProjectConfig): TiecodeProjectConfig {
+  const config: TiecodeProjectConfig = { ...raw };
+  const android = { ...(raw.android ?? {}) };
+  const androidLike = Boolean(raw.android) || hasAndroidConfig(raw) || normalizeProjectKind(raw.type) === "android";
+
+  if (raw.app_name && !config.name) {
+    config.name = raw.app_name;
+  }
+  if (raw.source_version !== undefined && config.sourceVersion === undefined) {
+    config.sourceVersion = raw.source_version;
+  }
+
+  const packageName = raw.app_pkg ?? raw.package;
+  if (packageName && !config.packageName) {
+    config.packageName = packageName;
+  }
+
+  if (androidLike) {
+    if (raw.app_name && !android.appName) {
+      android.appName = raw.app_name;
+    }
+    if (packageName && !android.packageName) {
+      android.packageName = packageName;
+    }
+    if (raw.min_sdk !== undefined && android.minSdk === undefined) {
+      android.minSdk = raw.min_sdk;
+    }
+    if (raw.target_sdk !== undefined && android.targetSdk === undefined) {
+      android.targetSdk = raw.target_sdk;
+    }
+    if (raw.version_code !== undefined && android.versionCode === undefined) {
+      android.versionCode = raw.version_code;
+    }
+    if (raw.version_name !== undefined && android.versionName === undefined) {
+      android.versionName = raw.version_name;
+    }
+    if (raw.icon_path !== undefined && android.iconPath === undefined) {
+      android.iconPath = raw.icon_path;
+    }
+    config.android = android;
+  }
+  if (!config.type && androidLike) {
+    config.type = "android";
+  }
+
+  return config;
+}
+
+function mergeProjectConfig(base: TiecodeProjectConfig, override: TiecodeProjectConfig): TiecodeProjectConfig {
+  const config: TiecodeProjectConfig = {
+    ...base,
+    ...override
+  };
+  const android = { ...(base.android ?? {}), ...(override.android ?? {}) };
+  const cxx = { ...(base.cxx ?? {}), ...(override.cxx ?? {}) };
+  const html = { ...(base.html ?? {}), ...(override.html ?? {}) };
+  const compiler = { ...(base.compiler ?? {}), ...(override.compiler ?? {}) };
+
+  if (Object.keys(android).length > 0) {
+    config.android = android;
+  }
+  if (Object.keys(cxx).length > 0) {
+    config.cxx = cxx;
+  }
+  if (Object.keys(html).length > 0) {
+    config.html = html;
+  }
+  if (Object.keys(compiler).length > 0) {
+    config.compiler = compiler;
+  }
+  return config;
+}
+
+function hasAndroidConfig(config: TiecodeProjectConfig): boolean {
+  return config.app_pkg !== undefined ||
+    config.min_sdk !== undefined ||
+    config.target_sdk !== undefined ||
+    config.version_code !== undefined ||
+    config.version_name !== undefined ||
+    config.icon_path !== undefined;
 }
 
 export function writeProjectConfig(rootPath: string, config: TiecodeProjectConfig): void {

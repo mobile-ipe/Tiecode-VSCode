@@ -15,6 +15,19 @@ export interface AndroidProjectConfig {
   foundationLibPath?: string;
 }
 
+export interface IpeProjectConfigFields {
+  app_name?: string;
+  app_pkg?: string;
+  package?: string;
+  min_sdk?: number;
+  target_sdk?: number;
+  version_code?: number;
+  version_name?: string;
+  icon_path?: string;
+  source_version?: number;
+  project_version?: number;
+}
+
 export interface CxxProjectConfig {
   target?: "windows" | "linux";
   executableName?: string;
@@ -31,7 +44,7 @@ export interface ProjectCompilerConfig {
   stdlibsPath?: string;
 }
 
-export interface TiecodeProjectConfig {
+export interface TiecodeProjectConfig extends IpeProjectConfigFields {
   type?: string;
   name?: string;
   packageName?: string;
@@ -81,7 +94,8 @@ export interface BuildRequest {
 export const SOURCE_DIR_NAME = "源代码";
 export const LIB_DIR_NAME = "绳包";
 export const BUILD_DIR_NAME = "build";
-export const PROJECT_CONFIG_FILE = "tiecode.project.json";
+export const PROJECT_CONFIG_FILE = "project.json";
+export const EXTENSION_CONFIG_FILE = "tiecode.project.json";
 
 export const TARGET_PLATFORM_NUMBER: Record<PlatformName, number> = {
   android: 1,

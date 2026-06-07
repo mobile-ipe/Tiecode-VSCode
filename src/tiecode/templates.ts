@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { LIB_DIR_NAME, PROJECT_CONFIG_FILE, ProjectKind, SOURCE_DIR_NAME, TiecodeProjectConfig } from "./types";
+import { EXTENSION_CONFIG_FILE, LIB_DIR_NAME, PROJECT_CONFIG_FILE, ProjectKind, SOURCE_DIR_NAME, TiecodeProjectConfig } from "./types";
 import { ensureDirectory, writeProjectConfig, writeTextFile } from "./workspace";
 
 export function registerTemplateCommands(context: vscode.ExtensionContext): void {
@@ -50,25 +50,22 @@ export async function createProject(kind: ProjectKind): Promise<void> {
 function createProjectConfig(kind: ProjectKind, name: string): TiecodeProjectConfig {
   if (kind === "android") {
     return {
-      type: "android",
-      name,
-      packageName: "cn.tiecode.app",
-      sourceVersion: 47,
-      android: {
-        appName: name,
-        packageName: "cn.tiecode.app",
-        minSdk: 21,
-        targetSdk: 28,
-        versionCode: 1,
-        versionName: "1.0",
-        gradle: true
-      }
+      app_name: name,
+      app_pkg: "cn.tiecode.app",
+      project_version: 2,
+      source_version: 47,
+      min_sdk: 21,
+      target_sdk: 28,
+      version_code: 1,
+      version_name: "1.0",
+      icon_path: ""
     };
   }
 
   if (kind === "html") {
     return {
       type: "html",
+      app_name: name,
       name,
       packageName: "cn.tiecode.web",
       sourceVersion: 47,
@@ -80,6 +77,7 @@ function createProjectConfig(kind: ProjectKind, name: string): TiecodeProjectCon
 
   return {
     type: "cxx",
+    app_name: name,
     name,
     packageName: "cn.tiecode.cxx",
     sourceVersion: 47,
@@ -186,5 +184,5 @@ function cmakeTemplate(name: string): string {
 }
 
 export function hasProjectConfig(rootPath: string): boolean {
-  return fs.existsSync(path.join(rootPath, PROJECT_CONFIG_FILE));
+  return fs.existsSync(path.join(rootPath, PROJECT_CONFIG_FILE)) || fs.existsSync(path.join(rootPath, EXTENSION_CONFIG_FILE));
 }
