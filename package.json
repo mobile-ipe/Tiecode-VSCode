@@ -220,6 +220,14 @@
         "when": "editorTextFocus && editorLangId == tiecode"
       }
     ],
+    "configurationDefaults": {
+      "[tiecode]": {
+        "editor.semanticHighlighting.enabled": true
+      },
+      "[tly]": {
+        "editor.semanticHighlighting.enabled": true
+      }
+    },
     "configuration": {
       "title": "结绳",
       "properties": {
@@ -253,6 +261,23 @@
           "type": "boolean",
           "default": true,
           "description": "是否启用结绳代码诊断。"
+        },
+        "tiecode.highlight.engine": {
+          "type": "string",
+          "default": "hybrid",
+          "enum": [
+            "hybrid",
+            "sweetline",
+            "compiler",
+            "textmate"
+          ],
+          "enumDescriptions": [
+            "优先使用 SweetLine WASM，高亮不可用时回退到编译器语义高亮。",
+            "只使用 SweetLine WASM 高亮。",
+            "只使用编译器 IDE Service 语义高亮。",
+            "关闭语义高亮，仅使用 VS Code TextMate 基础高亮。"
+          ],
+          "description": "结绳编辑器高亮引擎。"
         },
         "tiecode.sourceVersion": {
           "type": "number",

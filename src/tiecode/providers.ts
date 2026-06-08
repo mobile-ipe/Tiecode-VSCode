@@ -19,17 +19,46 @@ import {
   sortPinyinCompletionItems,
   type PinyinCompletionTarget
 } from "./pinyinCompletion";
+import { getTiecodeHighlightEngine, SweetLineService, SweetLineSemanticToken } from "./sweetlineService";
 import { getProjectInfo, isTiecodeDocument } from "./workspace";
 
 const tiecodeSelector: vscode.DocumentSelector = [{ language: "tiecode", scheme: "file" }];
 const tlySelector: vscode.DocumentSelector = [{ language: "tly", scheme: "file" }];
 const semanticLegend = new vscode.SemanticTokensLegend(
-  ["class", "variable", "method", "function", "property", "event", "decorator", "typeParameter"],
-  ["static", "deprecated"]
+  [
+    "namespace",
+    "type",
+    "class",
+    "enum",
+    "interface",
+    "struct",
+    "typeParameter",
+    "parameter",
+    "variable",
+    "property",
+    "enumMember",
+    "event",
+    "function",
+    "method",
+    "macro",
+    "keyword",
+    "modifier",
+    "comment",
+    "string",
+    "number",
+    "regexp",
+    "operator",
+    "decorator"
+  ],
+  ["static", "deprecated", "readonly"]
 );
 
-export function registerTiecodeProviders(context: vscode.ExtensionContext, service: TiecodeCompilerService): void {
-  const semanticTokensProvider = new TiecodeSemanticTokensProvider(service);
+export function registerTiecodeProviders(
+  context: vscode.ExtensionContext,
+  service: TiecodeCompilerService,
+  sweetLineService: SweetLineService
+): void {
+  const semanticTokensProvider = new TiecodeSemanticTokensProvider(service, sweetLineService);
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(tiecodeSelector, new TiecodeCompletionProvider(service), ".", ":", "@", "(", "\""),
     vscode.languages.registerCompletionItemProvider(tlySelector, new TlyCompletionProvider(service), "@", "{", ",", "="),
@@ -44,6 +73,8 @@ export function registerTiecodeProviders(context: vscode.ExtensionContext, servi
     vscode.languages.registerWorkspaceSymbolProvider(new TiecodeWorkspaceSymbolProvider(service)),
     vscode.languages.registerDocumentSemanticTokensProvider(tiecodeSelector, semanticTokensProvider, semanticLegend),
     vscode.languages.registerDocumentRangeSemanticTokensProvider(tiecodeSelector, semanticTokensProvider, semanticLegend),
+    vscode.languages.registerDocumentSemanticTokensProvider(tlySelector, semanticTokensProvider, semanticLegend),
+    vscode.languages.registerDocumentRangeSemanticTokensProvider(tlySelector, semanticTokensProvider, semanticLegend),
     vscode.languages.registerCodeActionsProvider(tiecodeSelector, new TiecodeCodeActionProvider(service), {
       providedCodeActionKinds: [vscode.CodeActionKind.QuickFix]
     })
@@ -340,7 +371,10 @@ class TiecodeWorkspaceSymbolProvider implements vscode.WorkspaceSymbolProvider {
 }
 
 class TiecodeSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider, vscode.DocumentRangeSemanticTokensProvider {
-  constructor(private readonly service: TiecodeCompilerService) {}
+  constructor(
+    private readonly service: TiecodeCompilerService,
+    private readonly sweetLineService: SweetLineService
+  ) {}
 
   async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens | undefined> {
     return this.provideTokens(document, undefined, token);
@@ -351,6 +385,31 @@ class TiecodeSemanticTokensProvider implements vscode.DocumentSemanticTokensProv
   }
 
   private async provideTokens(document: vscode.TextDocument, range: vscode.Range | undefined, token: vscode.CancellationToken): Promise<vscode.SemanticTokens | undefined> {
+    const highlightEngine = getTiecodeHighlightEngine();
+    if (highlightEngine === "textmate") {
+      return undefined;
+    }
+
+    if (highlightEngine !== "compiler") {
+      if (token.isCancellationRequested) {
+        return undefined;
+      }
+      const sweetLineTokens = await this.sweetLineService.provideSemanticTokens(document, range);
+      if (token.isCancellationRequested) {
+        return undefined;
+      }
+      if (sweetLineTokens) {
+        return this.buildSweetLineTokens(document, sweetLineTokens);
+      }
+      if (highlightEngine === "sweetline" || !isTiecodeDocument(document)) {
+        return undefined;
+      }
+    }
+
+    if (!isTiecodeDocument(document)) {
+      return undefined;
+    }
+
     return withCancellation(this.service, document.uri, token, () => this.service.call(document, session => {
       const uri = this.service.createUri(session.tiec, document.uri);
       const result = range && session.service.highlightRange
@@ -364,6 +423,14 @@ class TiecodeSemanticTokensProvider implements vscode.DocumentSemanticTokensProv
       }
       return builder.build();
     }));
+  }
+
+  private buildSweetLineTokens(document: vscode.TextDocument, tokens: SweetLineSemanticToken[]): vscode.SemanticTokens {
+    const builder = new vscode.SemanticTokensBuilder(semanticLegend);
+    for (const token of tokens) {
+      pushSemanticToken(builder, document, token.range, token.tokenType, token.tokenModifiers);
+    }
+    return builder.build();
   }
 }
 

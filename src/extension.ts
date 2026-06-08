@@ -5,20 +5,22 @@ import { TiecodeDiagnostics } from "./tiecode/diagnostics";
 import { applyTlyLayout, exportTlyLayout } from "./tiecode/layoutCommands";
 import { openTiecodeProject } from "./tiecode/projectLifecycle";
 import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
+import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
 import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from "./tiecode/workspace";
 
 export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel("结绳");
   const compilerService = new TiecodeCompilerService(context, output);
+  const sweetLineService = new SweetLineService(context, output);
   const diagnostics = new TiecodeDiagnostics(
     compilerService,
     vscode.languages.createDiagnosticCollection("tiecode"),
     output
   );
 
-  context.subscriptions.push(output, diagnostics);
-  registerTiecodeProviders(context, compilerService);
+  context.subscriptions.push(output, diagnostics, sweetLineService);
+  registerTiecodeProviders(context, compilerService, sweetLineService);
   registerBuildCommands(context, output);
   registerTemplateCommands(context);
 
@@ -39,17 +41,26 @@ export function activate(context: vscode.ExtensionContext): void {
         void compilerService.syncTextDocumentChange(event);
       }
       if (isTiecodeRelatedDocument(event.document)) {
+        sweetLineService.invalidate(event.document.uri);
         diagnostics.schedule(event.document);
       }
     }),
     vscode.workspace.onDidSaveTextDocument(document => diagnostics.refreshDocument(document)),
-    vscode.workspace.onDidCloseTextDocument(document => diagnostics.clear(document.uri)),
+    vscode.workspace.onDidCloseTextDocument(document => {
+      sweetLineService.invalidate(document.uri);
+      diagnostics.clear(document.uri);
+    }),
     vscode.workspace.onDidChangeConfiguration(event => {
       if (event.affectsConfiguration("tiecode")) {
+        sweetLineService.invalidate();
         void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
+      }
+      if (event.affectsConfiguration("editor.tabSize")) {
+        sweetLineService.invalidate();
       }
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      sweetLineService.invalidate();
       void openTiecodeProject(compilerService, diagnostics, undefined, "open");
     }),
     vscode.workspace.onDidRenameFiles(event => {

@@ -4,7 +4,7 @@
 
 ## 功能
 
-- `.t` 和 `.tly` 语法高亮、语言配置和片段。
+- `.t` 和 `.tly` 语法高亮、语言配置和片段，默认使用 SweetLine WASM 提供接近 Mobile-IPE 的高亮规则。
 - 通过结绳编译器 WASM IDE Service 提供补全、诊断、悬停、语义高亮、格式化、定义、引用、重命名、签名帮助和符号。
 - `.tly` 支持布局诊断、格式化，以及基于安卓可视化组件扫描结果的组件名和属性名补全。
 - 支持创建安卓工程、CXX 工程和网页工程，并复制对应基本库到工程 `绳包` 目录。
@@ -29,6 +29,7 @@
 - `tiecode.compiler.root`
 - `tiecode.compiler.tiecPath`
 - `tiecode.compiler.stdlibsPath`
+- `tiecode.highlight.engine`
 - `tiecode.sourceVersion`
 - `tiecode.project.platform`
 - `tiecode.android.runGradle`
@@ -36,3 +37,5 @@
 - `tiecode.cxx.runCmake`
 - `tiecode.cxx.cmakeGenerator`
 - `tiecode.cxx.cmakeBuildType`
+
+`tiecode.highlight.engine` 默认为 `hybrid`，会优先使用 SweetLine WASM，高亮不可用时回退到编译器 IDE Service。也可以设置为 `sweetline`、`compiler` 或 `textmate`。

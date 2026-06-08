@@ -1,0 +1,73 @@
+{
+  "name": "tly",
+  "fileSuffixes": [".tly"],
+  "variables": {
+    "identifier": "[\\p{Han}\\w_$][\\p{Han}\\w_$0-9]*",
+    "whiteSpace": "[ \\t\\f]",
+    "any": "[\\S\\s]"
+  },
+  "fragments": {
+    "doubleQuotedStringRule": [
+      {
+        "pattern": "(\")((?:[^\"\\\\]|\\\\.)*)(\")",
+        "styles": [1, "string", 2, "string", 3, "string"]
+      }
+    ],
+    "lineCommentRule": [
+      {
+        "pattern": "(//)(.*)",
+        "styles": [1, "comment", 2, "comment"]
+      }
+    ]
+  },
+  "states": {
+    "default": [
+      {
+        "pattern": "(^)(${whiteSpace}*)(${identifier})(${whiteSpace}*,)",
+        "styles": [3, "class", 4, "punctuation"]
+      },
+      {
+        "pattern": "(^)(${whiteSpace}*)(@)(${identifier})(${whiteSpace}*=)",
+        "styles": [3, "annotation", 4, "property", 5, "punctuation"]
+      },
+      {
+        "pattern": "(^)(${whiteSpace}*)(${identifier})(${whiteSpace}*=)",
+        "styles": [3, "property", 4, "punctuation"]
+      },
+      {
+        "includes": ["doubleQuotedStringRule"]
+      },
+      {
+        "pattern": "(?<![A-Za-z0-9_$])-?(?:[0-9]*\\.?[0-9]+(?:[eE][+-]?[0-9]+)?[fFdD]?)(?![A-Za-z0-9_$])",
+        "style": "number"
+      },
+      {
+        "pattern": "(?<![\\p{Han}\\w_$])(真|假|空|true|false|null)(?![\\p{Han}\\w_$])",
+        "styles": [1, "keyword"]
+      },
+      {
+        "pattern": "/\\*",
+        "style": "comment",
+        "state": "longComment"
+      },
+      {
+        "include": "lineCommentRule"
+      },
+      {
+        "pattern": "[{}=,@]",
+        "style": "punctuation"
+      }
+    ],
+    "longComment": [
+      {
+        "pattern": "\\*/",
+        "style": "comment",
+        "state": "default"
+      },
+      {
+        "pattern": "${any}",
+        "style": "comment"
+      }
+    ]
+  }
+}
