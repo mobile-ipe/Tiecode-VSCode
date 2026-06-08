@@ -2,6 +2,10 @@ export type ProjectKind = "android" | "cxx" | "html";
 
 export type PlatformName = "android" | "windows" | "linux" | "html";
 
+export type BuildMode = "debug" | "release";
+
+export type DefineValue = string | number | boolean | null;
+
 export interface AndroidProjectConfig {
   appName?: string;
   package?: string;
@@ -13,7 +17,6 @@ export interface AndroidProjectConfig {
   iconPath?: string;
   gradle?: boolean;
   runGradle?: boolean;
-  gradleTask?: string;
   foundationLibPath?: string;
 }
 
@@ -56,6 +59,8 @@ export interface TiecodeProjectConfig extends IpeProjectConfigFields {
   name?: string;
   packageName?: string;
   sourceVersion?: number;
+  buildMode?: BuildMode;
+  defines?: Record<string, DefineValue>;
   android?: AndroidProjectConfig;
   cxx?: CxxProjectConfig;
   html?: HtmlProjectConfig;

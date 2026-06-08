@@ -25,6 +25,8 @@
     "onLanguage:tly",
     "onCommand:tiecode.reloadProject",
     "onCommand:tiecode.lintWorkspace",
+    "onCommand:tiecode.runProject",
+    "onCommand:tiecode.openConfig",
     "onCommand:tiecode.buildAndroid",
     "onCommand:tiecode.buildCxx",
     "onCommand:tiecode.buildHtml",
@@ -36,7 +38,9 @@
     "onCommand:tiecode.scanUiClasses",
     "onCommand:tiecode.showSyncedSource",
     "onCommand:tiecode.exportTlyLayout",
-    "onCommand:tiecode.applyTlyLayout"
+    "onCommand:tiecode.applyTlyLayout",
+    "onDebug:tiecode",
+    "onView:tiecode.configView"
   ],
   "main": "./out/extension.js",
   "scripts": {
@@ -101,6 +105,14 @@
         "title": "结绳: 检查整个工程"
       },
       {
+        "command": "tiecode.runProject",
+        "title": "结绳: 运行工程"
+      },
+      {
+        "command": "tiecode.openConfig",
+        "title": "结绳: 打开运行配置"
+      },
+      {
         "command": "tiecode.buildAndroid",
         "title": "结绳: 构建安卓工程"
       },
@@ -149,6 +161,93 @@
         "title": "结绳: 应用 TLY 布局"
       }
     ],
+    "debuggers": [
+      {
+        "type": "tiecode",
+        "label": "结绳",
+        "languages": [
+          "tiecode"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "type",
+              "request",
+              "name"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "tiecode"
+                ],
+                "default": "tiecode"
+              },
+              "request": {
+                "type": "string",
+                "enum": [
+                  "launch"
+                ],
+                "default": "launch"
+              },
+              "name": {
+                "type": "string",
+                "default": "运行结绳工程"
+              },
+              "projectKind": {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "android",
+                  "cxx",
+                  "html"
+                ],
+                "default": "auto",
+                "description": "运行的结绳工程类型。"
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "tiecode",
+            "request": "launch",
+            "name": "运行结绳工程",
+            "projectKind": "auto"
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "结绳: 运行工程",
+            "description": "构建并运行当前结绳工程。",
+            "body": {
+              "type": "tiecode",
+              "request": "launch",
+              "name": "运行结绳工程",
+              "projectKind": "auto"
+            }
+          }
+        ]
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "tiecode",
+          "title": "结绳",
+          "icon": "assets/tiecode-view.svg"
+        }
+      ]
+    },
+    "views": {
+      "tiecode": [
+        {
+          "id": "tiecode.configView",
+          "name": "运行配置",
+          "type": "webview"
+        }
+      ]
+    },
     "menus": {
       "commandPalette": [
         {
@@ -156,6 +255,12 @@
         },
         {
           "command": "tiecode.lintWorkspace"
+        },
+        {
+          "command": "tiecode.runProject"
+        },
+        {
+          "command": "tiecode.openConfig"
         },
         {
           "command": "tiecode.buildAndroid"
@@ -306,25 +411,42 @@
           "default": "${workspaceFolder}\\build",
           "description": "构建输出目录。"
         },
+        "tiecode.build.mode": {
+          "type": "string",
+          "default": "debug",
+          "enum": [
+            "debug",
+            "release"
+          ],
+          "description": "默认打包模式。"
+        },
+        "tiecode.build.defines": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "description": "传给 tiec、IDE Service 和 SweetLine 的默认宏定义。"
+        },
         "tiecode.android.gradle": {
           "type": "boolean",
           "default": true,
           "description": "安卓构建是否输出 Gradle 工程结构。"
         },
-        "tiecode.android.runGradle": {
-          "type": "boolean",
-          "default": true,
-          "description": "安卓工程执行 tiec 后是否自动运行 Gradle 构建。"
-        },
-        "tiecode.android.gradleTask": {
-          "type": "string",
-          "default": "assembleDebug",
-          "description": "安卓工程自动运行的 Gradle 任务。"
-        },
         "tiecode.cxx.runCmake": {
           "type": "boolean",
           "default": true,
           "description": "CXX 工程执行 tiec 后是否自动运行 CMake 配置和构建。"
+        },
+        "tiecode.cxx.executableName": {
+          "type": "string",
+          "default": "main",
+          "description": "CXX 工程 F5 运行时优先查找的可执行文件名。"
         },
         "tiecode.cxx.cmakeCommand": {
           "type": "string",

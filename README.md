@@ -8,7 +8,9 @@
 - 通过结绳编译器 WASM IDE Service 提供补全、诊断、悬停、语义高亮、格式化、定义、引用、重命名、签名帮助和符号。
 - `.tly` 支持布局诊断、格式化，以及基于安卓可视化组件扫描结果的组件名和属性名补全。
 - 支持创建安卓工程、CXX 工程和网页工程，并复制对应基本库到工程 `绳包` 目录。
-- 支持调用本地 `tiec` 构建安卓、CXX 和网页工程；安卓工程会在生成 Gradle 工程后自动执行 Gradle task，CXX 工程会自动执行 CMake 配置和构建。
+- 支持调用本地 `tiec` 构建安卓、CXX 和网页工程；安卓工程会按调试包/正式包自动执行 Gradle 构建，CXX 工程会自动执行 CMake 配置和构建。
+- 支持 F5 运行当前工程；安卓调试包会安装并启动生成的 launcher Activity，CXX 工程会启动生成的可执行文件，网页工程会打开生成页面。
+- 提供结绳运行配置视图，可编辑工程类型、打包模式、SDK 版本、包名、图标、宏定义，并查看和修复 Java、Android SDK、adb、Gradle 环境。
 
 ## 工程结构
 
@@ -32,9 +34,11 @@
 - `tiecode.highlight.engine`
 - `tiecode.sourceVersion`
 - `tiecode.project.platform`
-- `tiecode.android.runGradle`
-- `tiecode.android.gradleTask`
+- `tiecode.build.mode`
+- `tiecode.build.defines`
+- `tiecode.android.gradle`
 - `tiecode.cxx.runCmake`
+- `tiecode.cxx.executableName`
 - `tiecode.cxx.cmakeGenerator`
 - `tiecode.cxx.cmakeBuildType`
 

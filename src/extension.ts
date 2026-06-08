@@ -1,18 +1,22 @@
 import * as vscode from "vscode";
 import { registerBuildCommands } from "./tiecode/build";
+import { registerConfigView } from "./tiecode/configView";
 import { TiecodeCompilerService } from "./tiecode/compilerService";
 import { TiecodeDiagnostics } from "./tiecode/diagnostics";
 import { applyTlyLayout, exportTlyLayout } from "./tiecode/layoutCommands";
 import { openTiecodeProject } from "./tiecode/projectLifecycle";
 import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
+import { registerRunCommands } from "./tiecode/run";
 import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
+import { ToolchainService } from "./tiecode/toolchain";
 import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from "./tiecode/workspace";
 
 export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel("结绳");
   const compilerService = new TiecodeCompilerService(context, output);
   const sweetLineService = new SweetLineService(context, output);
+  const toolchainService = new ToolchainService(context, output);
   const diagnostics = new TiecodeDiagnostics(
     compilerService,
     vscode.languages.createDiagnosticCollection("tiecode"),
@@ -21,7 +25,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(output, diagnostics, sweetLineService);
   registerTiecodeProviders(context, compilerService, sweetLineService);
-  registerBuildCommands(context, output);
+  registerBuildCommands(context, output, toolchainService);
+  registerRunCommands(context, output, toolchainService);
+  registerConfigView(context, toolchainService, () => {
+    sweetLineService.invalidate();
+    void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
+  });
   registerTemplateCommands(context);
 
   context.subscriptions.push(

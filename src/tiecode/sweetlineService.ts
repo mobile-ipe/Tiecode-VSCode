@@ -4,7 +4,7 @@ import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { nativeListToArray } from "./interop";
 import { ProjectInfo } from "./types";
-import { getProjectInfo, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
+import { getProjectDefines, getProjectInfo, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
 
 type DynamicImport = (specifier: string) => Promise<any>;
 export type TiecodeHighlightEngine = "hybrid" | "sweetline" | "compiler" | "textmate";
@@ -314,17 +314,26 @@ export class SweetLineService implements vscode.Disposable {
   }
 
   private getMacros(project: ProjectInfo | undefined): string[] {
+    const macros: string[] = [];
     const platform = project?.platformName;
     if (platform === "android") {
-      return ["ANDROID"];
+      macros.push("ANDROID");
+    } else if (platform === "windows" || platform === "linux") {
+      macros.push("WINDOWS");
+    } else if (platform === "html") {
+      macros.push("HTML");
+    } else {
+      macros.push("ANDROID");
     }
-    if (platform === "windows" || platform === "linux") {
-      return ["WINDOWS"];
+
+    if (project) {
+      for (const [name, value] of Object.entries(getProjectDefines(project.config))) {
+        if (value !== false && value !== null) {
+          macros.push(name);
+        }
+      }
     }
-    if (platform === "html") {
-      return ["HTML"];
-    }
-    return ["ANDROID"];
+    return Array.from(new Set(macros));
   }
 
   private getTabSize(): number {

@@ -3,7 +3,9 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
   BUILD_DIR_NAME,
+  BuildMode,
   CompilerPaths,
+  DefineValue,
   EXTENSION_CONFIG_FILE,
   LIB_DIR_NAME,
   PlatformName,
@@ -84,6 +86,10 @@ export function readProjectConfig(rootPath: string): ProjectConfigLoadResult {
   };
 }
 
+export function readProjectFileConfig(rootPath: string): TiecodeProjectConfig {
+  return readJsonFile(path.join(rootPath, PROJECT_CONFIG_FILE));
+}
+
 function readJsonFile(configPath: string): TiecodeProjectConfig {
   if (!fs.existsSync(configPath)) {
     return {};
@@ -154,6 +160,7 @@ function mergeProjectConfig(base: TiecodeProjectConfig, override: TiecodeProject
   const cxx = { ...(base.cxx ?? {}), ...(override.cxx ?? {}) };
   const html = { ...(base.html ?? {}), ...(override.html ?? {}) };
   const compiler = { ...(base.compiler ?? {}), ...(override.compiler ?? {}) };
+  const defines = { ...(base.defines ?? {}), ...(override.defines ?? {}) };
 
   if (Object.keys(android).length > 0) {
     config.android = android;
@@ -166,6 +173,9 @@ function mergeProjectConfig(base: TiecodeProjectConfig, override: TiecodeProject
   }
   if (Object.keys(compiler).length > 0) {
     config.compiler = compiler;
+  }
+  if (Object.keys(defines).length > 0) {
+    config.defines = normalizeDefines(defines);
   }
   return config;
 }
@@ -181,6 +191,22 @@ function hasAndroidConfig(config: TiecodeProjectConfig): boolean {
 
 export function writeProjectConfig(rootPath: string, config: TiecodeProjectConfig): void {
   fs.writeFileSync(path.join(rootPath, PROJECT_CONFIG_FILE), `${JSON.stringify(config, null, 2)}\n`, "utf8");
+}
+
+export function updateProjectConfig(rootPath: string, update: (config: TiecodeProjectConfig) => void): TiecodeProjectConfig {
+  const config = readProjectFileConfig(rootPath);
+  update(config);
+  writeProjectConfig(rootPath, config);
+  return config;
+}
+
+export function getProjectDefines(config: TiecodeProjectConfig): Record<string, DefineValue> {
+  const settings = vscode.workspace.getConfiguration("tiecode");
+  const configured = settings.get<Record<string, DefineValue>>("build.defines") ?? {};
+  return normalizeDefines({
+    ...configured,
+    ...(config.defines ?? {})
+  });
 }
 
 export function ensureDirectory(dirPath: string): void {
@@ -348,6 +374,43 @@ export function normalizeSourceVersion(value: unknown): number {
   const settings = vscode.workspace.getConfiguration("tiecode");
   const configured = Number(value ?? settings.get<number>("sourceVersion") ?? 47);
   return configured === 40 || configured === 46 || configured === 47 ? configured : 47;
+}
+
+export function getProjectBuildMode(config: TiecodeProjectConfig): BuildMode {
+  const settings = vscode.workspace.getConfiguration("tiecode");
+  return normalizeBuildMode(config.buildMode ?? settings.get<string>("build.mode")) ?? "debug";
+}
+
+export function normalizeBuildMode(value: unknown): BuildMode | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const normalized = value.toLocaleLowerCase();
+  if (normalized === "release" || normalized === "正式" || normalized === "正式包") {
+    return "release";
+  }
+  if (normalized === "debug" || normalized === "调试" || normalized === "调试包") {
+    return "debug";
+  }
+  return undefined;
+}
+
+export function normalizeDefines(values: Record<string, unknown>): Record<string, DefineValue> {
+  const defines: Record<string, DefineValue> = {};
+  for (const [rawName, rawValue] of Object.entries(values)) {
+    const name = rawName.trim();
+    if (!name) {
+      continue;
+    }
+    if (rawValue === null || typeof rawValue === "string" || typeof rawValue === "number" || typeof rawValue === "boolean") {
+      defines[name] = rawValue;
+      continue;
+    }
+    if (rawValue !== undefined) {
+      defines[name] = String(rawValue);
+    }
+  }
+  return defines;
 }
 
 export function resolveMaybeRelative(rootPath: string, value: string): string {

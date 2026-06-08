@@ -4,7 +4,7 @@ import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { NativeSession, ProjectInfo, ProjectKind } from "./types";
 import { toTiecodeRange } from "./interop";
-import { getProjectInfo, isTiecodeDocument } from "./workspace";
+import { getProjectDefines, getProjectInfo, isTiecodeDocument } from "./workspace";
 
 type DynamicImport = (specifier: string) => Promise<any>;
 
@@ -214,6 +214,12 @@ export class TiecodeCompilerService {
     if (typeof options.addSearchPrefix === "function") {
       for (const sourceRoot of project.sourceRoots) {
         options.addSearchPrefix("source", sourceRoot);
+      }
+    }
+
+    if (typeof options.define === "function") {
+      for (const [name, value] of Object.entries(getProjectDefines(project.config))) {
+        options.define(name, value);
       }
     }
 
