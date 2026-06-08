@@ -30,8 +30,14 @@ export async function buildProject(request: BuildRequest, output: vscode.OutputC
   buildProjectInfo.platformNumber = platformNumber(buildProjectInfo.platformName);
   ensureDirectory(buildProjectInfo.outputDir);
 
+  if (buildProjectInfo.sourceFiles.length === 0) {
+    void vscode.window.showErrorMessage(`未找到结绳源文件: ${buildProjectInfo.rootPath}`);
+    return;
+  }
+
   const args = createTiecArgs(buildProjectInfo);
   output.show(true);
+  output.appendLine(`源文件数量: ${buildProjectInfo.sourceFiles.length}`);
   output.appendLine(`> ${project.compiler.tiecPath} ${args.map(quoteArg).join(" ")}`);
 
   await vscode.window.withProgress({
@@ -155,9 +161,7 @@ function createTiecArgs(project: ProjectInfo): string[] {
     }
   }
 
-  for (const sourceRoot of project.sourceRoots) {
-    args.push("--dir", sourceRoot);
-  }
+  args.push(...project.sourceFiles);
 
   return args;
 }

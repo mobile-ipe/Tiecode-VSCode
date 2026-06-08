@@ -378,6 +378,11 @@ export namespace tiec {
         addSearchPrefix(scope: string, prefix: string): void;
 
         /**
+         * 定义编译条件宏
+         */
+        define(name: string, value?: string | number | boolean | null): void;
+
+        /**
          * 设置Android平台编译时特殊配置
          * @param androidOptions AndroidOptions对象
          */
