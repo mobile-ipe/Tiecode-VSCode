@@ -222,11 +222,12 @@ export class ToolchainService {
     }
 
     const additions = [
+      ...getWindowsSystemPathAdditions(),
       paths.javaHome ? path.join(paths.javaHome, "bin") : undefined,
       paths.androidSdkRoot ? path.join(paths.androidSdkRoot, "platform-tools") : undefined,
       paths.androidSdkRoot ? path.join(paths.androidSdkRoot, "cmdline-tools", "latest", "bin") : undefined
     ].filter(isString);
-    env.PATH = [...additions, env.PATH ?? ""].join(path.delimiter);
+    setEnvironmentPath(env, additions);
     return env;
   }
 
@@ -351,7 +352,7 @@ function resolveWindowsBatchInvocation(command: string, args: string[]): { comma
     return { command, args };
   }
   return {
-    command: "cmd.exe",
+    command: getWindowsCommandProcessor(),
     args: ["/d", "/c", "call", command, ...args]
   };
 }
@@ -366,7 +367,7 @@ function runHidden(command: string, args: string[], cwd: string): Promise<void> 
 
 function findExecutable(name: string): string | undefined {
   const executable = process.platform === "win32" && !name.toLocaleLowerCase().endsWith(".exe") ? `${name}.exe` : name;
-  for (const folder of (process.env.PATH ?? "").split(path.delimiter)) {
+  for (const folder of getEnvironmentPath(process.env).split(path.delimiter)) {
     if (!folder) {
       continue;
     }
@@ -376,6 +377,42 @@ function findExecutable(name: string): string | undefined {
     }
   }
   return undefined;
+}
+
+function setEnvironmentPath(env: NodeJS.ProcessEnv, additions: string[]): void {
+  const keys = Object.keys(env).filter(key => key.toLocaleLowerCase() === "path");
+  const pathKey = keys[0] ?? "Path";
+  const existing = keys.map(key => env[key]).filter(isString).join(path.delimiter);
+  for (const key of keys) {
+    if (key !== pathKey) {
+      delete env[key];
+    }
+  }
+
+  env[pathKey] = Array.from(new Set([
+    ...additions,
+    ...existing.split(path.delimiter)
+  ].filter(isString))).join(path.delimiter);
+}
+
+function getEnvironmentPath(env: NodeJS.ProcessEnv): string {
+  return Object.entries(env).find(([key]) => key.toLocaleLowerCase() === "path")?.[1] ?? "";
+}
+
+function getWindowsCommandProcessor(): string {
+  return process.env.ComSpec
+    ?? (process.env.SystemRoot ? path.join(process.env.SystemRoot, "System32", "cmd.exe") : "C:\\Windows\\System32\\cmd.exe");
+}
+
+function getWindowsSystemPathAdditions(): string[] {
+  if (process.platform !== "win32") {
+    return [];
+  }
+  const systemRoot = process.env.SystemRoot ?? "C:\\Windows";
+  return [
+    path.join(systemRoot, "System32"),
+    systemRoot
+  ];
 }
 
 function findFiles(rootPath: string, predicate: (file: string) => boolean): string[] {

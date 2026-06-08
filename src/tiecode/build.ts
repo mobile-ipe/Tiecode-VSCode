@@ -3,9 +3,15 @@ import * as fs from "fs";
 import * as path from "path";
 import { TextDecoder } from "util";
 import * as vscode from "vscode";
+import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
 import { BuildMode, BuildRequest, DefineValue, PlatformName, ProjectInfo, ProjectKind } from "./types";
 import { ensureDirectory, getProjectBuildMode, getProjectDefines, getProjectInfo, resolveMaybeRelative } from "./workspace";
+
+export interface ToolOutputLineHandler {
+  handleLine(line: string): void;
+  flush?(): void;
+}
 
 export interface BuildProjectOptions {
   buildMode?: BuildMode;
@@ -14,24 +20,35 @@ export interface BuildProjectOptions {
   runCmake?: boolean;
   env?: NodeJS.ProcessEnv;
   toolchain?: ToolchainService;
+  sourceMapping?: SourceMappingService;
 }
 
-export function registerBuildCommands(context: vscode.ExtensionContext, output: vscode.OutputChannel, toolchain?: ToolchainService): void {
+export function registerBuildCommands(
+  context: vscode.ExtensionContext,
+  output: vscode.OutputChannel,
+  toolchain?: ToolchainService,
+  sourceMapping?: SourceMappingService
+): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("tiecode.buildAndroid", () => buildProject({ kind: "android", platformName: "android" }, output, toolchain)),
-    vscode.commands.registerCommand("tiecode.buildCxx", () => buildProject({ kind: "cxx" }, output, toolchain)),
-    vscode.commands.registerCommand("tiecode.buildHtml", () => buildProject({ kind: "html", platformName: "html" }, output, toolchain))
+    vscode.commands.registerCommand("tiecode.buildAndroid", () => buildProject({ kind: "android", platformName: "android" }, output, toolchain, sourceMapping)),
+    vscode.commands.registerCommand("tiecode.buildCxx", () => buildProject({ kind: "cxx" }, output, toolchain, sourceMapping)),
+    vscode.commands.registerCommand("tiecode.buildHtml", () => buildProject({ kind: "html", platformName: "html" }, output, toolchain, sourceMapping))
   );
 }
 
-export async function buildProject(request: BuildRequest, output: vscode.OutputChannel, toolchain?: ToolchainService): Promise<void> {
+export async function buildProject(
+  request: BuildRequest,
+  output: vscode.OutputChannel,
+  toolchain?: ToolchainService,
+  sourceMapping?: SourceMappingService
+): Promise<void> {
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
     title: "正在构建结绳工程",
     cancellable: false
   }, async () => {
     try {
-      const project = await buildTiecodeProject(request, output, { toolchain });
+      const project = await buildTiecodeProject(request, output, { toolchain, sourceMapping });
       void vscode.window.showInformationMessage(`结绳构建完成: ${project.outputDir}`);
     } catch (error) {
       void vscode.window.showErrorMessage(`结绳构建失败: ${String(error instanceof Error ? error.message : error)}`);
@@ -65,6 +82,7 @@ export async function buildTiecodeProject(
   const buildMode = options.buildMode ?? getProjectBuildMode(buildProjectInfo.config);
   const buildOptions = await prepareBuildOptions(buildProjectInfo, { ...options, buildMode });
   const args = createTiecArgs(buildProjectInfo, buildMode);
+  options.sourceMapping?.clearProject(buildProjectInfo);
   output.show(true);
   output.appendLine(`源文件数量: ${buildProjectInfo.sourceFiles.length}`);
   output.appendLine(`> ${project.compiler.tiecPath} ${args.map(quoteArg).join(" ")}`);
@@ -108,15 +126,20 @@ async function runAndroidGradleBuild(project: ProjectInfo, output: vscode.Output
   }
 
   const task = options.gradleTask ?? (options.buildMode === "release" ? "assembleRelease" : "assembleDebug");
+  const javacDiagnostics = await options.sourceMapping?.createJavacDiagnostics(project);
   const wrapper = process.platform === "win32"
     ? path.join(gradleRoot, "gradlew.bat")
     : path.join(gradleRoot, "gradlew");
-  if (fs.existsSync(wrapper)) {
-    await runGradleWrapper(wrapper, [task], gradleRoot, output, options.env);
-    return;
-  }
+  try {
+    if (fs.existsSync(wrapper)) {
+      await runGradleWrapper(wrapper, [task], gradleRoot, output, options.env, javacDiagnostics);
+      return;
+    }
 
-  await runTool("gradle", [task], gradleRoot, output, process.platform === "win32", options.env);
+    await runTool("gradle", [task], gradleRoot, output, process.platform === "win32", options.env, javacDiagnostics);
+  } finally {
+    javacDiagnostics?.flush?.();
+  }
 }
 
 async function runCxxCMakeBuild(project: ProjectInfo, output: vscode.OutputChannel, options: BuildProjectOptions): Promise<void> {
@@ -242,13 +265,14 @@ export function runTool(
   cwd: string,
   output: vscode.OutputChannel,
   shell = process.platform === "win32",
-  env?: NodeJS.ProcessEnv
+  env?: NodeJS.ProcessEnv,
+  lineHandler?: ToolOutputLineHandler
 ): Promise<void> {
   output.appendLine(`> ${quoteArg(command)} ${args.map(quoteArg).join(" ")}`);
   return new Promise((resolve, reject) => {
     const child = cp.spawn(command, args, { cwd, shell, env });
-    const stdout = new ProcessOutputDecoder(text => output.append(text));
-    const stderr = new ProcessOutputDecoder(text => output.append(text));
+    const stdout = new ProcessOutputDecoder(text => output.append(text), lineHandler);
+    const stderr = new ProcessOutputDecoder(text => output.append(text), lineHandler);
     child.stdout.on("data", data => stdout.write(data));
     child.stderr.on("data", data => stderr.write(data));
     child.on("error", reject);
@@ -264,11 +288,18 @@ export function runTool(
   });
 }
 
-function runGradleWrapper(wrapper: string, args: string[], cwd: string, output: vscode.OutputChannel, env?: NodeJS.ProcessEnv): Promise<void> {
+function runGradleWrapper(
+  wrapper: string,
+  args: string[],
+  cwd: string,
+  output: vscode.OutputChannel,
+  env?: NodeJS.ProcessEnv,
+  lineHandler?: ToolOutputLineHandler
+): Promise<void> {
   if (process.platform === "win32") {
-    return runTool("cmd.exe", ["/d", "/c", "chcp", "65001", ">nul", "&&", "call", wrapper, ...args], cwd, output, false, env);
+    return runTool(getWindowsCommandProcessor(), ["/d", "/c", "chcp", "65001", ">nul", "&&", "call", wrapper, ...args], cwd, output, false, env, lineHandler);
   }
-  return runTool("sh", [wrapper, ...args], cwd, output, false, env);
+  return runTool("sh", [wrapper, ...args], cwd, output, false, env, lineHandler);
 }
 
 export function resolveCMakeSourceDirectory(project: ProjectInfo): string | undefined {
@@ -295,11 +326,22 @@ function quoteArg(value: string): string {
   return /\s/.test(value) ? `"${value.replace(/"/g, "\\\"")}"` : value;
 }
 
+function getWindowsCommandProcessor(): string {
+  return process.env.ComSpec
+    ?? (process.env.SystemRoot ? path.join(process.env.SystemRoot, "System32", "cmd.exe") : "C:\\Windows\\System32\\cmd.exe");
+}
+
 class ProcessOutputDecoder {
   private readonly chunks: Buffer[] = [];
   private decoder?: TextDecoder;
+  private readonly lines?: ProcessLineEmitter;
 
-  constructor(private readonly append: (text: string) => void) {}
+  constructor(
+    private readonly append: (text: string) => void,
+    lineHandler?: ToolOutputLineHandler
+  ) {
+    this.lines = lineHandler ? new ProcessLineEmitter(lineHandler) : undefined;
+  }
 
   write(data: Buffer): void {
     const chunk = Buffer.from(data);
@@ -314,7 +356,7 @@ class ProcessOutputDecoder {
       return;
     }
 
-    this.append(this.decoder.decode(chunk, { stream: true }));
+    this.appendDecoded(this.decoder.decode(chunk, { stream: true }));
   }
 
   end(): void {
@@ -328,14 +370,52 @@ class ProcessOutputDecoder {
     }
     const rest = decoder.decode();
     if (rest) {
-      this.append(rest);
+      this.appendDecoded(rest);
     }
+    this.lines?.end();
   }
 
   private start(data: Buffer): void {
     this.decoder = new TextDecoder(selectOutputEncoding(data));
     if (data.length > 0) {
-      this.append(this.decoder.decode(data, { stream: true }));
+      this.appendDecoded(this.decoder.decode(data, { stream: true }));
+    }
+  }
+
+  private appendDecoded(text: string): void {
+    this.append(text);
+    this.lines?.write(text);
+  }
+}
+
+class ProcessLineEmitter {
+  private pending = "";
+
+  constructor(private readonly handler: ToolOutputLineHandler) {}
+
+  write(text: string): void {
+    this.pending += text;
+    let newline = this.pending.search(/\r?\n/);
+    while (newline >= 0) {
+      const line = this.pending.slice(0, newline).replace(/\r$/, "");
+      this.pending = this.pending.slice(newline + (this.pending[newline] === "\r" && this.pending[newline + 1] === "\n" ? 2 : 1));
+      this.emit(line);
+      newline = this.pending.search(/\r?\n/);
+    }
+  }
+
+  end(): void {
+    if (this.pending.length > 0) {
+      this.emit(this.pending.replace(/\r$/, ""));
+      this.pending = "";
+    }
+  }
+
+  private emit(line: string): void {
+    try {
+      this.handler.handleLine(line);
+    } catch {
+      // 输出处理不能影响实际构建进程。
     }
   }
 }

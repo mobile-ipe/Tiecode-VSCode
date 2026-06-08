@@ -4,9 +4,11 @@ import { registerConfigView } from "./tiecode/configView";
 import { TiecodeCompilerService } from "./tiecode/compilerService";
 import { TiecodeDiagnostics } from "./tiecode/diagnostics";
 import { applyTlyLayout, exportTlyLayout } from "./tiecode/layoutCommands";
+import { AndroidLogcatService } from "./tiecode/logcat";
 import { openTiecodeProject } from "./tiecode/projectLifecycle";
 import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
 import { registerRunCommands } from "./tiecode/run";
+import { SourceMappingService } from "./tiecode/sourceMapping";
 import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
 import { ToolchainService } from "./tiecode/toolchain";
@@ -17,16 +19,18 @@ export function activate(context: vscode.ExtensionContext): void {
   const compilerService = new TiecodeCompilerService(context, output);
   const sweetLineService = new SweetLineService(context, output);
   const toolchainService = new ToolchainService(context, output);
+  const sourceMappingService = new SourceMappingService(context, output);
+  const logcatService = new AndroidLogcatService();
   const diagnostics = new TiecodeDiagnostics(
     compilerService,
     vscode.languages.createDiagnosticCollection("tiecode"),
     output
   );
 
-  context.subscriptions.push(output, diagnostics, sweetLineService);
+  context.subscriptions.push(output, diagnostics, sweetLineService, sourceMappingService, logcatService);
   registerTiecodeProviders(context, compilerService, sweetLineService);
-  registerBuildCommands(context, output, toolchainService);
-  registerRunCommands(context, output, toolchainService);
+  registerBuildCommands(context, output, toolchainService, sourceMappingService);
+  registerRunCommands(context, output, toolchainService, sourceMappingService, logcatService);
   registerConfigView(context, toolchainService, () => {
     sweetLineService.invalidate();
     void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");

@@ -4,6 +4,7 @@ import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { nativeListToArray } from "./interop";
 import { ProjectInfo } from "./types";
+import { createWasmOutputOptions } from "./wasmOutput";
 import { getProjectDefines, getProjectInfo, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
 
 type DynamicImport = (specifier: string) => Promise<any>;
@@ -166,8 +167,7 @@ export class SweetLineService implements vscode.Disposable {
     const factory = imported.default ?? imported;
     return factory({
       locateFile: (fileName: string) => path.join(wasmDir, fileName),
-      print: (message: string) => this.output.appendLine(String(message ?? "")),
-      printErr: (message: string) => this.output.appendLine(String(message ?? ""))
+      ...createWasmOutputOptions(this.output)
     });
   }
 

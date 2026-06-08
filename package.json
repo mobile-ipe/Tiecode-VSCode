@@ -362,6 +362,11 @@
           "default": true,
           "description": "是否启用编译器 WASM IDE Service。"
         },
+        "tiecode.languageService.traceCompilerOutput": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否将编译器 WASM 内部日志输出到结绳输出窗口。"
+        },
         "tiecode.diagnostics.enabled": {
           "type": "boolean",
           "default": true,

@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { buildTiecodeProject, resolveCMakeBuildDirectory, runTool } from "./build";
+import { AndroidLogcatService } from "./logcat";
+import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
 import { ProjectInfo, ProjectKind } from "./types";
 import { getProjectBuildMode, getProjectInfo, normalizeProjectKind } from "./workspace";
@@ -10,14 +12,28 @@ interface TiecodeDebugConfiguration extends vscode.DebugConfiguration {
   projectKind?: ProjectKind | "auto";
 }
 
-export function registerRunCommands(context: vscode.ExtensionContext, output: vscode.OutputChannel, toolchain: ToolchainService): void {
+export function registerRunCommands(
+  context: vscode.ExtensionContext,
+  output: vscode.OutputChannel,
+  toolchain: ToolchainService,
+  sourceMapping: SourceMappingService,
+  logcat: AndroidLogcatService
+): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("tiecode.runProject", () => runTiecodeProject(output, toolchain)),
-    vscode.debug.registerDebugConfigurationProvider("tiecode", new TiecodeDebugConfigurationProvider(output, toolchain))
+    vscode.commands.registerCommand("tiecode.runProject", () => runTiecodeProject(output, toolchain, sourceMapping, logcat)),
+    vscode.debug.registerDebugConfigurationProvider("tiecode", new TiecodeDebugConfigurationProvider(output, toolchain, sourceMapping, logcat))
   );
 }
 
-export async function runTiecodeProject(output: vscode.OutputChannel, toolchain: ToolchainService, requestedKind?: ProjectKind): Promise<void> {
+export async function runTiecodeProject(
+  output: vscode.OutputChannel,
+  toolchain: ToolchainService,
+  sourceMapping: SourceMappingService,
+  logcat: AndroidLogcatService,
+  requestedKind?: ProjectKind
+): Promise<void> {
+  output.clear();
+  output.show(true);
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
     title: "正在运行结绳工程",
@@ -26,7 +42,7 @@ export async function runTiecodeProject(output: vscode.OutputChannel, toolchain:
     try {
       const project = resolveRunProject(requestedKind);
       if (project.kind === "android") {
-        await runAndroidProject(project, output, toolchain);
+        await runAndroidProject(project, output, toolchain, sourceMapping, logcat);
         return;
       }
       if (project.kind === "cxx") {
@@ -43,7 +59,9 @@ export async function runTiecodeProject(output: vscode.OutputChannel, toolchain:
 class TiecodeDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   constructor(
     private readonly output: vscode.OutputChannel,
-    private readonly toolchain: ToolchainService
+    private readonly toolchain: ToolchainService,
+    private readonly sourceMapping: SourceMappingService,
+    private readonly logcat: AndroidLogcatService
   ) {}
 
   provideDebugConfigurations(): vscode.DebugConfiguration[] {
@@ -62,7 +80,7 @@ class TiecodeDebugConfigurationProvider implements vscode.DebugConfigurationProv
     config: TiecodeDebugConfiguration
   ): Promise<vscode.DebugConfiguration | undefined> {
     const projectKind = normalizeProjectKind(config.projectKind);
-    await runTiecodeProject(this.output, this.toolchain, projectKind);
+    await runTiecodeProject(this.output, this.toolchain, this.sourceMapping, this.logcat, projectKind);
     return undefined;
   }
 }
@@ -75,20 +93,29 @@ function resolveRunProject(requestedKind?: ProjectKind): ProjectInfo {
   return project;
 }
 
-async function runAndroidProject(project: ProjectInfo, output: vscode.OutputChannel, toolchain: ToolchainService): Promise<void> {
+async function runAndroidProject(
+  project: ProjectInfo,
+  output: vscode.OutputChannel,
+  toolchain: ToolchainService,
+  sourceMapping: SourceMappingService,
+  logcat: AndroidLogcatService
+): Promise<void> {
   const buildMode = getProjectBuildMode(project.config);
   const androidToolchain = await toolchain.prepareAndroidToolchain(project);
   const gradleTask = buildMode === "release" ? "assembleRelease" : "installDebug";
   const builtProject = await buildTiecodeProject(
     { kind: "android", platformName: "android" },
     output,
-    { buildMode, gradleTask, runGradle: true, env: androidToolchain.env }
+    { buildMode, gradleTask, runGradle: true, env: androidToolchain.env, sourceMapping }
   );
   if (buildMode === "release") {
     output.appendLine("Android 正式包已构建，未自动安装运行。");
     return;
   }
   const component = resolveAndroidLaunchComponent(builtProject);
+  await runTool(androidToolchain.adbPath, ["logcat", "-c"], builtProject.rootPath, output, false, androidToolchain.env)
+    .catch(error => output.appendLine(`清理 logcat 失败: ${String(error instanceof Error ? error.message : error)}`));
+  await logcat.start(builtProject, androidToolchain.adbPath, androidToolchain.env, output, sourceMapping);
   output.appendLine(`启动 Android Activity: ${component}`);
   await runTool(androidToolchain.adbPath, ["shell", "am", "start", "-n", component], builtProject.rootPath, output, false, androidToolchain.env);
 }

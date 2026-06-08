@@ -4,6 +4,7 @@ import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { NativeSession, ProjectInfo, ProjectKind } from "./types";
 import { toTiecodeRange } from "./interop";
+import { createWasmOutputOptions } from "./wasmOutput";
 import { getProjectDefines, getProjectInfo, isTiecodeDocument } from "./workspace";
 
 type DynamicImport = (specifier: string) => Promise<any>;
@@ -310,8 +311,7 @@ export class TiecodeCompilerService {
     const factory = imported.default ?? imported;
     return factory({
       locateFile: (fileName: string) => path.join(wasmDir, fileName),
-      print: (message: string) => this.output.appendLine(message),
-      printErr: (message: string) => this.output.appendLine(message)
+      ...createWasmOutputOptions(this.output)
     });
   }
 

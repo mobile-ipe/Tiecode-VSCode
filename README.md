@@ -10,6 +10,7 @@
 - 支持创建安卓工程、CXX 工程和网页工程，并复制对应基本库到工程 `绳包` 目录。
 - 支持调用本地 `tiec` 构建安卓、CXX 和网页工程；安卓工程会按调试包/正式包自动执行 Gradle 构建，CXX 工程会自动执行 CMake 配置和构建。
 - 支持 F5 运行当前工程；安卓调试包会安装并启动生成的 launcher Activity，CXX 工程会启动生成的可执行文件，网页工程会打开生成页面。
+- 支持通过 `mapping.bin` 将 Gradle/Javac 编译错误和 Android logcat 崩溃栈还原到结绳源文件行号。
 - 提供结绳运行配置视图，可编辑工程类型、打包模式、SDK 版本、包名、图标、宏定义，并查看和修复 Java、Android SDK、adb、Gradle 环境。
 
 ## 工程结构
@@ -32,6 +33,7 @@
 - `tiecode.compiler.tiecPath`
 - `tiecode.compiler.stdlibsPath`
 - `tiecode.highlight.engine`
+- `tiecode.languageService.traceCompilerOutput`
 - `tiecode.sourceVersion`
 - `tiecode.project.platform`
 - `tiecode.build.mode`
