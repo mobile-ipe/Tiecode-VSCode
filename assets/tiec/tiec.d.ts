@@ -5,6 +5,7 @@ export namespace tiec {
     export class Position {
         line: number;
         column: number;
+        index: number;
     }
 
     /**
@@ -210,47 +211,32 @@ export namespace tiec {
     }
 
     export class StringSet {
-        add(element: string);
-        remove(element: string);
+        add(element: string): void;
+        remove(element: string): void;
         contains(element: string): boolean;
         isEmpty(): boolean;
         size(): number;
     }
 
-    export class StringList {
-        get(index: number): string;
-        set(index: number, element: string);
-        add(element: string);
-        remove(element: string);
+    abstract class NativeList<T> {
+        get(index: number): T;
+        set(index: number, element: T): void;
+        add(element: T): void;
+        remove(element: T): void;
         isEmpty(): boolean;
         size(): number;
     }
 
-    export class UriList {
-        get(index: number): Source;
-        set(index: number, element: Source);
-        add(element: Source);
-        remove(element: Source);
-        isEmpty(): boolean;
-        size(): number;
+    export class StringList extends NativeList<string> {
     }
 
-    export class SourceList {
-        get(index: number): Source;
-        set(index: number, element: Source);
-        add(element: Source);
-        remove(element: Source);
-        isEmpty(): boolean;
-        size(): number;
+    export class UriList extends NativeList<Uri> {
     }
 
-    export class DiagnosticList {
-        get(index: number): Diagnostic;
-        set(index: number, element: Diagnostic);
-        add(element: Diagnostic);
-        remove(element: Diagnostic);
-        isEmpty(): boolean;
-        size(): number;
+    export class SourceList extends NativeList<Source> {
+    }
+
+    export class DiagnosticList extends NativeList<Diagnostic> {
     }
 
     export class AndroidAppConfig {
@@ -410,13 +396,13 @@ export namespace tiec {
          * 设置编译器的任务阶段监听
          * @param listener TaskListener实例
          */
-        setTaskListener(listener: TaskListener);
+        setTaskListener(listener: TaskListener): void;
 
         /**
          * 设置编译器编译过程中的诊断信息输出监听
          * @param handler DiagnosticHandler实例
          */
-        setDiagnosticHandler(handler: DiagnosticHandler);
+        setDiagnosticHandler(handler: DiagnosticHandler): void;
 
         /**
          * 编译源文件
@@ -430,7 +416,7 @@ export namespace tiec {
          * @param sources 自定义源文件列表
          * @returns 编译成功返回true，编译过程中有错误返回false
          */
-        compileSources(sources: Source[]): boolean;
+        compileSources(sources: SourceList): boolean;
     }
 
     /**
@@ -463,13 +449,7 @@ export namespace tiec {
         newText: string;
     }
 
-    export class TextEditList {
-        get(index: number): TextEdit;
-        set(index: number, element: TextEdit);
-        add(element: TextEdit);
-        remove(element: TextEdit);
-        isEmpty(): boolean;
-        size(): number;
+    export class TextEditList extends NativeList<TextEdit> {
     }
 
     /**
@@ -586,13 +566,7 @@ export namespace tiec {
         extraEdits: TextEditList
     }
 
-    export class CompletionItemList {
-        get(index: number): CompletionItem;
-        set(index: number, element: CompletionItem);
-        add(element: CompletionItem);
-        remove(element: CompletionItem);
-        isEmpty(): boolean;
-        size(): number;
+    export class CompletionItemList extends NativeList<CompletionItem> {
     }
 
     /**
@@ -740,13 +714,7 @@ export namespace tiec {
         DEPRECATED = 2
     }
 
-    export class ElementTagList {
-        get(index: number): ElementTag;
-        set(index: number, element: ElementTag);
-        add(element: ElementTag);
-        remove(element: ElementTag);
-        isEmpty(): boolean;
-        size(): number;
+    export class ElementTagList extends NativeList<ElementTag> {
     }
 
     /**
@@ -769,13 +737,7 @@ export namespace tiec {
         tags: ElementTagList;
     }
 
-    export class SemanticHighlightList {
-        get(index: number): SemanticHighlight;
-        set(index: number, element: SemanticHighlight);
-        add(element: SemanticHighlight);
-        remove(element: SemanticHighlight);
-        isEmpty(): boolean;
-        size(): number;
+    export class SemanticHighlightList extends NativeList<SemanticHighlight> {
     }
 
     /**
@@ -843,13 +805,7 @@ export namespace tiec {
         identifierRange: Range;
     }
 
-    export class ElementInfoList {
-        get(index: number): ElementInfo;
-        set(index: number, element: ElementInfo);
-        add(element: ElementInfo);
-        remove(element: ElementInfo);
-        isEmpty(): boolean;
-        size(): number;
+    export class ElementInfoList extends NativeList<ElementInfo> {
     }
 
     /**
@@ -867,13 +823,7 @@ export namespace tiec {
         children: SourceElementList;
     }
 
-    export class SourceElementList {
-        get(index: number): SourceElement;
-        set(index: number, element: SourceElement);
-        add(element: SourceElement);
-        remove(element: SourceElement);
-        isEmpty(): boolean;
-        size(): number;
+    export class SourceElementList extends NativeList<SourceElement> {
     }
 
     /**
@@ -953,13 +903,7 @@ export namespace tiec {
         range: Range;
     }
 
-    export class LocationList {
-        get(index: number): Location;
-        set(index: number, element: Location);
-        add(element: Location);
-        remove(element: Location);
-        isEmpty(): boolean;
-        size(): number;
+    export class LocationList extends NativeList<Location> {
     }
 
     /**
@@ -1114,13 +1058,7 @@ export namespace tiec {
         edits: TextEditList;
     }
 
-    export class CodeActionList {
-        get(index: number): CodeAction;
-        set(index: number, element: CodeAction);
-        add(element: CodeAction);
-        remove(element: CodeAction);
-        isEmpty(): boolean;
-        size(): number;
+    export class CodeActionList extends NativeList<CodeAction> {
     }
 
     /**
@@ -1228,13 +1166,7 @@ export namespace tiec {
         mangledName: string;
     }
 
-    export class ViewEditablePropertyList {
-        get(index: number): ViewEditableProperty;
-        set(index: number, element: ViewEditableProperty);
-        add(element: ViewEditableProperty);
-        remove(element: ViewEditableProperty);
-        isEmpty(): boolean;
-        size(): number;
+    export class ViewEditablePropertyList extends NativeList<ViewEditableProperty> {
     }
 
     /**
@@ -1267,13 +1199,7 @@ export namespace tiec {
         containerProperties: ViewEditablePropertyList;
     }
 
-    export class ViewClassInfoList {
-        get(index: number): ViewClassInfo;
-        set(index: number, element: ViewClassInfo);
-        add(element: ViewClassInfo);
-        remove(element: ViewClassInfo);
-        isEmpty(): boolean;
-        size(): number;
+    export class ViewClassInfoList extends NativeList<ViewClassInfo> {
     }
 
     /**
@@ -1585,3 +1511,111 @@ export namespace tiec {
         getSourceLine(filename: string, outputLine: number): SourceLine | null;
     }
 }
+
+/**
+ * Emscripten FS文件系统后端描述。
+ */
+export interface TiecFSBackend {
+    mount(mount: TiecFSMount): unknown;
+}
+
+/**
+ * Emscripten FS挂载记录。
+ */
+export interface TiecFSMount {
+    type: TiecFSBackend;
+    mountpoint: string;
+    opts: Record<string, unknown> | null;
+}
+
+/**
+ * NODEFS挂载参数。
+ */
+export interface TiecNodeFSOptions {
+    root: string;
+}
+
+export interface TiecFileSystems {
+    /**
+     * Node.js文件系统桥接后端。
+     */
+    NODEFS: TiecFSBackend;
+}
+
+export interface TiecFS {
+    /**
+     * 已注册的文件系统后端。
+     */
+    filesystems: TiecFileSystems;
+
+    /**
+     * 获取当前工作目录。
+     */
+    cwd(): string;
+
+    /**
+     * 切换当前工作目录。
+     */
+    chdir(path: string): void;
+
+    /**
+     * 创建单级目录。
+     */
+    mkdir(path: string): void;
+
+    /**
+     * 递归创建目录。
+     */
+    mkdirTree(path: string): void;
+
+    /**
+     * 挂载文件系统后端。
+     */
+    mount(type: TiecFSBackend, opts: TiecNodeFSOptions | Record<string, unknown> | null, mountpoint: string): TiecFSMount;
+
+    /**
+     * 卸载文件系统。
+     */
+    unmount(mountpoint: string): void;
+
+    readFile(path: string, options?: { encoding?: "utf8" | "binary"; flags?: string }): string | Uint8Array;
+    writeFile(path: string, data: string | ArrayBufferView | ArrayBuffer, options?: { encoding?: "utf8" | "binary"; flags?: string }): void;
+    unlink(path: string): void;
+}
+
+/**
+ * 默认工厂函数返回的运行时模块对象。
+ */
+export type TiecModule = typeof tiec & {
+    FS: TiecFS;
+    addRunDependency(id: string): void;
+    removeRunDependency(id: string): void;
+    calledRun: boolean;
+};
+
+export interface TiecModuleFactoryOptions {
+    locateFile?(path: string, prefix: string): string;
+    print?(message?: unknown, ...optionalParams: unknown[]): void;
+    printErr?(message?: unknown, ...optionalParams: unknown[]): void;
+    onAbort?(reason: unknown): void;
+    onRuntimeInitialized?(): void;
+    preInit?: Array<() => void> | (() => void);
+    preRun?: Array<(module: TiecModule) => void> | ((module: TiecModule) => void);
+    postRun?: Array<(module: TiecModule) => void> | ((module: TiecModule) => void);
+    monitorRunDependencies?(left: number): void;
+    instantiateWasm?(
+        imports: WebAssembly.Imports,
+        successCallback: (instance: WebAssembly.Instance, module?: WebAssembly.Module) => void,
+    ): void;
+    preloadPlugins?: unknown[];
+    wasmBinary?: ArrayBuffer | Uint8Array;
+    arguments?: string[];
+    thisProgram?: string;
+    noFSInit?: boolean;
+    noExitRuntime?: boolean;
+    setStatus?(text: string): void;
+}
+
+declare function createTiec(module?: TiecModuleFactoryOptions): Promise<TiecModule>;
+
+export default createTiec;

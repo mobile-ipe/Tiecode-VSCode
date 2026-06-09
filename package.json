@@ -18,9 +18,10 @@
   ],
   "activationEvents": [
     "workspaceContains:project.json",
-    "workspaceContains:tiecode.project.json",
     "workspaceContains:**/project.json",
-    "workspaceContains:**/tiecode.project.json",
+    "workspaceContains:**/*.t",
+    "workspaceContains:**/*.tly",
+    "onStartupFinished",
     "onLanguage:tiecode",
     "onLanguage:tly",
     "onCommand:tiecode.reloadProject",
@@ -284,7 +285,8 @@
           "command": "tiecode.generateEvent"
         },
         {
-          "command": "tiecode.smartEnter"
+          "command": "tiecode.smartEnter",
+          "when": "false"
         },
         {
           "command": "tiecode.scanUiClasses"
@@ -336,33 +338,12 @@
     "configuration": {
       "title": "结绳",
       "properties": {
-        "tiecode.compiler.root": {
-          "type": "string",
-          "default": "D:\\Projects\\CrossPlatform\\Tiecode-Compiler",
-          "description": "结绳编译器根目录。"
-        },
-        "tiecode.compiler.tiecPath": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": null,
-          "description": "tiec 可执行文件路径。为空时从编译器根目录推断。"
-        },
-        "tiecode.compiler.stdlibsPath": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": null,
-          "description": "结绳标准库目录。为空时使用编译器根目录下的 stdlibs。"
-        },
         "tiecode.languageService.enabled": {
           "type": "boolean",
           "default": true,
           "description": "是否启用编译器 WASM IDE Service。"
         },
-        "tiecode.languageService.traceCompilerOutput": {
+        "tiecode.wasm.traceOutput": {
           "type": "boolean",
           "default": false,
           "description": "是否将编译器 WASM 内部日志输出到结绳输出窗口。"
@@ -388,93 +369,6 @@
             "关闭语义高亮，仅使用 VS Code TextMate 基础高亮。"
           ],
           "description": "结绳编辑器高亮引擎。"
-        },
-        "tiecode.sourceVersion": {
-          "type": "number",
-          "default": 47,
-          "enum": [
-            40,
-            46,
-            47
-          ],
-          "description": "默认结绳源码版本。"
-        },
-        "tiecode.project.platform": {
-          "type": "string",
-          "default": "auto",
-          "enum": [
-            "auto",
-            "android",
-            "windows",
-            "linux",
-            "html"
-          ],
-          "description": "未声明工程类型时的目标平台。"
-        },
-        "tiecode.build.outputDirectory": {
-          "type": "string",
-          "default": "${workspaceFolder}\\build",
-          "description": "构建输出目录。"
-        },
-        "tiecode.build.mode": {
-          "type": "string",
-          "default": "debug",
-          "enum": [
-            "debug",
-            "release"
-          ],
-          "description": "默认打包模式。"
-        },
-        "tiecode.build.defines": {
-          "type": "object",
-          "default": {},
-          "additionalProperties": {
-            "type": [
-              "string",
-              "number",
-              "boolean",
-              "null"
-            ]
-          },
-          "description": "传给 tiec、IDE Service 和 SweetLine 的默认宏定义。"
-        },
-        "tiecode.android.gradle": {
-          "type": "boolean",
-          "default": true,
-          "description": "安卓构建是否输出 Gradle 工程结构。"
-        },
-        "tiecode.cxx.runCmake": {
-          "type": "boolean",
-          "default": true,
-          "description": "CXX 工程执行 tiec 后是否自动运行 CMake 配置和构建。"
-        },
-        "tiecode.cxx.executableName": {
-          "type": "string",
-          "default": "main",
-          "description": "CXX 工程 F5 运行时优先查找的可执行文件名。"
-        },
-        "tiecode.cxx.cmakeCommand": {
-          "type": "string",
-          "default": "cmake",
-          "description": "CMake 命令路径或命令名。"
-        },
-        "tiecode.cxx.cmakeGenerator": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": null,
-          "description": "CMake generator。为空时使用 CMake 默认 generator。"
-        },
-        "tiecode.cxx.cmakeBuildType": {
-          "type": "string",
-          "default": "Debug",
-          "description": "CXX 工程 CMake 构建类型。"
-        },
-        "tiecode.cxx.cmakeBuildDirectory": {
-          "type": "string",
-          "default": "${workspaceFolder}\\build\\cmake",
-          "description": "CXX 工程 CMake 构建目录。"
         }
       }
     }

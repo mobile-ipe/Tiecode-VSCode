@@ -1,13 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
-import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { nativeListToArray } from "./interop";
 import { ProjectInfo } from "./types";
+import { loadWasmModule } from "./wasmModule";
 import { createWasmOutputOptions } from "./wasmOutput";
 import { getProjectDefines, getProjectInfo, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
 
-type DynamicImport = (specifier: string) => Promise<any>;
 export type TiecodeHighlightEngine = "hybrid" | "sweetline" | "compiler" | "textmate";
 
 export interface SweetLineSemanticToken {
@@ -157,18 +156,7 @@ export class SweetLineService implements vscode.Disposable {
 
   private async importModule(): Promise<any> {
     const wasmDir = path.join(this.context.extensionPath, "assets", "sweetline", "wasm");
-    const modulePath = path.join(wasmDir, "sweetline.mjs");
-    if (!fs.existsSync(modulePath)) {
-      throw new Error(`找不到 SweetLine WASM 模块: ${modulePath}`);
-    }
-
-    const dynamicImport = new Function("specifier", "return import(specifier)") as DynamicImport;
-    const imported = await dynamicImport(pathToFileURL(modulePath).href);
-    const factory = imported.default ?? imported;
-    return factory({
-      locateFile: (fileName: string) => path.join(wasmDir, fileName),
-      ...createWasmOutputOptions(this.output)
-    });
+    return loadWasmModule(wasmDir, "sweetline.mjs", "SweetLine", createWasmOutputOptions(this.output));
   }
 
   private compileSyntaxAssets(engine: any): void {

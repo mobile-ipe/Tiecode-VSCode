@@ -12,6 +12,7 @@ import { SourceMappingService } from "./tiecode/sourceMapping";
 import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
 import { ToolchainService } from "./tiecode/toolchain";
+import { TiecodeWasmBuildService } from "./tiecode/wasmBuild";
 import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from "./tiecode/workspace";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -21,6 +22,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const toolchainService = new ToolchainService(context, output);
   const sourceMappingService = new SourceMappingService(context, output);
   const logcatService = new AndroidLogcatService();
+  const wasmBuildService = new TiecodeWasmBuildService(context, output);
   const diagnostics = new TiecodeDiagnostics(
     compilerService,
     vscode.languages.createDiagnosticCollection("tiecode"),
@@ -29,8 +31,8 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(output, diagnostics, sweetLineService, sourceMappingService, logcatService);
   registerTiecodeProviders(context, compilerService, sweetLineService);
-  registerBuildCommands(context, output, toolchainService, sourceMappingService);
-  registerRunCommands(context, output, toolchainService, sourceMappingService, logcatService);
+  registerBuildCommands(context, output, toolchainService, sourceMappingService, wasmBuildService);
+  registerRunCommands(context, output, toolchainService, sourceMappingService, logcatService, wasmBuildService);
   registerConfigView(context, toolchainService, () => {
     sweetLineService.invalidate();
     void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
@@ -138,7 +140,10 @@ export function activate(context: vscode.ExtensionContext): void {
   for (const document of vscode.workspace.textDocuments) {
     diagnostics.schedule(document);
   }
-  void openTiecodeProject(compilerService, diagnostics, undefined, "open");
+  const startupTimer = setTimeout(() => {
+    void openTiecodeProject(compilerService, diagnostics, undefined, "open");
+  }, 500);
+  context.subscriptions.push({ dispose: () => clearTimeout(startupTimer) });
 }
 
 export function deactivate(): void {}

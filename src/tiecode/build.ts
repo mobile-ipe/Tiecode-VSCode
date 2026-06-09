@@ -5,8 +5,9 @@ import { TextDecoder } from "util";
 import * as vscode from "vscode";
 import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
-import { BuildMode, BuildRequest, DefineValue, PlatformName, ProjectInfo, ProjectKind } from "./types";
-import { ensureDirectory, getProjectBuildMode, getProjectDefines, getProjectInfo, resolveMaybeRelative } from "./workspace";
+import { BuildMode, BuildRequest, ProjectInfo, ProjectKind, TARGET_PLATFORM_NUMBER } from "./types";
+import { TiecodeWasmBuildService } from "./wasmBuild";
+import { ensureDirectory, getProjectBuildMode, getProjectInfo, resolveMaybeRelative } from "./workspace";
 
 export interface ToolOutputLineHandler {
   handleLine(line: string): void;
@@ -21,26 +22,29 @@ export interface BuildProjectOptions {
   env?: NodeJS.ProcessEnv;
   toolchain?: ToolchainService;
   sourceMapping?: SourceMappingService;
+  compiler: TiecodeWasmBuildService;
 }
 
 export function registerBuildCommands(
   context: vscode.ExtensionContext,
   output: vscode.OutputChannel,
-  toolchain?: ToolchainService,
-  sourceMapping?: SourceMappingService
+  toolchain: ToolchainService,
+  sourceMapping: SourceMappingService,
+  compiler: TiecodeWasmBuildService
 ): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("tiecode.buildAndroid", () => buildProject({ kind: "android", platformName: "android" }, output, toolchain, sourceMapping)),
-    vscode.commands.registerCommand("tiecode.buildCxx", () => buildProject({ kind: "cxx" }, output, toolchain, sourceMapping)),
-    vscode.commands.registerCommand("tiecode.buildHtml", () => buildProject({ kind: "html", platformName: "html" }, output, toolchain, sourceMapping))
+    vscode.commands.registerCommand("tiecode.buildAndroid", () => buildProject({ kind: "android", platformName: "android" }, output, toolchain, sourceMapping, compiler)),
+    vscode.commands.registerCommand("tiecode.buildCxx", () => buildProject({ kind: "cxx" }, output, toolchain, sourceMapping, compiler)),
+    vscode.commands.registerCommand("tiecode.buildHtml", () => buildProject({ kind: "html", platformName: "html" }, output, toolchain, sourceMapping, compiler))
   );
 }
 
 export async function buildProject(
   request: BuildRequest,
   output: vscode.OutputChannel,
-  toolchain?: ToolchainService,
-  sourceMapping?: SourceMappingService
+  toolchain: ToolchainService,
+  sourceMapping: SourceMappingService,
+  compiler: TiecodeWasmBuildService
 ): Promise<void> {
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
@@ -48,7 +52,7 @@ export async function buildProject(
     cancellable: false
   }, async () => {
     try {
-      const project = await buildTiecodeProject(request, output, { toolchain, sourceMapping });
+      const project = await buildTiecodeProject(request, output, { toolchain, sourceMapping, compiler });
       void vscode.window.showInformationMessage(`结绳构建完成: ${project.outputDir}`);
     } catch (error) {
       void vscode.window.showErrorMessage(`结绳构建失败: ${String(error instanceof Error ? error.message : error)}`);
@@ -59,7 +63,7 @@ export async function buildProject(
 export async function buildTiecodeProject(
   request: BuildRequest,
   output: vscode.OutputChannel,
-  options: BuildProjectOptions = {}
+  options: BuildProjectOptions
 ): Promise<ProjectInfo> {
   const uri = vscode.window.activeTextEditor?.document.uri;
   const project = getProjectInfo(uri, request.kind);
@@ -67,13 +71,8 @@ export async function buildTiecodeProject(
     throw new Error("没有打开结绳工作区。");
   }
 
-  if (!fs.existsSync(project.compiler.tiecPath)) {
-    throw new Error(`找不到 tiec: ${project.compiler.tiecPath}`);
-  }
-
   const buildProjectInfo = { ...project, platformName: request.platformName ?? project.platformName };
-  buildProjectInfo.platformNumber = platformNumber(buildProjectInfo.platformName);
-  ensureDirectory(buildProjectInfo.outputDir);
+  buildProjectInfo.platformNumber = TARGET_PLATFORM_NUMBER[buildProjectInfo.platformName];
 
   if (buildProjectInfo.sourceFiles.length === 0) {
     throw new Error(`未找到结绳源文件: ${buildProjectInfo.rootPath}`);
@@ -81,13 +80,12 @@ export async function buildTiecodeProject(
 
   const buildMode = options.buildMode ?? getProjectBuildMode(buildProjectInfo.config);
   const buildOptions = await prepareBuildOptions(buildProjectInfo, { ...options, buildMode });
-  const args = createTiecArgs(buildProjectInfo, buildMode);
   options.sourceMapping?.clearProject(buildProjectInfo);
   output.show(true);
   output.appendLine(`源文件数量: ${buildProjectInfo.sourceFiles.length}`);
-  output.appendLine(`> ${project.compiler.tiecPath} ${args.map(quoteArg).join(" ")}`);
+  output.appendLine("> tiec.wasm compile");
 
-  await runProcess(project.compiler.tiecPath, args, project.rootPath, output, buildOptions.env);
+  await options.compiler.compile(buildProjectInfo, buildMode);
   await runGeneratedProjectBuild(buildProjectInfo, output, buildOptions);
   return buildProjectInfo;
 }
@@ -112,11 +110,8 @@ async function runGeneratedProjectBuild(project: ProjectInfo, output: vscode.Out
 }
 
 async function runAndroidGradleBuild(project: ProjectInfo, output: vscode.OutputChannel, options: BuildProjectOptions): Promise<void> {
-  const settings = vscode.workspace.getConfiguration("tiecode");
-  const androidConfig = project.config.android ?? {};
-  const generateGradleProject = androidConfig.gradle ?? settings.get<boolean>("android.gradle") ?? true;
-  const runGradle = options.runGradle ?? androidConfig.runGradle ?? settings.get<boolean>("android.runGradle") ?? true;
-  if (!generateGradleProject || !runGradle) {
+  const runGradle = options.runGradle ?? true;
+  if (!runGradle) {
     return;
   }
 
@@ -143,9 +138,8 @@ async function runAndroidGradleBuild(project: ProjectInfo, output: vscode.Output
 }
 
 async function runCxxCMakeBuild(project: ProjectInfo, output: vscode.OutputChannel, options: BuildProjectOptions): Promise<void> {
-  const settings = vscode.workspace.getConfiguration("tiecode");
   const cxxConfig = project.config.cxx ?? {};
-  const runCmake = options.runCmake ?? cxxConfig.runCmake ?? cxxConfig.useCmake ?? settings.get<boolean>("cxx.runCmake") ?? true;
+  const runCmake = options.runCmake ?? cxxConfig.runCmake ?? true;
   if (!runCmake) {
     return;
   }
@@ -155,9 +149,9 @@ async function runCxxCMakeBuild(project: ProjectInfo, output: vscode.OutputChann
     throw new Error(`未找到 CMakeLists.txt: ${path.join(project.outputDir, "src")} 或 ${project.rootPath}`);
   }
 
-  const cmakeCommand = cxxConfig.cmakeCommand ?? settings.get<string>("cxx.cmakeCommand") ?? "cmake";
-  const generator = cxxConfig.cmakeGenerator ?? settings.get<string | null>("cxx.cmakeGenerator");
-  const buildType = cxxConfig.cmakeBuildType ?? (options.buildMode === "release" ? "Release" : settings.get<string>("cxx.cmakeBuildType") ?? "Debug");
+  const cmakeCommand = cxxConfig.cmakeCommand ?? "cmake";
+  const generator = cxxConfig.cmakeGenerator;
+  const buildType = cxxConfig.cmakeBuildType ?? (options.buildMode === "release" ? "Release" : "Debug");
   const buildDirectory = resolveCMakeBuildDirectory(project);
   ensureDirectory(buildDirectory);
 
@@ -175,88 +169,6 @@ async function runCxxCMakeBuild(project: ProjectInfo, output: vscode.OutputChann
     buildArgs.push("--config", buildType);
   }
   await runTool(cmakeCommand, buildArgs, project.rootPath, output);
-}
-
-function createTiecArgs(project: ProjectInfo, buildMode: BuildMode): string[] {
-  const args = [
-    "--output",
-    project.outputDir,
-    "--package",
-    project.packageName,
-    "--source",
-    String(project.sourceVersion),
-    buildMode === "release" ? "--release" : "--debug",
-    "--hard-mode",
-    "--enable-toplevel-stmt",
-    "--platform",
-    project.platformName,
-    "--line-map",
-    project.lineMapPath
-  ];
-
-  if (project.kind === "android") {
-    const androidConfigPath = writeAndroidAppConfig(project);
-    args.push("--android.app.config", androidConfigPath);
-    const androidConfig = project.config.android ?? {};
-    const useGradle = androidConfig.gradle ?? vscode.workspace.getConfiguration("tiecode").get<boolean>("android.gradle") ?? true;
-    if (useGradle) {
-      args.push("--android.gradle");
-    }
-    const foundationLibPath = androidConfig.foundationLibPath ?? path.dirname(project.stdlibSourceRoot ?? "");
-    if (foundationLibPath) {
-      args.push("--android.legacy.lib.path", foundationLibPath);
-    }
-  }
-
-  for (const [name, value] of Object.entries(getProjectDefines(project.config))) {
-    args.push("--define", formatDefineArg(name, value));
-  }
-
-  args.push(...project.sourceFiles);
-
-  return args;
-}
-
-function writeAndroidAppConfig(project: ProjectInfo): string {
-  const android = project.config.android ?? {};
-  const appConfig = {
-    appName: android.appName ?? project.config.name ?? "我的应用",
-    appIcon: android.iconPath ?? "",
-    minSdk: android.minSdk ?? 21,
-    targetSdk: android.targetSdk ?? 28,
-    versionCode: android.versionCode ?? 1,
-    versionName: android.versionName ?? "1.0"
-  };
-  const configPath = path.join(project.outputDir, "android-app-config.json");
-  fs.writeFileSync(configPath, `${JSON.stringify(appConfig, null, 2)}\n`, "utf8");
-  return configPath;
-}
-
-function formatDefineArg(name: string, value: DefineValue): string {
-  if (value === null) {
-    return `${name}=`;
-  }
-  return `${name}=${String(value)}`;
-}
-
-function runProcess(command: string, args: string[], cwd: string, output: vscode.OutputChannel, env?: NodeJS.ProcessEnv): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const child = cp.spawn(command, args, { cwd, shell: false, env });
-    const stdout = new ProcessOutputDecoder(text => output.append(text));
-    const stderr = new ProcessOutputDecoder(text => output.append(text));
-    child.stdout.on("data", data => stdout.write(data));
-    child.stderr.on("data", data => stderr.write(data));
-    child.on("error", reject);
-    child.on("close", code => {
-      stdout.end();
-      stderr.end();
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`tiec 退出码 ${code ?? "unknown"}`));
-      }
-    });
-  });
 }
 
 export function runTool(
@@ -314,11 +226,10 @@ export function resolveCMakeSourceDirectory(project: ProjectInfo): string | unde
 }
 
 export function resolveCMakeBuildDirectory(project: ProjectInfo): string {
-  const settings = vscode.workspace.getConfiguration("tiecode");
   const cxxConfig = project.config.cxx ?? {};
   return resolveMaybeRelative(
     project.rootPath,
-    cxxConfig.cmakeBuildDirectory ?? settings.get<string>("cxx.cmakeBuildDirectory") ?? "${workspaceFolder}\\build\\cmake"
+    cxxConfig.cmakeBuildDirectory ?? "${workspaceFolder}\\build\\cmake"
   );
 }
 
@@ -451,30 +362,4 @@ function isMojibakeCodePoint(code: number): boolean {
 
 function isCjkCodePoint(code: number): boolean {
   return (code >= 0x3400 && code <= 0x9FFF) || (code >= 0xF900 && code <= 0xFAFF);
-}
-
-function platformNumber(platformName: PlatformName): number {
-  switch (platformName) {
-    case "android":
-      return 1;
-    case "linux":
-      return 3;
-    case "windows":
-      return 4;
-    case "html":
-      return 7;
-  }
-}
-
-export function buildKindForCommand(command: string): ProjectKind | undefined {
-  if (command.endsWith("Android")) {
-    return "android";
-  }
-  if (command.endsWith("Cxx")) {
-    return "cxx";
-  }
-  if (command.endsWith("Html")) {
-    return "html";
-  }
-  return undefined;
 }

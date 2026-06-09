@@ -6,8 +6,9 @@ import {
   getProjectBuildMode,
   getProjectInfo,
   getWorkspaceRoot,
-  normalizeDefines,
   normalizeProjectKind,
+  normalizeSourceVersion,
+  projectKindTypeId,
   readProjectFileConfig,
   updateProjectConfig
 } from "./workspace";
@@ -117,15 +118,15 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     const android = effective.android ?? {};
     const cxx = effective.cxx ?? {};
     const html = effective.html ?? {};
-    const kind = project?.kind ?? normalizeProjectKind(effective.type) ?? "android";
+    const kind = project?.kind ?? normalizeProjectKind(effective.typeId ?? effective.classification_id ?? effective.type ?? effective.classification) ?? "android";
 
     return {
       hasProject: Boolean(project && rootPath),
       rootPath,
       kind,
       appName: android.appName ?? effective.name ?? effective.app_name ?? "",
-      packageName: project?.packageName ?? effective.packageName ?? effective.app_pkg ?? "",
-      sourceVersion: project?.sourceVersion ?? effective.sourceVersion ?? effective.source_version ?? 47,
+      packageName: project?.packageName ?? effective.app_pkg ?? effective.packageName ?? "",
+      sourceVersion: project?.sourceVersion ?? effective.source_version ?? effective.sourceVersion ?? 47,
       buildMode: getProjectBuildMode(effective),
       minSdk: android.minSdk ?? effective.min_sdk ?? 21,
       targetSdk: android.targetSdk ?? effective.target_sdk ?? 28,
@@ -135,13 +136,13 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
       toolchain: project?.kind === "android" ? this.toolchain.getStatus(project).items : [],
       cxxTarget: cxx.target ?? (process.platform === "win32" ? "windows" : "linux"),
       cxxExecutableName: cxx.executableName ?? effective.name ?? "main",
-      runCmake: cxx.runCmake ?? cxx.useCmake ?? true,
+      runCmake: cxx.runCmake ?? true,
       cmakeCommand: cxx.cmakeCommand ?? "cmake",
       cmakeGenerator: cxx.cmakeGenerator ?? "",
       cmakeBuildType: cxx.cmakeBuildType ?? "Debug",
       cmakeBuildDirectory: cxx.cmakeBuildDirectory ?? "${workspaceFolder}\\build\\cmake",
-      htmlTitle: html.title ?? effective.name ?? "",
-      definesText: formatDefines(effective.defines ?? {})
+      htmlTitle: html.title ?? effective.name ?? effective.app_name ?? "",
+      definesText: effective.macro_definitions ?? formatDefines(effective.defines ?? {})
     };
   }
 
@@ -501,38 +502,45 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
 
 function applyState(config: TiecodeProjectConfig, payload: ConfigViewState): void {
   const kind = normalizeProjectKind(payload.kind) ?? "android";
-  config.type = kind;
-  config.name = payload.appName;
+  config.typeId = projectKindTypeId(kind);
   config.app_name = payload.appName;
-  config.packageName = payload.packageName;
-  config.app_pkg = payload.packageName;
-  config.sourceVersion = normalizeSourceVersion(payload.sourceVersion);
-  config.source_version = config.sourceVersion;
+  config.source_version = normalizeSourceVersion(payload.sourceVersion);
   config.buildMode = payload.buildMode === "release" ? "release" : "debug";
-  config.defines = parseDefines(payload.definesText);
+  config.macro_definitions = payload.definesText;
+  delete (config as Record<string, unknown>).compiler;
+  delete config.type;
+  delete config.name;
+  delete config.packageName;
+  delete config.sourceVersion;
+  delete config.defines;
+  delete config.classification_id;
+  delete config.classification;
+  delete config.project_name;
+  delete config.project_kind;
+  delete config.android;
+
+  if (kind !== "android") {
+    delete config.app_pkg;
+    delete config.min_sdk;
+    delete config.target_sdk;
+    delete config.version_code;
+    delete config.version_name;
+    delete config.icon_path;
+  }
+  if (kind !== "cxx") {
+    delete config.cxx;
+  }
+  if (kind !== "html") {
+    delete config.html;
+  }
 
   if (kind === "android") {
+    config.app_pkg = payload.packageName;
     config.min_sdk = toPositiveNumber(payload.minSdk, 21);
     config.target_sdk = toPositiveNumber(payload.targetSdk, 28);
     config.version_code = toPositiveNumber(payload.versionCode, 1);
     config.version_name = payload.versionName || "1.0";
     config.icon_path = payload.iconPath;
-    config.android = {
-      ...(config.android ?? {}),
-      appName: payload.appName,
-      packageName: payload.packageName,
-      minSdk: config.min_sdk,
-      targetSdk: config.target_sdk,
-      versionCode: config.version_code,
-      versionName: config.version_name,
-      iconPath: payload.iconPath
-    };
-    delete config.android.gradle;
-    delete config.android.runGradle;
-    delete (config.android as Record<string, unknown>).gradleTask;
-    delete (config.android as Record<string, unknown>).installTask;
-    delete (config.android as Record<string, unknown>).adbPath;
-    delete (config.android as Record<string, unknown>).startActivity;
   }
 
   if (kind === "cxx") {
@@ -540,13 +548,13 @@ function applyState(config: TiecodeProjectConfig, payload: ConfigViewState): voi
       ...(config.cxx ?? {}),
       target: payload.cxxTarget === "linux" ? "linux" : "windows",
       executableName: payload.cxxExecutableName || "main",
-      useCmake: payload.runCmake,
       runCmake: payload.runCmake,
       cmakeCommand: payload.cmakeCommand || "cmake",
       cmakeGenerator: payload.cmakeGenerator || undefined,
       cmakeBuildType: payload.cmakeBuildType || "Debug",
       cmakeBuildDirectory: payload.cmakeBuildDirectory || "${workspaceFolder}\\build\\cmake"
     };
+    delete (config.cxx as Record<string, unknown>).useCmake;
   }
 
   if (kind === "html") {
@@ -557,49 +565,20 @@ function applyState(config: TiecodeProjectConfig, payload: ConfigViewState): voi
   }
 }
 
-function parseDefines(text: string): Record<string, DefineValue> {
-  const values: Record<string, DefineValue> = {};
-  for (const rawLine of text.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) {
-      continue;
-    }
-    const equalsIndex = line.indexOf("=");
-    if (equalsIndex < 0) {
-      values[line] = true;
-      continue;
-    }
-    const name = line.slice(0, equalsIndex).trim();
-    const value = line.slice(equalsIndex + 1).trim();
-    if (name) {
-      values[name] = parseDefineValue(value);
-    }
-  }
-  return normalizeDefines(values);
-}
-
-function parseDefineValue(value: string): DefineValue {
-  if (value === "true" || value === "真") {
-    return true;
-  }
-  if (value === "false" || value === "假") {
-    return false;
-  }
-  if (value === "null") {
-    return null;
-  }
-  const numberValue = Number(value);
-  return value !== "" && Number.isFinite(numberValue) ? numberValue : value;
-}
-
 function formatDefines(defines: Record<string, DefineValue>): string {
   return Object.entries(defines)
-    .map(([name, value]) => value === true ? name : `${name}=${value ?? ""}`)
+    .map(([name, value]) => value === null ? name : `${name}=${formatDefineValue(value)}`)
     .join("\n");
 }
 
-function normalizeSourceVersion(value: number): number {
-  return value === 40 || value === 46 || value === 47 ? value : 47;
+function formatDefineValue(value: Exclude<DefineValue, null>): string {
+  if (value === true) {
+    return "真";
+  }
+  if (value === false) {
+    return "假";
+  }
+  return String(value);
 }
 
 function toPositiveNumber(value: number, fallback: number): number {

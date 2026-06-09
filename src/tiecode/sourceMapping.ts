@@ -1,12 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import type { ToolOutputLineHandler } from "./build";
 import { ProjectInfo } from "./types";
 import { createWasmOutputOptions } from "./wasmOutput";
-
-type DynamicImport = (specifier: string) => Promise<any>;
+import { loadTiecodeModule } from "./tiecRuntime";
 
 export interface SourceMappedLocation {
   sourcePath: string;
@@ -99,19 +97,7 @@ export class SourceMappingService implements vscode.Disposable {
   }
 
   private async importModule(): Promise<any> {
-    const wasmDir = path.join(this.context.extensionPath, "assets", "wasm");
-    const modulePath = path.join(wasmDir, "libtiec.mjs");
-    if (!fs.existsSync(modulePath)) {
-      throw new Error(`找不到结绳 WASM 模块: ${modulePath}`);
-    }
-
-    const dynamicImport = new Function("specifier", "return import(specifier)") as DynamicImport;
-    const imported = await dynamicImport(pathToFileURL(modulePath).href);
-    const factory = imported.default ?? imported;
-    return factory({
-      locateFile: (fileName: string) => path.join(wasmDir, fileName),
-      ...createWasmOutputOptions(this.output)
-    });
+    return loadTiecodeModule(this.context, createWasmOutputOptions(this.output));
   }
 }
 

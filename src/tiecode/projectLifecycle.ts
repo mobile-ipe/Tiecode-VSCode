@@ -2,7 +2,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { TiecodeCompilerService } from "./compilerService";
 import { TiecodeDiagnostics } from "./diagnostics";
-import { getProjectInfo, projectKindDisplayName } from "./workspace";
+import { ProjectKind } from "./types";
+import { createProjectConfig, getProjectInfo, getWorkspaceRoot, hasProjectConfig, looksLikeTiecodeWorkspace, projectKindDisplayName, writeProjectConfig } from "./workspace";
 
 type OpenReason = "open" | "reload";
 
@@ -14,6 +15,7 @@ export async function openTiecodeProject(
 ): Promise<void> {
   const project = getProjectInfo(uri);
   if (!project) {
+    await promptCreateProjectInfo(service, diagnostics, uri);
     return;
   }
 
@@ -41,4 +43,40 @@ export async function openTiecodeProject(
     const action = reason === "reload" ? "重新加载" : "打开";
     void vscode.window.showErrorMessage(`${action}${projectType}失败: ${String(error instanceof Error ? error.message : error)}`);
   }
+}
+
+async function promptCreateProjectInfo(
+  service: TiecodeCompilerService,
+  diagnostics: TiecodeDiagnostics,
+  uri?: vscode.Uri
+): Promise<void> {
+  const rootPath = getWorkspaceRoot(uri);
+  if (!rootPath || hasProjectConfig(rootPath) || !looksLikeTiecodeWorkspace(rootPath)) {
+    return;
+  }
+
+  const choices = new Map<string, ProjectKind>([
+    ["创建安卓工程信息", "android"],
+    ["创建 CXX 工程信息", "cxx"],
+    ["创建网页工程信息", "html"]
+  ]);
+  const picked = await vscode.window.showWarningMessage(
+    "当前工作区缺少 project.json，不能作为结绳工程打开。请选择工程类型创建工程信息。",
+    { modal: true },
+    ...choices.keys()
+  );
+  const kind = picked ? choices.get(picked) : undefined;
+  if (!kind) {
+    return;
+  }
+
+  try {
+    writeProjectConfig(rootPath, createProjectConfig(kind, path.basename(rootPath)));
+  } catch (error) {
+    void vscode.window.showErrorMessage(`创建结绳工程信息失败: ${String(error instanceof Error ? error.message : error)}`);
+    return;
+  }
+
+  void vscode.window.showInformationMessage(`已创建 project.json: ${projectKindDisplayName(kind)}`);
+  await openTiecodeProject(service, diagnostics, uri, "reload");
 }

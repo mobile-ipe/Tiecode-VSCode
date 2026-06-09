@@ -1,13 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import { pathToFileURL } from "url";
 import * as vscode from "vscode";
 import { NativeSession, ProjectInfo, ProjectKind } from "./types";
 import { toTiecodeRange } from "./interop";
 import { createWasmOutputOptions } from "./wasmOutput";
-import { getProjectDefines, getProjectInfo, isTiecodeDocument } from "./workspace";
-
-type DynamicImport = (specifier: string) => Promise<any>;
+import { createTiecodeOptions, loadTiecodeModule } from "./tiecRuntime";
+import { getProjectInfo, isTiecodeDocument } from "./workspace";
 
 export class TiecodeCompilerService {
   private modulePromise?: Promise<any>;
@@ -197,59 +195,13 @@ export class TiecodeCompilerService {
   }
 
   private createOptions(tiec: any, project: ProjectInfo): any {
-    const options = new tiec.Options();
-    options.sourceVersion = enumMember(tiec.SourceVersion, sourceVersionKey(project.sourceVersion), project.sourceVersion);
-    options.packageName = project.packageName;
-    options.outputDir = project.outputDir;
-    options.lineMapPath = project.lineMapPath;
-    options.debug = true;
-    options.hardMode = false;
-    options.enableTopLevelStmt = true;
-    options.friendlyName = enumMember(tiec.FriendlyNameKind, "RANDOM", 0);
-    options.ideMode = true;
-    options.profile = enumMember(tiec.BuildProfile, "STANDARD", 0);
-    options.optimizeLevel = 0;
-    options.logLevel = enumMember(tiec.LogLevel, "WARNING", 2);
-    options.platform = enumMember(tiec.TargetPlatform, project.platformName.toUpperCase(), project.platformNumber);
-
-    if (typeof options.addSearchPrefix === "function") {
-      for (const sourceRoot of project.sourceRoots) {
-        options.addSearchPrefix("source", sourceRoot);
-      }
-    }
-
-    if (typeof options.define === "function") {
-      for (const [name, value] of Object.entries(getProjectDefines(project.config))) {
-        options.define(name, value);
-      }
-    }
-
-    if (project.kind === "android" && typeof options.setAndroidOptions === "function") {
-      this.applyAndroidOptions(tiec, project, options);
-    }
-
-    return options;
-  }
-
-  private applyAndroidOptions(tiec: any, project: ProjectInfo, options: any): void {
-    try {
-      const androidConfig = project.config.android ?? {};
-      const appConfig = new tiec.AndroidAppConfig();
-      appConfig.appName = androidConfig.appName ?? project.config.name ?? "我的应用";
-      appConfig.appIcon = androidConfig.iconPath ?? "";
-      appConfig.minSdk = androidConfig.minSdk ?? 21;
-      appConfig.targetSdk = androidConfig.targetSdk ?? 28;
-      appConfig.versionCode = androidConfig.versionCode ?? 1;
-      appConfig.versionName = androidConfig.versionName ?? "1.0";
-
-      const androidOptions = new tiec.AndroidOptions();
-      androidOptions.appConfig = appConfig;
-      androidOptions.gradle = androidConfig.gradle ?? vscode.workspace.getConfiguration("tiecode").get<boolean>("android.gradle") ?? true;
-      androidOptions.foundationLibPath = androidConfig.foundationLibPath ?? path.dirname(project.stdlibSourceRoot ?? "");
-      options.setAndroidOptions(androidOptions);
-    } catch (error) {
-      this.output.appendLine(`Android 编译选项初始化失败: ${String(error)}`);
-    }
+    return createTiecodeOptions(tiec, project, {
+      outputDir: project.outputDir,
+      lineMapPath: project.lineMapPath,
+      debug: true,
+      hardMode: false,
+      ideMode: true
+    });
   }
 
   private compileProjectSources(tiec: any, service: any, project: ProjectInfo): void {
@@ -300,38 +252,12 @@ export class TiecodeCompilerService {
       throw new Error("结绳语言服务已被配置关闭。");
     }
 
-    const wasmDir = path.join(this.context.extensionPath, "assets", "wasm");
-    const modulePath = path.join(wasmDir, "libtiec.mjs");
-    if (!fs.existsSync(modulePath)) {
-      throw new Error(`找不到结绳 WASM 模块: ${modulePath}`);
-    }
-
-    const dynamicImport = new Function("specifier", "return import(specifier)") as DynamicImport;
-    const imported = await dynamicImport(pathToFileURL(modulePath).href);
-    const factory = imported.default ?? imported;
-    return factory({
-      locateFile: (fileName: string) => path.join(wasmDir, fileName),
-      ...createWasmOutputOptions(this.output)
-    });
+    return loadTiecodeModule(this.context, createWasmOutputOptions(this.output));
   }
 
   private isEnabled(): boolean {
     return vscode.workspace.getConfiguration("tiecode").get<boolean>("languageService.enabled", true);
   }
-}
-
-function enumMember(enumObject: any, key: string, fallback: number): unknown {
-  return enumObject?.[key] ?? fallback;
-}
-
-function sourceVersionKey(sourceVersion: number): string {
-  if (sourceVersion === 40) {
-    return "VERSION_4_0";
-  }
-  if (sourceVersion === 46) {
-    return "VERSION_4_6";
-  }
-  return "VERSION_4_7";
 }
 
 function getPartial(document: vscode.TextDocument, position: vscode.Position): string {

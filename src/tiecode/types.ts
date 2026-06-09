@@ -15,12 +15,14 @@ export interface AndroidProjectConfig {
   versionCode?: number;
   versionName?: string;
   iconPath?: string;
-  gradle?: boolean;
-  runGradle?: boolean;
-  foundationLibPath?: string;
 }
 
 export interface IpeProjectConfigFields {
+  typeId?: string;
+  classification_id?: string;
+  classification?: string;
+  project_name?: string;
+  project_kind?: number;
   app_name?: string;
   app_pkg?: string;
   package?: string;
@@ -31,12 +33,12 @@ export interface IpeProjectConfigFields {
   icon_path?: string;
   source_version?: number;
   project_version?: number;
+  macro_definitions?: string;
 }
 
 export interface CxxProjectConfig {
   target?: "windows" | "linux";
   executableName?: string;
-  useCmake?: boolean;
   runCmake?: boolean;
   cmakeCommand?: string;
   cmakeGenerator?: string;
@@ -46,12 +48,6 @@ export interface CxxProjectConfig {
 
 export interface HtmlProjectConfig {
   title?: string;
-}
-
-export interface ProjectCompilerConfig {
-  root?: string;
-  tiecPath?: string;
-  stdlibsPath?: string;
 }
 
 export interface TiecodeProjectConfig extends IpeProjectConfigFields {
@@ -64,13 +60,6 @@ export interface TiecodeProjectConfig extends IpeProjectConfigFields {
   android?: AndroidProjectConfig;
   cxx?: CxxProjectConfig;
   html?: HtmlProjectConfig;
-  compiler?: ProjectCompilerConfig;
-}
-
-export interface CompilerPaths {
-  rootPath: string;
-  tiecPath: string;
-  stdlibsPath: string;
 }
 
 export interface ProjectInfo {
@@ -88,7 +77,6 @@ export interface ProjectInfo {
   projectSourceRoots: string[];
   stdlibSourceRoot?: string;
   sourceFiles: string[];
-  compiler: CompilerPaths;
 }
 
 export interface NativeSession {

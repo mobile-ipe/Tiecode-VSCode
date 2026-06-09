@@ -6,6 +6,7 @@ import { AndroidLogcatService } from "./logcat";
 import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
 import { ProjectInfo, ProjectKind } from "./types";
+import { TiecodeWasmBuildService } from "./wasmBuild";
 import { getProjectBuildMode, getProjectInfo, normalizeProjectKind } from "./workspace";
 
 interface TiecodeDebugConfiguration extends vscode.DebugConfiguration {
@@ -17,11 +18,12 @@ export function registerRunCommands(
   output: vscode.OutputChannel,
   toolchain: ToolchainService,
   sourceMapping: SourceMappingService,
-  logcat: AndroidLogcatService
+  logcat: AndroidLogcatService,
+  compiler: TiecodeWasmBuildService
 ): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("tiecode.runProject", () => runTiecodeProject(output, toolchain, sourceMapping, logcat)),
-    vscode.debug.registerDebugConfigurationProvider("tiecode", new TiecodeDebugConfigurationProvider(output, toolchain, sourceMapping, logcat))
+    vscode.commands.registerCommand("tiecode.runProject", () => runTiecodeProject(output, toolchain, sourceMapping, logcat, compiler)),
+    vscode.debug.registerDebugConfigurationProvider("tiecode", new TiecodeDebugConfigurationProvider(output, toolchain, sourceMapping, logcat, compiler))
   );
 }
 
@@ -30,6 +32,7 @@ export async function runTiecodeProject(
   toolchain: ToolchainService,
   sourceMapping: SourceMappingService,
   logcat: AndroidLogcatService,
+  compiler: TiecodeWasmBuildService,
   requestedKind?: ProjectKind
 ): Promise<void> {
   output.clear();
@@ -42,14 +45,14 @@ export async function runTiecodeProject(
     try {
       const project = resolveRunProject(requestedKind);
       if (project.kind === "android") {
-        await runAndroidProject(project, output, toolchain, sourceMapping, logcat);
+        await runAndroidProject(project, output, toolchain, sourceMapping, logcat, compiler);
         return;
       }
       if (project.kind === "cxx") {
-        await runCxxProject(project, output);
+        await runCxxProject(project, output, compiler);
         return;
       }
-      await runHtmlProject(project, output);
+      await runHtmlProject(project, output, compiler);
     } catch (error) {
       void vscode.window.showErrorMessage(`结绳运行失败: ${String(error instanceof Error ? error.message : error)}`);
     }
@@ -61,7 +64,8 @@ class TiecodeDebugConfigurationProvider implements vscode.DebugConfigurationProv
     private readonly output: vscode.OutputChannel,
     private readonly toolchain: ToolchainService,
     private readonly sourceMapping: SourceMappingService,
-    private readonly logcat: AndroidLogcatService
+    private readonly logcat: AndroidLogcatService,
+    private readonly compiler: TiecodeWasmBuildService
   ) {}
 
   provideDebugConfigurations(): vscode.DebugConfiguration[] {
@@ -80,7 +84,7 @@ class TiecodeDebugConfigurationProvider implements vscode.DebugConfigurationProv
     config: TiecodeDebugConfiguration
   ): Promise<vscode.DebugConfiguration | undefined> {
     const projectKind = normalizeProjectKind(config.projectKind);
-    await runTiecodeProject(this.output, this.toolchain, this.sourceMapping, this.logcat, projectKind);
+    await runTiecodeProject(this.output, this.toolchain, this.sourceMapping, this.logcat, this.compiler, projectKind);
     return undefined;
   }
 }
@@ -98,7 +102,8 @@ async function runAndroidProject(
   output: vscode.OutputChannel,
   toolchain: ToolchainService,
   sourceMapping: SourceMappingService,
-  logcat: AndroidLogcatService
+  logcat: AndroidLogcatService,
+  compiler: TiecodeWasmBuildService
 ): Promise<void> {
   const buildMode = getProjectBuildMode(project.config);
   const androidToolchain = await toolchain.prepareAndroidToolchain(project);
@@ -106,7 +111,7 @@ async function runAndroidProject(
   const builtProject = await buildTiecodeProject(
     { kind: "android", platformName: "android" },
     output,
-    { buildMode, gradleTask, runGradle: true, env: androidToolchain.env, sourceMapping }
+    { buildMode, gradleTask, runGradle: true, env: androidToolchain.env, sourceMapping, compiler }
   );
   if (buildMode === "release") {
     output.appendLine("Android 正式包已构建，未自动安装运行。");
@@ -120,21 +125,22 @@ async function runAndroidProject(
   await runTool(androidToolchain.adbPath, ["shell", "am", "start", "-n", component], builtProject.rootPath, output, false, androidToolchain.env);
 }
 
-async function runCxxProject(project: ProjectInfo, output: vscode.OutputChannel): Promise<void> {
+async function runCxxProject(project: ProjectInfo, output: vscode.OutputChannel, compiler: TiecodeWasmBuildService): Promise<void> {
   const builtProject = await buildTiecodeProject(
     { kind: "cxx", platformName: project.platformName },
     output,
-    { runCmake: true }
+    { runCmake: true, compiler }
   );
   const executable = findCxxExecutable(builtProject);
   output.appendLine(`启动 CXX 程序: ${executable}`);
   await runTool(executable, [], path.dirname(executable), output, false);
 }
 
-async function runHtmlProject(project: ProjectInfo, output: vscode.OutputChannel): Promise<void> {
+async function runHtmlProject(project: ProjectInfo, output: vscode.OutputChannel, compiler: TiecodeWasmBuildService): Promise<void> {
   const builtProject = await buildTiecodeProject(
     { kind: "html", platformName: "html" },
-    output
+    output,
+    { compiler }
   );
   const htmlPath = findHtmlEntry(builtProject.outputDir);
   output.appendLine(`打开网页工程: ${htmlPath}`);
@@ -182,9 +188,8 @@ function normalizeAndroidActivityName(packageName: string, activityName: string)
 
 function findCxxExecutable(project: ProjectInfo): string {
   const buildDirectory = resolveCMakeBuildDirectory(project);
-  const settings = vscode.workspace.getConfiguration("tiecode");
-  const buildType = project.config.cxx?.cmakeBuildType ?? settings.get<string>("cxx.cmakeBuildType") ?? "Debug";
-  const targetName = project.config.cxx?.executableName ?? settings.get<string>("cxx.executableName") ?? readCMakeTargetName(project) ?? "main";
+  const buildType = project.config.cxx?.cmakeBuildType ?? "Debug";
+  const targetName = project.config.cxx?.executableName ?? readCMakeTargetName(project) ?? "main";
   const names = Array.from(new Set([targetName, "main", project.config.name].filter(isString)));
   const extension = process.platform === "win32" ? ".exe" : "";
   const directories = [

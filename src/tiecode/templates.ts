@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { EXTENSION_CONFIG_FILE, LIB_DIR_NAME, PROJECT_CONFIG_FILE, ProjectKind, SOURCE_DIR_NAME, TiecodeProjectConfig } from "./types";
-import { basicLibraryFolderName, ensureDirectory, resolveCompilerPaths, resolveStdlibSourceRoot, writeProjectConfig, writeTextFile } from "./workspace";
+import { LIB_DIR_NAME, ProjectKind, SOURCE_DIR_NAME } from "./types";
+import { basicLibraryFolderName, createProjectConfig, ensureDirectory, getBundledStdlibsPath, resolveBundledStdlibSourceRoot, writeProjectConfig, writeTextFile } from "./workspace";
 
 export function registerTemplateCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
@@ -53,48 +53,6 @@ export async function createProject(kind: ProjectKind): Promise<void> {
   }
 }
 
-function createProjectConfig(kind: ProjectKind, name: string): TiecodeProjectConfig {
-  if (kind === "android") {
-    return {
-      app_name: name,
-      app_pkg: "cn.tiecode.app",
-      project_version: 2,
-      source_version: 47,
-      min_sdk: 21,
-      target_sdk: 28,
-      version_code: 1,
-      version_name: "1.0",
-      icon_path: ""
-    };
-  }
-
-  if (kind === "html") {
-    return {
-      type: "html",
-      app_name: name,
-      name,
-      packageName: "cn.tiecode.web",
-      sourceVersion: 47,
-      html: {
-        title: name
-      }
-    };
-  }
-
-  return {
-    type: "cxx",
-    app_name: name,
-    name,
-    packageName: "cn.tiecode.cxx",
-    sourceVersion: 47,
-    cxx: {
-      target: process.platform === "win32" ? "windows" : "linux",
-      executableName: name,
-      useCmake: true
-    }
-  };
-}
-
 function writeTemplateFiles(rootPath: string, kind: ProjectKind, name: string): void {
   if (kind === "android") {
     writeTextFile(path.join(rootPath, SOURCE_DIR_NAME, "启动窗口.t"), androidTemplate());
@@ -111,11 +69,10 @@ function writeTemplateFiles(rootPath: string, kind: ProjectKind, name: string): 
 }
 
 function copyProjectBasicLibrary(rootPath: string, kind: ProjectKind): void {
-  const compiler = resolveCompilerPaths(rootPath, {});
-  const stdlibSourceRoot = resolveStdlibSourceRoot(compiler.stdlibsPath, kind);
+  const stdlibSourceRoot = resolveBundledStdlibSourceRoot(kind);
   const libraryName = basicLibraryFolderName(kind);
   if (!stdlibSourceRoot) {
-    throw new Error(`未找到${libraryName}，请检查 tiecode.compiler.stdlibsPath: ${compiler.stdlibsPath}`);
+    throw new Error(`未找到插件内置${libraryName}: ${getBundledStdlibsPath()}`);
   }
 
   const libraryRoot = path.dirname(stdlibSourceRoot);
@@ -201,8 +158,4 @@ function cmakeTemplate(name: string): string {
     `add_executable(${target} \${TIECODE_GENERATED})`,
     ""
   ].join("\n");
-}
-
-export function hasProjectConfig(rootPath: string): boolean {
-  return fs.existsSync(path.join(rootPath, PROJECT_CONFIG_FILE)) || fs.existsSync(path.join(rootPath, EXTENSION_CONFIG_FILE));
 }
