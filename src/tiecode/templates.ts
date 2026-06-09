@@ -18,7 +18,7 @@ export async function createProject(kind: ProjectKind): Promise<void> {
     return;
   }
 
-  const defaultName = kind === "android" ? "TiecodeAndroidApp" : kind === "html" ? "TiecodeWebApp" : "TiecodeCxxApp";
+  const defaultName = kind === "android" ? "我的应用" : kind === "html" ? "TiecodeWebApp" : "TiecodeCxxApp";
   const name = await vscode.window.showInputBox({
     title: "结绳工程名称",
     value: defaultName,

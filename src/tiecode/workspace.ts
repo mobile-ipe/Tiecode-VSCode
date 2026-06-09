@@ -64,7 +64,7 @@ export function getProjectInfo(uri?: vscode.Uri, overrideKind?: ProjectKind): Pr
     kind,
     platformName,
     platformNumber: TARGET_PLATFORM_NUMBER[platformName],
-    packageName: config.packageName ?? config.android?.packageName ?? config.android?.package ?? "cn.tiecode.app",
+    packageName: config.packageName ?? config.android?.packageName ?? config.android?.package ?? "我的.安卓.应用",
     sourceVersion,
     outputDir,
     lineMapPath,
@@ -100,7 +100,7 @@ export function createProjectConfig(kind: ProjectKind, name: string): TiecodePro
     return {
       typeId: projectKindTypeId("android"),
       app_name: name,
-      app_pkg: "cn.tiecode.app",
+      app_pkg: "我的.安卓.应用",
       project_version: 2,
       source_version: 47,
       min_sdk: 21,
