@@ -5,12 +5,12 @@ import { TextDecoder } from "util";
 import * as vscode from "vscode";
 import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
-import { BuildMode, BuildRequest, ProjectInfo, ProjectKind, TARGET_PLATFORM_NUMBER } from "./types";
+import { BuildMode, BuildRequest, ProjectInfo, TARGET_PLATFORM_NUMBER } from "./types";
 import { TiecodeWasmBuildService } from "./wasmBuild";
 import { ensureDirectory, getProjectBuildMode, getProjectInfo, resolveMaybeRelative } from "./workspace";
 
 export interface ToolOutputLineHandler {
-  handleLine(line: string): void;
+  handleLine(line: string): boolean | void;
   flush?(): void;
 }
 

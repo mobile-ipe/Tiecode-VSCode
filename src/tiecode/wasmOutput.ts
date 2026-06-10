@@ -6,7 +6,7 @@ export interface WasmOutputOptions {
 }
 
 export function createWasmOutputOptions(output: vscode.OutputChannel): WasmOutputOptions {
-  if (!vscode.workspace.getConfiguration("tiecode").get<boolean>("wasm.traceOutput", false)) {
+  if (!shouldTraceWasmOutput()) {
     return {
       print: () => undefined,
       printErr: () => undefined
@@ -17,4 +17,8 @@ export function createWasmOutputOptions(output: vscode.OutputChannel): WasmOutpu
     print: message => output.appendLine(String(message ?? "")),
     printErr: message => output.appendLine(String(message ?? ""))
   };
+}
+
+export function shouldTraceWasmOutput(): boolean {
+  return vscode.workspace.getConfiguration("tiecode").get<boolean>("wasm.traceOutput", false);
 }

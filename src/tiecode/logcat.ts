@@ -29,8 +29,13 @@ export class AndroidLogcatService implements vscode.Disposable {
     this.stopping = false;
 
     const stdout = new LogcatLineEmitter(line => {
+      try {
+        if (lineHandler?.handleLine(line) === true) {
+          return;
+        }
+      } catch {
+      }
       output.appendLine(line);
-      lineHandler?.handleLine(line);
     });
     const stderr = new LogcatLineEmitter(line => output.appendLine(line));
 
@@ -39,6 +44,7 @@ export class AndroidLogcatService implements vscode.Disposable {
     child.on("error", error => output.appendLine(`logcat 启动失败: ${String(error)}`));
     child.on("close", code => {
       stdout.end();
+      lineHandler?.flush?.();
       stderr.end();
       if (this.active === child) {
         this.active = undefined;

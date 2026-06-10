@@ -2,9 +2,12 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import type { ToolOutputLineHandler } from "./build";
+import { LogcatCrashHandler } from "./logcatCrash";
 import { ProjectInfo } from "./types";
 import { createWasmOutputOptions } from "./wasmOutput";
 import { loadTiecodeModule } from "./tiecRuntime";
+import { getBundledStdlibsPath } from "./workspace";
+import { mapHostPathToWasmMount, normalizeSlashes, resolveWasmOrHostPath } from "./wasmPaths";
 
 export interface SourceMappedLocation {
   sourcePath: string;
@@ -42,7 +45,7 @@ export class SourceMappingService implements vscode.Disposable {
       return existing;
     }
 
-    const promise = this.createMapping(project.lineMapPath).catch(error => {
+    const promise = this.createMapping(project).catch(error => {
       this.mappings.delete(project.lineMapPath);
       this.output.appendLine(`行号表加载失败: ${project.lineMapPath} ${String(error)}`);
       return undefined;
@@ -58,18 +61,18 @@ export class SourceMappingService implements vscode.Disposable {
 
   async createLogcatDiagnostics(project: ProjectInfo): Promise<ToolOutputLineHandler | undefined> {
     const mapping = await this.loadMapping(project);
-    return mapping ? new LogcatCrashHandler(mapping, this.diagnostics, this.output) : undefined;
+    return new LogcatCrashHandler(mapping, this.diagnostics, this.output);
   }
 
-  private async createMapping(mappingPath: string): Promise<TiecodeSourceMapping | undefined> {
+  private async createMapping(project: ProjectInfo): Promise<TiecodeSourceMapping | undefined> {
     const module = await this.loadModule();
     const tiec = module.tiec ?? module;
     if (typeof tiec.SourceMapping !== "function") {
       this.output.appendLine("当前结绳 WASM 未提供 SourceMapping。");
       return undefined;
     }
-    const wasmPath = this.writeMappingToWasmFs(module, mappingPath);
-    return new TiecodeSourceMapping(new tiec.SourceMapping(wasmPath));
+    const wasmPath = this.writeMappingToWasmFs(module, project.lineMapPath);
+    return new TiecodeSourceMapping(new tiec.SourceMapping(wasmPath), project);
   }
 
   private writeMappingToWasmFs(module: any, mappingPath: string): string {
@@ -102,22 +105,20 @@ export class SourceMappingService implements vscode.Disposable {
 }
 
 export class TiecodeSourceMapping {
-  constructor(private readonly nativeMapping: any) {}
+  constructor(
+    private readonly nativeMapping: any,
+    private readonly project: ProjectInfo
+  ) {}
 
   mapOutputLine(outputPath: string, outputLine: number): SourceMappedLocation | undefined {
     if (!Number.isFinite(outputLine) || outputLine <= 0) {
       return undefined;
     }
 
-    const candidates = Array.from(new Set([
-      outputPath,
-      path.basename(outputPath),
-      normalizeGeneratedFileName(outputPath)
-    ].filter(isString)));
-
+    const candidates = createOutputPathCandidates(outputPath, this.project);
     for (const outputFile of candidates) {
       const sourceLine = this.nativeMapping.getSourceLine(outputFile, outputLine);
-      const sourcePath = normalizeSourcePath(sourceLine?.path);
+      const sourcePath = resolveMappedSourcePath(sourceLine?.path, this.project);
       const line = Number(sourceLine?.line ?? 0);
       if (sourcePath && line > 0) {
         return {
@@ -195,93 +196,11 @@ class JavacDiagnosticsHandler implements ToolOutputLineHandler {
   }
 }
 
-class LogcatCrashHandler implements ToolOutputLineHandler {
-  private activeCrash = false;
-  private crashLineBudget = 0;
-  private crashSummary = "Android 崩溃";
-  private readonly emitted = new Set<string>();
-
-  constructor(
-    private readonly mapping: TiecodeSourceMapping,
-    private readonly collection: vscode.DiagnosticCollection,
-    private readonly output: vscode.OutputChannel
-  ) {}
-
-  handleLine(line: string): void {
-    if (line.includes("FATAL EXCEPTION")) {
-      this.activeCrash = true;
-      this.crashLineBudget = 120;
-      this.crashSummary = "Android 崩溃";
-      this.emitted.clear();
-      this.output.appendLine("=> 检测到 Android 崩溃，正在按结绳行号表还原栈帧。");
-      return;
-    }
-
-    if (!this.activeCrash) {
-      return;
-    }
-
-    this.crashLineBudget -= 1;
-    if (this.crashLineBudget <= 0) {
-      this.activeCrash = false;
-      return;
-    }
-
-    const exception = line.match(/\b([A-Za-z_$][\w$.]*Exception|[A-Za-z_$][\w$.]*Error):\s*(.*)$/);
-    if (exception) {
-      this.crashSummary = this.mapping.restoreText(`${exception[1]}: ${exception[2] ?? ""}`.trim());
-      this.output.appendLine(`=> ${this.crashSummary}`);
-      return;
-    }
-
-    const frame = parseStackFrame(line);
-    if (!frame) {
-      return;
-    }
-
-    const mapped = this.mapping.mapOutputLine(frame.fileName, frame.line);
-    if (!mapped) {
-      return;
-    }
-
-    const restoredClass = this.mapping.restoreQualifiedName(frame.className);
-    const restoredMethod = this.mapping.getOriginalName(frame.methodName) ?? frame.methodName;
-    const key = `${mapped.sourcePath}:${mapped.sourceLine}:${restoredClass}.${restoredMethod}`;
-    if (this.emitted.has(key)) {
-      return;
-    }
-    this.emitted.add(key);
-
-    this.output.appendLine(`=> 结绳栈帧: ${mapped.sourcePath}:${mapped.sourceLine} ${restoredClass}.${restoredMethod}`);
-    this.addCrashDiagnostic(mapped, `${this.crashSummary}: ${restoredClass}.${restoredMethod}`);
-  }
-
-  private addCrashDiagnostic(mapped: SourceMappedLocation, message: string): void {
-    const uri = vscode.Uri.file(mapped.sourcePath);
-    const existing = this.collection.get(uri) ?? [];
-    const line = Math.max(0, mapped.sourceLine - 1);
-    const diagnostic = new vscode.Diagnostic(
-      new vscode.Range(line, 0, line, Number.MAX_SAFE_INTEGER),
-      message,
-      vscode.DiagnosticSeverity.Error
-    );
-    diagnostic.source = "tiecode logcat";
-    this.collection.set(uri, [...existing, diagnostic]);
-  }
-}
-
 interface JavacDiagnosticLine {
   outputPath: string;
   line: number;
   severity: vscode.DiagnosticSeverity;
   message: string;
-}
-
-interface StackFrameLine {
-  className: string;
-  methodName: string;
-  fileName: string;
-  line: number;
 }
 
 function parseJavacDiagnosticLine(line: string): JavacDiagnosticLine | undefined {
@@ -304,24 +223,6 @@ function parseJavacDiagnosticLine(line: string): JavacDiagnosticLine | undefined
   };
 }
 
-function parseStackFrame(line: string): StackFrameLine | undefined {
-  const match = line.match(/\bat\s+([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\.([A-Za-z_$][\w$<>$]*)\(([^:()]+\.java):(\d+)\)/);
-  if (!match) {
-    return undefined;
-  }
-
-  const frameLine = Number(match[4]);
-  if (!Number.isFinite(frameLine)) {
-    return undefined;
-  }
-  return {
-    className: match[1] ?? "",
-    methodName: match[2] ?? "",
-    fileName: match[3] ?? "",
-    line: frameLine
-  };
-}
-
 function toDiagnosticSeverity(kind: string): vscode.DiagnosticSeverity {
   const normalized = kind.toLocaleLowerCase();
   if (normalized.includes("warning") || normalized.includes("警告")) {
@@ -334,11 +235,55 @@ function toDiagnosticSeverity(kind: string): vscode.DiagnosticSeverity {
 }
 
 function normalizeGeneratedFileName(outputPath: string): string {
-  return outputPath.replace(/\\/g, "/").split("/").pop() ?? outputPath;
+  return normalizeSlashes(outputPath).split("/").pop() ?? outputPath;
 }
 
-function normalizeSourcePath(sourcePath: unknown): string {
-  return typeof sourcePath === "string" ? path.normalize(sourcePath) : "";
+function createOutputPathCandidates(outputPath: string, project: ProjectInfo): string[] {
+  const candidates: string[] = [
+    outputPath,
+    normalizeSlashes(outputPath),
+    normalizeGeneratedFileName(outputPath)
+  ];
+
+  for (const hostPath of createGeneratedHostPathCandidates(outputPath, project)) {
+    const wasmPath = mapHostPathToWasmMount(hostPath, {
+      mountPoint: "/project",
+      hostRoot: project.rootPath
+    });
+    if (wasmPath) {
+      candidates.push(wasmPath);
+    }
+  }
+
+  return Array.from(new Set(candidates.filter(isString)));
+}
+
+function createGeneratedHostPathCandidates(outputPath: string, project: ProjectInfo): string[] {
+  if (path.isAbsolute(outputPath)) {
+    return [outputPath];
+  }
+
+  return [
+    path.join(project.outputDir, outputPath),
+    path.join(project.rootPath, outputPath)
+  ];
+}
+
+function resolveMappedSourcePath(sourcePath: unknown, project: ProjectInfo): string {
+  if (typeof sourcePath !== "string" || sourcePath.length === 0) {
+    return "";
+  }
+
+  return resolveWasmOrHostPath(sourcePath, project.rootPath, [
+    {
+      mountPoint: "/project",
+      hostRoot: project.rootPath
+    },
+    {
+      mountPoint: "/stdlibs",
+      hostRoot: getBundledStdlibsPath()
+    }
+  ]);
 }
 
 function hashText(text: string): string {

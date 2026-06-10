@@ -3,6 +3,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { createTiecodeOptions, loadTiecodeModule } from "./tiecRuntime";
 import { BuildMode, ProjectInfo } from "./types";
+import { mapHostPathToWasmMounts } from "./wasmPaths";
+import { shouldTraceWasmOutput } from "./wasmOutput";
 import { getBundledStdlibsPath, isInsideRoot } from "./workspace";
 
 interface MountedRoots {
@@ -74,7 +76,7 @@ export class TiecodeWasmBuildService {
     const lines = String(message ?? "").split(/\r?\n/).map(line => line.trimEnd()).filter(Boolean);
     for (const line of lines) {
       this.activeBuildLogs?.push(line);
-      if (shouldShowBuildLog(line) || shouldTraceCompilerOutput()) {
+      if (shouldShowBuildLog(line) || shouldTraceWasmOutput()) {
         this.output.appendLine(line);
       }
     }
@@ -131,25 +133,20 @@ function mountNodeFs(fsApi: any, nodeFs: any, mountPoint: string, hostRoot: stri
 
 function mapHostPathToWasm(hostPath: string, mounts: MountedRoots): string {
   const resolved = path.resolve(hostPath);
-  if (isInsideOrSame(resolved, mounts.projectRoot)) {
-    return joinWasmPath(mounts.projectMount, path.relative(mounts.projectRoot, resolved));
-  }
-  if (isInsideOrSame(resolved, mounts.stdlibsRoot)) {
-    return joinWasmPath(mounts.stdlibsMount, path.relative(mounts.stdlibsRoot, resolved));
+  const wasmPath = mapHostPathToWasmMounts(resolved, [
+    {
+      mountPoint: mounts.projectMount,
+      hostRoot: mounts.projectRoot
+    },
+    {
+      mountPoint: mounts.stdlibsMount,
+      hostRoot: mounts.stdlibsRoot
+    }
+  ]);
+  if (wasmPath) {
+    return wasmPath;
   }
   throw new Error(`无法映射到 WASM 挂载目录: ${resolved}`);
-}
-
-function isInsideOrSame(filePath: string, rootPath: string): boolean {
-  const relative = path.relative(rootPath, filePath);
-  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
-}
-
-function joinWasmPath(root: string, relativePath: string): string {
-  if (!relativePath) {
-    return root;
-  }
-  return `${root}/${relativePath.replace(/\\/g, "/")}`;
 }
 
 function formatBuildFailure(logs: string[]): string {
@@ -170,8 +167,4 @@ function isCompilerErrorLine(line: string): boolean {
 
 function isCompilerWarningLine(line: string): boolean {
   return /^\[WARNING\]/i.test(line) || /[:：]警告\(/.test(line);
-}
-
-function shouldTraceCompilerOutput(): boolean {
-  return vscode.workspace.getConfiguration("tiecode").get<boolean>("wasm.traceOutput", false);
 }

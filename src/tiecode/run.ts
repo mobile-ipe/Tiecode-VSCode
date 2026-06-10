@@ -7,11 +7,14 @@ import { SourceMappingService } from "./sourceMapping";
 import { ToolchainService } from "./toolchain";
 import { ProjectInfo, ProjectKind } from "./types";
 import { TiecodeWasmBuildService } from "./wasmBuild";
+import { resolveWasmOrHostPath } from "./wasmPaths";
 import { getProjectBuildMode, getProjectInfo, normalizeProjectKind } from "./workspace";
 
 interface TiecodeDebugConfiguration extends vscode.DebugConfiguration {
   projectKind?: ProjectKind | "auto";
 }
+
+type JsonObject = Record<string, unknown>;
 
 export function registerRunCommands(
   context: vscode.ExtensionContext,
@@ -148,12 +151,42 @@ async function runHtmlProject(project: ProjectInfo, output: vscode.OutputChannel
 }
 
 function resolveAndroidLaunchComponent(project: ProjectInfo): string {
-  const activityName = findLauncherActivity(project);
-  return `${project.packageName}/${normalizeAndroidActivityName(project.packageName, activityName)}`;
+  const metadata = readAndroidBuildMetadata(project);
+  const productInfo = asJsonObject(metadata.productInfo);
+  const packageName = readMetadataString(productInfo.packageName, "productInfo.packageName");
+  const manifestPath = resolveWasmOrHostPath(readMetadataString(productInfo.manifest, "productInfo.manifest"), project.rootPath, [{
+    mountPoint: "/project",
+    hostRoot: project.rootPath
+  }]);
+  const activityName = findLauncherActivity(manifestPath);
+  return `${packageName}/${normalizeAndroidActivityName(packageName, activityName)}`;
 }
 
-function findLauncherActivity(project: ProjectInfo): string {
-  const manifestPath = path.join(project.outputDir, "app", "src", "main", "AndroidManifest.xml");
+function readAndroidBuildMetadata(project: ProjectInfo): JsonObject {
+  const metadataPath = path.join(project.outputDir, "metadata.json");
+  if (!fs.existsSync(metadataPath)) {
+    throw new Error(`未找到 Android 编译元数据: ${metadataPath}`);
+  }
+
+  try {
+    return asJsonObject(JSON.parse(fs.readFileSync(metadataPath, "utf8")));
+  } catch (error) {
+    throw new Error(`Android 编译元数据读取失败: ${metadataPath} ${String(error)}`);
+  }
+}
+
+function asJsonObject(value: unknown): JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as JsonObject : {};
+}
+
+function readMetadataString(value: unknown, fieldName: string): string {
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value.trim();
+  }
+  throw new Error(`Android 编译元数据缺少 ${fieldName}`);
+}
+
+function findLauncherActivity(manifestPath: string): string {
   if (!fs.existsSync(manifestPath)) {
     throw new Error(`未找到 AndroidManifest.xml: ${manifestPath}`);
   }

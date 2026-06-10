@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { TiecodeCompilerService } from "./compilerService";
 import { nativeListToArray, parseNativeResult, toVscodeRange, tryToVscodeUri } from "./interop";
-import { isTiecodeDocument, isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
+import { isTiecodeRelatedDocument, isTlyDocument } from "./workspace";
 
 export class TiecodeDiagnostics {
   private readonly timers = new Map<string, NodeJS.Timeout>();
