@@ -8,6 +8,7 @@ import { createWasmOutputOptions } from "./wasmOutput";
 import { loadTiecodeModule } from "./tiecRuntime";
 import { getBundledStdlibsPath } from "./workspace";
 import { mapHostPathToWasmMount, normalizeSlashes, resolveWasmOrHostPath } from "./wasmPaths";
+import { formatLabeledSourceLocation } from "./sourceLocationFormat";
 
 export interface SourceMappedLocation {
   sourcePath: string;
@@ -202,7 +203,10 @@ class JavacDiagnosticsHandler implements ToolOutputLineHandler {
 
     const key = sourceUri.toString();
     this.diagnostics.set(key, [...(this.diagnostics.get(key) ?? []), vscodeDiagnostic]);
-    this.output.appendLine(`=> 结绳源: ${mapped.sourcePath}:${mapped.sourceLine}: ${message}`);
+    this.output.appendLine(formatLabeledSourceLocation("结绳源", {
+      sourcePath: mapped.sourcePath,
+      line: mapped.sourceLine
+    }, message));
     this.javacDetailState = "source";
     return true;
   }

@@ -102,5 +102,8 @@ function sourceVersionKey(sourceVersion: number): string {
   if (sourceVersion === 46) {
     return "VERSION_4_6";
   }
-  return "VERSION_4_7";
+  if (sourceVersion === 47) {
+    return "VERSION_4_7";
+  }
+  return "VERSION_4_6";
 }

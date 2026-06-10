@@ -8,6 +8,7 @@ import {
   translateCrashException
 } from "./exceptionTranslator";
 import type { SourceMappedLocation, TiecodeSourceMapping } from "./sourceMapping";
+import { formatLabeledSourceLocation } from "./sourceLocationFormat";
 
 export class LogcatCrashHandler implements ToolOutputLineHandler {
   private activeCrash = false;
@@ -161,7 +162,10 @@ export class LogcatCrashHandler implements ToolOutputLineHandler {
     const diagnosticSummary = this.getDiagnosticSummary(summaries);
     if (this.mappedFrames.length > 0) {
       for (const frame of this.mappedFrames) {
-        this.output.appendLine(`=> 结绳栈帧: ${frame.mapped.sourcePath}:${frame.mapped.sourceLine} ${frame.frameText}`);
+        this.output.appendLine(formatLabeledSourceLocation("结绳栈帧", {
+          sourcePath: frame.mapped.sourcePath,
+          line: frame.mapped.sourceLine
+        }, frame.frameText));
         this.addCrashDiagnostic(frame.mapped, `${diagnosticSummary}: ${frame.frameText}`);
       }
       return;

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { createTiecodeOptions, loadTiecodeModule } from "./tiecRuntime";
+import { formatTiecodeCompilerOutputLine } from "./sourceLocationFormat";
 import { BuildMode, ProjectInfo } from "./types";
 import { mapHostPathToWasmMounts } from "./wasmPaths";
 import { shouldTraceWasmOutput } from "./wasmOutput";
@@ -18,6 +19,7 @@ export class TiecodeWasmBuildService {
   private modulePromise?: Promise<any>;
   private buildQueue: Promise<void> = Promise.resolve();
   private activeBuildLogs?: string[];
+  private activeBuildMounts?: MountedRoots;
 
   constructor(
     private readonly context: vscode.ExtensionContext,
@@ -36,6 +38,7 @@ export class TiecodeWasmBuildService {
     const mounts = createMountedRoots(project);
     const buildLogs: string[] = [];
     this.activeBuildLogs = buildLogs;
+    this.activeBuildMounts = mounts;
 
     try {
       prepareHostOutputDirectory(project);
@@ -57,6 +60,7 @@ export class TiecodeWasmBuildService {
       }
     } finally {
       this.activeBuildLogs = undefined;
+      this.activeBuildMounts = undefined;
     }
   }
 
@@ -75,9 +79,12 @@ export class TiecodeWasmBuildService {
   private handleWasmMessage(message: string): void {
     const lines = String(message ?? "").split(/\r?\n/).map(line => line.trimEnd()).filter(Boolean);
     for (const line of lines) {
-      this.activeBuildLogs?.push(line);
-      if (shouldShowBuildLog(line) || shouldTraceWasmOutput()) {
-        this.output.appendLine(line);
+      const outputLine = this.activeBuildMounts
+        ? formatTiecodeCompilerOutputLine(line, this.activeBuildMounts.projectRoot, createSourcePathMounts(this.activeBuildMounts))
+        : line;
+      this.activeBuildLogs?.push(outputLine);
+      if (shouldShowBuildLog(outputLine) || shouldTraceWasmOutput()) {
+        this.output.appendLine(outputLine);
       }
     }
   }
@@ -90,6 +97,19 @@ function createMountedRoots(project: ProjectInfo): MountedRoots {
     projectMount: "/project",
     stdlibsMount: "/stdlibs"
   };
+}
+
+function createSourcePathMounts(mounts: MountedRoots) {
+  return [
+    {
+      mountPoint: mounts.projectMount,
+      hostRoot: mounts.projectRoot
+    },
+    {
+      mountPoint: mounts.stdlibsMount,
+      hostRoot: mounts.stdlibsRoot
+    }
+  ];
 }
 
 function prepareHostOutputDirectory(project: ProjectInfo): void {

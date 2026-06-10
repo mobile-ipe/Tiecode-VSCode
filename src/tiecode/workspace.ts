@@ -27,6 +27,15 @@ const PROJECT_KIND_TYPE_IDS: Record<ProjectKind, string> = {
   html: "cn.tiecode.html"
 };
 
+const ROOT_BASIC_LIBRARY_NAMES: Record<ProjectKind, string> = {
+  android: "安卓基本库",
+  cxx: "CXX基本库",
+  html: "网页基本库"
+};
+
+export const PROJECT_CONFIG_DEFAULT_SOURCE_VERSION = 46;
+const NEW_PROJECT_SOURCE_VERSION = 47;
+
 export function getWorkspaceRoot(uri?: vscode.Uri): string | undefined {
   if (uri) {
     const folder = vscode.workspace.getWorkspaceFolder(uri);
@@ -50,7 +59,7 @@ export function getProjectInfo(uri?: vscode.Uri, overrideKind?: ProjectKind): Pr
   const outputDir = resolveOutputDirectory(rootPath);
   const lineMapPath = path.join(outputDir, "mapping.bin");
   const projectSourceRoots = collectProjectSourceRoots(rootPath);
-  const projectStdlibSourceRoot = resolveProjectStdlibSourceRoot(rootPath, kind);
+  const projectStdlibSourceRoot = resolveRootBasicLibrarySourceRoot(rootPath, kind) ?? resolveProjectStdlibSourceRoot(rootPath, kind);
   const bundledStdlibSourceRoot = resolveBundledStdlibSourceRoot(kind);
   const stdlibSourceRoot = projectStdlibSourceRoot ?? bundledStdlibSourceRoot;
   const fallbackStdlibRoots = projectStdlibSourceRoot ? [] : (bundledStdlibSourceRoot ? [bundledStdlibSourceRoot] : []);
@@ -102,7 +111,7 @@ export function createProjectConfig(kind: ProjectKind, name: string): TiecodePro
       app_name: name,
       app_pkg: "我的.安卓.应用",
       project_version: 2,
-      source_version: 47,
+      source_version: NEW_PROJECT_SOURCE_VERSION,
       min_sdk: 21,
       target_sdk: 28,
       version_code: 1,
@@ -116,7 +125,7 @@ export function createProjectConfig(kind: ProjectKind, name: string): TiecodePro
     return {
       typeId: projectKindTypeId("html"),
       app_name: name,
-      source_version: 47,
+      source_version: NEW_PROJECT_SOURCE_VERSION,
       html: {
         title: name
       }
@@ -126,7 +135,7 @@ export function createProjectConfig(kind: ProjectKind, name: string): TiecodePro
   return {
     typeId: projectKindTypeId("cxx"),
     app_name: name,
-    source_version: 47,
+    source_version: NEW_PROJECT_SOURCE_VERSION,
     cxx: {
       target: process.platform === "win32" ? "windows" : "linux",
       executableName: name,
@@ -309,6 +318,25 @@ export function resolveProjectStdlibSourceRoot(rootPath: string, kind: ProjectKi
   return undefined;
 }
 
+function resolveRootBasicLibrarySourceRoot(rootPath: string, kind: ProjectKind): string | undefined {
+  if (!isRootBasicLibrary(rootPath, kind)) {
+    return undefined;
+  }
+
+  const sourceRoot = path.join(rootPath, SOURCE_DIR_NAME);
+  return fs.existsSync(sourceRoot) ? sourceRoot : undefined;
+}
+
+function isRootBasicLibrary(rootPath: string, kind: ProjectKind): boolean {
+  const configPath = path.join(rootPath, "lib.json");
+  if (!fs.existsSync(configPath)) {
+    return false;
+  }
+
+  const config = readJsonFile(configPath);
+  return config.name === ROOT_BASIC_LIBRARY_NAMES[kind];
+}
+
 export function collectProjectSourceRoots(rootPath: string): string[] {
   const roots: string[] = [];
   const sourceRoot = path.join(rootPath, SOURCE_DIR_NAME);
@@ -436,8 +464,8 @@ export function normalizePlatformName(value: unknown): PlatformName | undefined 
 }
 
 export function normalizeSourceVersion(value: unknown): number {
-  const configured = Number(value ?? 47);
-  return configured === 40 || configured === 46 || configured === 47 ? configured : 47;
+  const configured = Number(value ?? PROJECT_CONFIG_DEFAULT_SOURCE_VERSION);
+  return configured === 40 || configured === 46 || configured === 47 ? configured : PROJECT_CONFIG_DEFAULT_SOURCE_VERSION;
 }
 
 export function getProjectBuildMode(config: TiecodeProjectConfig): BuildMode {

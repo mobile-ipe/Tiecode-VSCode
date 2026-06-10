@@ -4,6 +4,7 @@ import { registerConfigView } from "./tiecode/configView";
 import { TiecodeCompilerService } from "./tiecode/compilerService";
 import { TiecodeDiagnostics } from "./tiecode/diagnostics";
 import { applyTlyLayout, exportTlyLayout } from "./tiecode/layoutCommands";
+import { registerLayoutDesigner } from "./tiecode/layoutDesigner";
 import { AndroidLogcatService } from "./tiecode/logcat";
 import { openTiecodeProject } from "./tiecode/projectLifecycle";
 import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
@@ -40,6 +41,7 @@ export function activate(context: vscode.ExtensionContext): void {
   });
   registerTemplateCommands(context);
   registerTspImport(context);
+  registerLayoutDesigner(context, compilerService);
 
   context.subscriptions.push(
     vscode.commands.registerCommand("tiecode.reloadProject", async () => {

@@ -144,7 +144,7 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
       kind,
       appName: android.appName ?? effective.name ?? effective.app_name ?? "",
       packageName: project?.packageName ?? effective.app_pkg ?? effective.packageName ?? "",
-      sourceVersion: project?.sourceVersion ?? effective.source_version ?? effective.sourceVersion ?? 47,
+      sourceVersion: project?.sourceVersion ?? normalizeSourceVersion(effective.source_version ?? effective.sourceVersion),
       buildMode: getProjectBuildMode(effective),
       minSdk: android.minSdk ?? effective.min_sdk ?? 21,
       targetSdk: android.targetSdk ?? effective.target_sdk ?? 28,

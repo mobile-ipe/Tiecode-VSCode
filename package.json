@@ -41,6 +41,7 @@
     "onCommand:tiecode.showSyncedSource",
     "onCommand:tiecode.exportTlyLayout",
     "onCommand:tiecode.applyTlyLayout",
+    "onCommand:tiecode.openLayoutDesigner",
     "onCustomEditor:tiecode.tspProject",
     "onDebug:tiecode",
     "onView:tiecode.configView"
@@ -178,6 +179,10 @@
       {
         "command": "tiecode.applyTlyLayout",
         "title": "结绳: 应用 TLY 布局"
+      },
+      {
+        "command": "tiecode.openLayoutDesigner",
+        "title": "结绳: 打开布局设计器"
       }
     ],
     "debuggers": [
@@ -320,6 +325,10 @@
         },
         {
           "command": "tiecode.applyTlyLayout"
+        },
+        {
+          "command": "tiecode.openLayoutDesigner",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -335,6 +344,11 @@
         },
         {
           "command": "tiecode.exportTlyLayout",
+          "when": "editorLangId == tiecode",
+          "group": "navigation"
+        },
+        {
+          "command": "tiecode.openLayoutDesigner",
           "when": "editorLangId == tiecode",
           "group": "navigation"
         }
