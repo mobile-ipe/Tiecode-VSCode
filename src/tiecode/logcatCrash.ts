@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import type { ToolOutputLineHandler } from "./build";
+import type { ToolOutputLineHandler, ToolOutputLineResult } from "./build";
 import {
   CrashExceptionInfo,
   CrashExceptionRelation,
@@ -25,7 +25,7 @@ export class LogcatCrashHandler implements ToolOutputLineHandler {
     private readonly output: vscode.OutputChannel
   ) {}
 
-  handleLine(line: string): boolean {
+  handleLine(line: string): ToolOutputLineResult {
     if (line.includes("FATAL EXCEPTION")) {
       this.finalizeCrash();
       this.startCrash();
@@ -33,13 +33,13 @@ export class LogcatCrashHandler implements ToolOutputLineHandler {
     }
 
     if (!this.activeCrash) {
-      return false;
+      return undefined;
     }
 
     this.crashLineBudget -= 1;
     if (this.crashLineBudget <= 0) {
       this.finalizeCrash();
-      return false;
+      return undefined;
     }
     this.scheduleFinalize();
 

@@ -9,8 +9,10 @@ import { BuildMode, BuildRequest, ProjectInfo, TARGET_PLATFORM_NUMBER } from "./
 import { TiecodeWasmBuildService } from "./wasmBuild";
 import { ensureDirectory, getProjectBuildMode, getProjectInfo, resolveMaybeRelative } from "./workspace";
 
+export type ToolOutputLineResult = true | string | void;
+
 export interface ToolOutputLineHandler {
-  handleLine(line: string): boolean | void;
+  handleLine(line: string): ToolOutputLineResult;
   flush?(): void;
 }
 
@@ -251,7 +253,7 @@ class ProcessOutputDecoder {
     private readonly append: (text: string) => void,
     lineHandler?: ToolOutputLineHandler
   ) {
-    this.lines = lineHandler ? new ProcessLineEmitter(lineHandler) : undefined;
+    this.lines = lineHandler ? new ProcessLineEmitter(lineHandler, append) : undefined;
   }
 
   write(data: Buffer): void {
@@ -294,40 +296,52 @@ class ProcessOutputDecoder {
   }
 
   private appendDecoded(text: string): void {
+    if (this.lines) {
+      this.lines.write(text);
+      return;
+    }
     this.append(text);
-    this.lines?.write(text);
   }
 }
 
 class ProcessLineEmitter {
   private pending = "";
 
-  constructor(private readonly handler: ToolOutputLineHandler) {}
+  constructor(
+    private readonly handler: ToolOutputLineHandler,
+    private readonly append: (text: string) => void
+  ) {}
 
   write(text: string): void {
     this.pending += text;
     let newline = this.pending.search(/\r?\n/);
     while (newline >= 0) {
       const line = this.pending.slice(0, newline).replace(/\r$/, "");
-      this.pending = this.pending.slice(newline + (this.pending[newline] === "\r" && this.pending[newline + 1] === "\n" ? 2 : 1));
-      this.emit(line);
+      const lineEnding = this.pending[newline] === "\r" && this.pending[newline + 1] === "\n" ? "\r\n" : "\n";
+      this.pending = this.pending.slice(newline + (lineEnding === "\r\n" ? 2 : 1));
+      this.emit(line, lineEnding);
       newline = this.pending.search(/\r?\n/);
     }
   }
 
   end(): void {
     if (this.pending.length > 0) {
-      this.emit(this.pending.replace(/\r$/, ""));
+      this.emit(this.pending.replace(/\r$/, ""), "");
       this.pending = "";
     }
   }
 
-  private emit(line: string): void {
+  private emit(line: string, lineEnding: string): void {
+    let result: ToolOutputLineResult = undefined;
     try {
-      this.handler.handleLine(line);
+      result = this.handler.handleLine(line);
     } catch {
       // 输出处理不能影响实际构建进程。
     }
+    if (result === true) {
+      return;
+    }
+    this.append(`${typeof result === "string" ? result : line}${lineEnding}`);
   }
 }
 

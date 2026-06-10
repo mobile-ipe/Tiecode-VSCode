@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import type { ToolOutputLineHandler } from "./build";
+import type { ToolOutputLineHandler, ToolOutputLineResult } from "./build";
 import { LogcatCrashHandler } from "./logcatCrash";
 import { ProjectInfo } from "./types";
 import { createWasmOutputOptions } from "./wasmOutput";
@@ -155,6 +155,7 @@ export class TiecodeSourceMapping {
 
 class JavacDiagnosticsHandler implements ToolOutputLineHandler {
   private readonly diagnostics = new Map<string, vscode.Diagnostic[]>();
+  private javacDetailState: JavacDetailState = "none";
 
   constructor(
     private readonly mapping: TiecodeSourceMapping,
@@ -162,7 +163,22 @@ class JavacDiagnosticsHandler implements ToolOutputLineHandler {
     private readonly output: vscode.OutputChannel
   ) {}
 
-  handleLine(line: string): void {
+  handleLine(line: string): ToolOutputLineResult {
+    if (this.javacDetailState === "pointer") {
+      this.javacDetailState = "none";
+      if (isJavacPointerLine(line)) {
+        return undefined;
+      }
+    }
+
+    if (this.javacDetailState === "source") {
+      this.javacDetailState = "none";
+      if (isJavacSourceExcerptLine(line) && !parseJavacDiagnosticLine(line)) {
+        this.javacDetailState = "pointer";
+        return this.mapping.restoreText(line);
+      }
+    }
+
     const diagnostic = parseJavacDiagnosticLine(line);
     if (!diagnostic) {
       return;
@@ -187,6 +203,8 @@ class JavacDiagnosticsHandler implements ToolOutputLineHandler {
     const key = sourceUri.toString();
     this.diagnostics.set(key, [...(this.diagnostics.get(key) ?? []), vscodeDiagnostic]);
     this.output.appendLine(`=> 结绳源: ${mapped.sourcePath}:${mapped.sourceLine}: ${message}`);
+    this.javacDetailState = "source";
+    return true;
   }
 
   flush(): void {
@@ -194,6 +212,16 @@ class JavacDiagnosticsHandler implements ToolOutputLineHandler {
       this.collection.set(vscode.Uri.parse(uri), diagnostics);
     }
   }
+}
+
+type JavacDetailState = "none" | "source" | "pointer";
+
+function isJavacPointerLine(line: string): boolean {
+  return /^\s*\^+\s*$/.test(line);
+}
+
+function isJavacSourceExcerptLine(line: string): boolean {
+  return /^\s+\S/.test(line) && !isJavacPointerLine(line);
 }
 
 interface JavacDiagnosticLine {
