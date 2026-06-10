@@ -33,32 +33,32 @@ TTS文字转语音工具类
 	@end
 
 	//设置朗读和转文件的语速
-	属性写 语速(语速 为 小数)
+	属性写 语速(语速: 小数)
 		code mSpeech.setSpeechRate((float) #语速);
 	结束 属性
 
 	//设置朗读和转文件的语速，音调越高，越偏向女声
-	属性写 音调(音调 为 小数)
+	属性写 音调(音调: 小数)
 		code mSpeech.setPitch((float) #音调);
 	结束 属性
 
 	//设置语言环境
-	属性写 语言(语言 为 语言环境)
+	属性写 语言(语言: 语言环境)
 		code mSpeech.setLanguage(#语言);
 	结束 属性
 
 	//获取TTS朗读状态，若正在朗读，则返回真，反之则假
-	属性读 朗读状态() 为 逻辑型
+	属性读 朗读状态(): 逻辑型
 		code return mSpeech.isSpeaking();
 	结束 属性
 
 	//朗读一段文本
-	方法 朗读文本(欲朗读文本 为 文本)
+	方法 朗读文本(欲朗读文本: 文本)
 		code mSpeech.speak(#欲朗读文本, TextToSpeech.QUEUE_FLUSH, null);
 	结束 方法
 
 	//将文本转为wav语音文件
-	方法 文本转wav(欲转换文本 为 文本,保存路径 为 文本)
+	方法 文本转wav(欲转换文本: 文本,保存路径: 文本)
 		@code
 		HashMap<String, String> myHashRender = new HashMap<>();
 		myHashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, #欲转换文本);
@@ -77,6 +77,6 @@ TTS文字转语音工具类
 	结束 方法
 
 	//TTS初始化完毕触发该事件，返回是否初始化成功
-	定义事件 初始化完毕(结果 为 逻辑型)
+	定义事件 初始化完毕(结果: 逻辑型)
 
 结束 类

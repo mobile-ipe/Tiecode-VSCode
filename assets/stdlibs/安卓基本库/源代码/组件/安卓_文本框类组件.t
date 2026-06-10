@@ -99,7 +99,7 @@
 	结束 属性
 
 	//设置文本框字体大小
-	属性写 字体大小(字体大小 为 对象)
+	属性写 字体大小(字体大小: 对象)
 		@code
 		if (#字体大小 instanceof Number) {
             int size = ((Number) #字体大小).intValue();
@@ -122,54 +122,54 @@
 	结束 属性
 
 	//获取字体大小 PX
-	属性读 字体大小() 为 整数
+	属性读 字体大小(): 整数
 		code return (int)getView().getTextSize();
 	结束 属性
 
 	//设置文本框字体大小 PX
 	@废弃使用("建议直接使用'字体大小'属性设置px")
-	属性写 字体大小PX(字体大小 为 整数)
+	属性写 字体大小PX(字体大小: 整数)
 		code getView().setTextSize(0,#字体大小);
 	结束 属性
 
 	//设置文本框字体大小 DP
 	@废弃使用("建议直接使用'字体大小'属性设置dp")
-	属性写 字体大小DP(字体大小 为 整数)
+	属性写 字体大小DP(字体大小: 整数)
 		code getView().setTextSize(1,#字体大小);
 	结束 属性
 
 	//设置文本框字体颜色
-	属性写 字体颜色(字体颜色 为 整数)
+	属性写 字体颜色(字体颜色: 整数)
 		code getView().setTextColor(#字体颜色);
 	结束 属性
 
 	//获取文本框字体颜色
-	属性读 字体颜色() 为 整数
+	属性读 字体颜色(): 整数
 		code return getView().getTextColors().getDefaultColor();
 	结束 属性
 
 	//设置文本框显示行数
-	属性写 显示行数(行数 为 整数)
+	属性写 显示行数(行数: 整数)
 		code getView().setLines(#行数);
 	结束 属性
 
 	//设置文本框最大显示行数
-	属性写 最大显示行数(行数 为 整数)
+	属性写 最大显示行数(行数: 整数)
 		code getView().setMaxLines(#行数);
 	结束 属性
 
 	//设置文本框最小显示行数
-	属性写 最小显示行数(行数 为 整数)
+	属性写 最小显示行数(行数: 整数)
 		code getView().setMinLines(#行数);
 	结束 属性
 
 	//设置行间距
-	属性写 行距(行距 为 整数)
+	属性写 行距(行距: 整数)
 		code getView().setLineSpacing(0f, #行距);
 	结束 属性
 
 	//设置组件的字体，字体路径可以为附加资源中字体文件名称，也可以是sdcard路径
-	属性写 字体(字体路径 为 文本)
+	属性写 字体(字体路径: 文本)
 		@code
 		if(fonts.containsKey(#字体路径)) {
 		    getView().setTypeface(fonts.get(#字体路径));
@@ -231,7 +231,7 @@
 	结束 方法
 
 	//设置文本框是否开启跑马灯效果
-	属性写 跑马灯效果(是否开启跑马灯效果 为 逻辑型)
+	属性写 跑马灯效果(是否开启跑马灯效果: 逻辑型)
 		@code
 		android.widget.TextView textView = getView();
 		if (#是否开启跑马灯效果) {
@@ -249,7 +249,7 @@
 	结束 属性
 
 	//设置是否单行显示
-	属性写 单行显示(是否单行显示 为 逻辑型)
+	属性写 单行显示(是否单行显示: 逻辑型)
 		code getView().setSingleLine(#是否单行显示);
 	结束 属性
 
@@ -259,7 +259,7 @@
 	1为省略中间
 	2为省省略结尾
 	*/
-	属性写 省略显示(显示方式 为 整数)
+	属性写 省略显示(显示方式: 整数)
 		@code
 		if (#显示方式 == 0) {
 			getView().setEllipsize(TextUtils.TruncateAt.START);
@@ -300,7 +300,7 @@
 	@导入Java("java.util.regex.Matcher")
 	@导入Java("android.text.*")
 	@导入Java("android.text.style.*")
-	方法 高亮(欲高亮文本数组 为 文本[], 高亮颜色 为 整数)
+	方法 高亮(欲高亮文本数组: 文本[], 高亮颜色: 整数)
 		@code
 		SpannableString ss = new SpannableString(getView().getText());
 		for (int i = 0;i < #欲高亮文本数组.length;i++) {
@@ -325,7 +325,7 @@
 	渲染类型=8,表示标记的范围从start+1到end-1，不包括start和end.
 	高亮样式已内置常见类型，可以通过'样式_xxx.取实例()'
 	*/
-	方法 高亮2(欲高亮文本数组 为 文本[], 高亮样式 为 对象,渲染类型=0)
+	方法 高亮2(欲高亮文本数组: 文本[], 高亮样式: 对象,渲染类型=0)
 		变量 文本框内容:文本 = 本对象.内容
 		变量 欲高亮内容 : 可扩展文本 = 文本框内容
 		循环(i, 0, 取数组长度(欲高亮文本数组))
@@ -385,61 +385,61 @@
 	常量 输入方式_密码 : 整数 = 0x81
 
 	//设置编辑框提示文本
-	属性写 提示文本(提示文本 为 文本)
+	属性写 提示文本(提示文本: 文本)
 		code getView().setHint(#提示文本);
 	结束 属性
 
 	//获取编辑框提示文本
-	属性读 提示文本() 为 文本
+	属性读 提示文本(): 文本
 		code return getView().getHint().toString();
 	结束 属性
 
 	//设置编辑框提示文本颜色，0xaarrggbb格式
-	属性写 提示文本颜色(提示文本颜色 为 整数)
+	属性写 提示文本颜色(提示文本颜色: 整数)
 		code getView().setHintTextColor(#提示文本颜色);
 	结束 属性
 
 	//获取编辑框提示文本颜色
-	属性读 提示文本颜色() 为 整数
+	属性读 提示文本颜色(): 整数
 		code return getView().getHintTextColors().getDefaultColor();
 	结束 属性
 
 	//设置编辑框输入方式
-	属性写 输入方式(输入方式 为 整数)
+	属性写 输入方式(输入方式: 整数)
 		code getView().setInputType(#输入方式);
 	结束 属性
 
 	//获取编辑框输入方式
-	属性读 输入方式() 为 整数
+	属性读 输入方式(): 整数
 		code return getView().getInputType();
 	结束 属性
 
 	//设置光标位置
-	属性写 光标位置(光标位置 为 整数)
+	属性写 光标位置(光标位置: 整数)
 		code getView().setSelection(#光标位置);
 	结束 属性
 
 	//获取光标位置
-	属性读 光标位置() 为 整数
+	属性读 光标位置(): 整数
 		code return getView().getSelectionStart();
 	结束 属性
 
 	//设置编辑框状态是否为密码输入
-	属性写 密码输入(是否密码输入 为 逻辑型)
+	属性写 密码输入(是否密码输入: 逻辑型)
 		如果 是否密码输入 == 真 则
 			输入方式 = 0x81
 		否则
-			code #输入方式(android.text.InputType.TYPE_TEXT_VARIATION_NORMAL);
+			code #set<输入方式>(android.text.InputType.TYPE_TEXT_VARIATION_NORMAL);
 		结束 如果
 	结束 属性
 
 	//设置编辑框是否为只能单行输入
-	属性写 单行输入(是否单行输入 为 逻辑型)
+	属性写 单行输入(是否单行输入: 逻辑型)
 		code getView().setSingleLine(#是否单行输入);
 	结束 属性
 
 	//设置编辑框是否显示光标
-	属性写 显示光标(是否显示光标 为 逻辑型)
+	属性写 显示光标(是否显示光标: 逻辑型)
 		code getView().setCursorVisible(#是否显示光标);
 	结束 属性
 
@@ -449,22 +449,22 @@
 	结束 方法
 
 	//删除指定位置文本
-	方法 删除文本(开始位置 为 整数, 结束位置 为 整数)
+	方法 删除文本(开始位置: 整数, 结束位置: 整数)
 		code getView().getText().delete(#开始位置, #结束位置);
 	结束 方法
 
 	//选中指定位置文本
-	方法 选中文本(开始位置 为 整数, 结束位置 为 整数)
+	方法 选中文本(开始位置: 整数, 结束位置: 整数)
 		code getView().setSelection(#开始位置, #结束位置);
 	结束 方法
 
 	//向编辑框指定位置插入文本
-	方法 插入文本(欲插入位置 为 整数, 欲插入文本 为 文本)
+	方法 插入文本(欲插入位置: 整数, 欲插入文本: 文本)
 		code getView().getText().insert(#欲插入位置, #欲插入文本);
 	结束 方法
 
 	//向编辑框中追加文本
-	方法 追加文本(内容 为 文本)
+	方法 追加文本(内容: 文本)
 		code getView().getText().append(#内容);
 	结束 方法
 

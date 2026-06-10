@@ -102,7 +102,7 @@
 	设置子组件的外边距
 	*/
 	@布局属性
-	方法 外边距(欲设置组件 : 可视化组件, 边距 为 对象)
+	方法 外边距(欲设置组件 : 可视化组件, 边距: 对象)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -116,7 +116,7 @@
 	结束 方法
 
 	@布局属性
-	方法 左外边距(欲设置组件 : 可视化组件, 左外边距 为 对象)
+	方法 左外边距(欲设置组件 : 可视化组件, 左外边距: 对象)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -129,7 +129,7 @@
 	结束 方法
 
 	@布局属性
-	方法 上外边距(欲设置组件 : 可视化组件, 上外边距 为 对象)
+	方法 上外边距(欲设置组件 : 可视化组件, 上外边距: 对象)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -142,7 +142,7 @@
 	结束 方法
 
 	@布局属性
-	方法 右外边距(欲设置组件 : 可视化组件, 右外边距 为 对象)
+	方法 右外边距(欲设置组件 : 可视化组件, 右外边距: 对象)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -155,7 +155,7 @@
 	结束 方法
 	
 	@布局属性
-	方法 下外边距(欲设置组件 : 可视化组件, 下外边距 为 对象)
+	方法 下外边距(欲设置组件 : 可视化组件, 下外边距: 对象)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -172,7 +172,7 @@
 	*/
 	@废弃使用("建议直接使用'外边距'属性设置dp")
 	@布局属性
-	方法 外边距DP(欲设置组件 : 可视化组件, 边距 为 整数)
+	方法 外边距DP(欲设置组件 : 可视化组件, 边距: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -187,7 +187,7 @@
 
     @废弃使用("建议直接使用'左外边距'属性设置dp")
 	@布局属性
-	方法 左外边距DP(欲设置组件 : 可视化组件, 左外边距 为 整数)
+	方法 左外边距DP(欲设置组件 : 可视化组件, 左外边距: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -201,7 +201,7 @@
 
     @废弃使用("建议直接使用'上外边距'属性设置dp")
 	@布局属性
-	方法 上外边距DP(欲设置组件 : 可视化组件, 上外边距 为 整数)
+	方法 上外边距DP(欲设置组件 : 可视化组件, 上外边距: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -215,7 +215,7 @@
 
     @废弃使用("建议直接使用'右外边距'属性设置dp")
 	@布局属性
-	方法 右外边距DP(欲设置组件 : 可视化组件, 右外边距 为 整数)
+	方法 右外边距DP(欲设置组件 : 可视化组件, 右外边距: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -229,7 +229,7 @@
 	
 	@废弃使用("建议直接使用'下外边距'属性设置dp")
 	@布局属性
-	方法 下外边距DP(欲设置组件 : 可视化组件, 下外边距 为 整数)
+	方法 下外边距DP(欲设置组件 : 可视化组件, 下外边距: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		ViewGroup.LayoutParams params = view.getLayoutParams();
@@ -449,7 +449,7 @@
 	
 	//设置对应组件位于布局中间
 	@布局属性
-	方法 位于布局中间(欲设置组件 : 可视化组件, 是否位于中间 为 逻辑型)
+	方法 位于布局中间(欲设置组件 : 可视化组件, 是否位于中间: 逻辑型)
 		@code
 		View view = #欲设置组件.getView();
 		LayoutParams params = (LayoutParams) view.getLayoutParams();
@@ -464,7 +464,7 @@
 
 	//设置对应组件位于布局顶部
 	@布局属性
-	方法 位于布局顶部(欲设置组件 : 可视化组件, 是否位于顶部 为 逻辑型)
+	方法 位于布局顶部(欲设置组件 : 可视化组件, 是否位于顶部: 逻辑型)
 		@code
 		View view = #欲设置组件.getView();
 		LayoutParams params = (LayoutParams) view.getLayoutParams();
@@ -479,7 +479,7 @@
 
 	//设置对应组件位于布局底部
 	@布局属性
-	方法 位于布局底部(欲设置组件 : 可视化组件, 是否位于底部 为 逻辑型)
+	方法 位于布局底部(欲设置组件 : 可视化组件, 是否位于底部: 逻辑型)
 		@code
 		View view = #欲设置组件.getView();
 		LayoutParams params = (LayoutParams) view.getLayoutParams();
@@ -494,7 +494,7 @@
 
 	//设置对应组件位于布局左边
 	@布局属性
-	方法 位于布局左边(欲设置组件 : 可视化组件, 是否位于左边 为 逻辑型)
+	方法 位于布局左边(欲设置组件 : 可视化组件, 是否位于左边: 逻辑型)
 		@code
 		View view = #欲设置组件.getView();
 		LayoutParams params = (LayoutParams) view.getLayoutParams();
@@ -509,7 +509,7 @@
 
 	//设置对应组件位于布局右边
 	@布局属性
-	方法 位于布局右边(欲设置组件 : 可视化组件, 是否位于右边 为 逻辑型)
+	方法 位于布局右边(欲设置组件 : 可视化组件, 是否位于右边: 逻辑型)
 		@code
 		View view = #欲设置组件.getView();
 		LayoutParams params = (LayoutParams) view.getLayoutParams();
@@ -524,7 +524,7 @@
 
 	//设置对应组件位于某个组件的左边
 	@布局属性
-	方法 位于某组件左边(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 位于某组件左边(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -535,7 +535,7 @@
 
 	//设置对应组件位于某个组件的右边
 	@布局属性
-	方法 位于某组件右边(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 位于某组件右边(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -546,7 +546,7 @@
 
 	//设置对应组件位于某个组件的上面
 	@布局属性
-	方法 位于某组件之上(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 位于某组件之上(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -557,7 +557,7 @@
 
 	//设置对应组件位于某个组件的下面
 	@布局属性
-	方法 位于某组件之下(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 位于某组件之下(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -568,7 +568,7 @@
 
 	//设置对应组件与某个组件的左边平齐
 	@布局属性
-	方法 与某组件左边平齐(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 与某组件左边平齐(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -579,7 +579,7 @@
 
 	//设置对应组件与某个组件的右边平齐
 	@布局属性
-	方法 与某组件右边平齐(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 与某组件右边平齐(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -590,7 +590,7 @@
 
 	//设置对应组件与某个组件的顶部平齐
 	@布局属性
-	方法 与某组件顶部平齐(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 与某组件顶部平齐(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -601,7 +601,7 @@
 
 	//设置对应组件与某个组件的底部平齐
 	@布局属性
-	方法 与某组件底部平齐(欲设置组件 : 可视化组件, 目标组件ID 为 整数)
+	方法 与某组件底部平齐(欲设置组件 : 可视化组件, 目标组件ID: 整数)
 		@code
 		View view = #欲设置组件.getView();
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -636,22 +636,22 @@
     @end
 	
 	//设置宫格布局的列数，也就是每行显示的控件个数
-	属性写 列数(列数 为 整数)
+	属性写 列数(列数: 整数)
 		code getView().setColumnCount(#列数);
 	结束 属性
 	
 	//获取宫格布局的列数
-	属性读 列数() 为 整数
+	属性读 列数(): 整数
 		code return getView().getColumnCount();
 	结束 属性
 
 	//设置宫格布局的行数，也就是每列显示的控件个数
-	属性写 行数(行数 为 整数)
+	属性写 行数(行数: 整数)
 		code getView().setRowCount(#行数);
 	结束 属性
 
 	//获取宫格布局的行数
-	属性读 行数() 为 整数
+	属性读 行数(): 整数
 		code return getView().getRowCount();
 	结束 属性
 	
@@ -679,17 +679,17 @@
     @end
 	
 	//使横滚布局滚动到某一位置
-	方法 滚动至(X坐标 为 整数, Y坐标 为 整数)
+	方法 滚动至(X坐标: 整数, Y坐标: 整数)
 		code getView().scrollTo(#X坐标, #Y坐标);
 	结束 方法
 
 	//设置滚动布局是否显示滚动条
-	属性写 显示滚动条(是否显示 为 逻辑型)
+	属性写 显示滚动条(是否显示: 逻辑型)
 		code getView().setVerticalScrollBarEnabled(#是否显示);
 	结束 属性
 
 	
-	属性写 完全显示(是否完全显示 为 逻辑型)
+	属性写 完全显示(是否完全显示: 逻辑型)
 		code getView().setFillViewport(#是否完全显示);
 	结束 属性
 结束 类
@@ -717,17 +717,17 @@
     @end
 	
 	//使横滚布局滚动到某一位置
-	方法 滚动至(X坐标 为 整数, Y坐标 为 整数)
+	方法 滚动至(X坐标: 整数, Y坐标: 整数)
 		code getView().scrollTo(#X坐标, #Y坐标);
 	结束 方法
 
 	//设置滚动布局是否显示滚动条
-	属性写 显示滚动条(是否显示 为 逻辑型)
+	属性写 显示滚动条(是否显示: 逻辑型)
 		code getView().setHorizontalScrollBarEnabled(#是否显示);
 	结束 属性
 
 	
-	属性写 完全显示(是否完全显示 为 逻辑型)
+	属性写 完全显示(是否完全显示: 逻辑型)
 		code getView().setFillViewport(#是否完全显示);
 	结束 属性
 结束 类
@@ -756,17 +756,17 @@
     @end
 	
 	//设置卡片圆角
-	属性写 圆角(圆角度 为 整数)
+	属性写 圆角(圆角度: 整数)
 		code getView().setRadius(#圆角度);
 	结束 属性
 
 	//设置卡片阴影
-	属性写 卡片阴影(阴影 为 整数)
+	属性写 卡片阴影(阴影: 整数)
 		code getView().setCardElevation(#阴影);
 	结束 属性
 
 	//设置卡片背景颜色
-	属性写 卡片背景颜色(颜色 为 整数)
+	属性写 卡片背景颜色(颜色: 整数)
 		code getView().setCardBackgroundColor(#颜色);
 	结束 属性
 结束 类
@@ -775,9 +775,9 @@
 /*
 侧滑布局，提供左侧滑出页面与右侧滑出页面功能
 */
-@外部Java文件("..//drawerlayout/DrawerLayout.java")
-@外部Java文件("..//drawerlayout/DrawerLayoutImpl.java")
-@外部Java文件("..//drawerlayout/ViewDragHelper.java")
+@外部Java文件("../../extra_java/drawerlayout/DrawerLayout.java")
+@外部Java文件("../../extra_java/drawerlayout/DrawerLayoutImpl.java")
+@外部Java文件("../../extra_java/drawerlayout/ViewDragHelper.java")
 类 侧滑布局 : 布局组件
 	@code
     public #cls<侧滑布局>(android.content.Context context) {
@@ -805,11 +805,11 @@
     @end
 	
 	//设置侧滑栏打开的阴影度
-	属性写 侧滑阴影(阴影 为 整数)
+	属性写 侧滑阴影(阴影: 整数)
 		code getView().setDrawerElevation(#阴影);
 	结束 属性
 
-	属性写 左侧布局(左侧布局 为 组件容器)
+	属性写 左侧布局(左侧布局: 组件容器)
 		@code
 		#cls<可视化组件> component = #左侧布局.getLayout();
 		#添加组件(component);
@@ -821,7 +821,7 @@
 		@end
 	结束 属性
 
-	属性写 右侧布局(右侧布局 为 组件容器)
+	属性写 右侧布局(右侧布局: 组件容器)
 		@code
 		#cls<可视化组件> component = #右侧布局.getLayout();
 		#添加组件(component);
@@ -871,7 +871,7 @@
 	结束 方法
 
 	//关闭指定方向的侧滑栏
-	方法 关闭侧滑栏(方向 为 整数)
+	方法 关闭侧滑栏(方向: 整数)
 		code getView().closeDrawer(#方向);
 	结束 方法
 
@@ -971,25 +971,25 @@
     @end
 	
 	//获取页面总数
-	属性读 页面总数() 为 整数
+	属性读 页面总数(): 整数
 		code return (adapter.getCount());
 	结束 属性
 
 	//设置分页布局页面布局
-	属性写 页面边距(页面边距 为 整数)
+	属性写 页面边距(页面边距: 整数)
 		code getView().setPageMargin(#页面边距);
 	结束 属性
 	
-	属性写 缓存数量(数量 为 整数)
+	属性写 缓存数量(数量: 整数)
 		code getView().setOffscreenPageLimit(#数量);
 	结束 属性
 	
-	属性写 可否滑动(可否 为 逻辑型)
+	属性写 可否滑动(可否: 逻辑型)
 		code getView().setTouchEnabled(#可否);
 	结束 属性
 
 	//向分页布局添加组件容器
-	方法 添加页面(欲添加页面 为 组件容器)
+	方法 添加页面(欲添加页面: 组件容器)
 		@code
 		#cls<可视化组件> component = #mem<欲添加页面.取根布局>();
 		adapter.add(component.getView());
@@ -999,7 +999,7 @@
 	结束 方法
 
 	//向分页布局指定索引处插入组件容器
-	方法 插入页面(欲插入索引 为 整数, 欲插入页面 为 组件容器)
+	方法 插入页面(欲插入索引: 整数, 欲插入页面: 组件容器)
 		@code
 		#cls<可视化组件> component = #mem<欲插入页面.取根布局>();
 		adapter.insert(#欲插入索引, component.getView());
@@ -1009,7 +1009,7 @@
 	结束 方法
 
 	//删除分页布局中已添加的组件容器
-	方法 删除页面布局(欲删除页面 为 组件容器)
+	方法 删除页面布局(欲删除页面: 组件容器)
 		@code
 		#cls<可视化组件> component = #mem<欲删除页面.取根布局>();
 		adapter.remove(component.getView());
@@ -1018,7 +1018,7 @@
 	结束 方法
 
 	//删除分页布局中指定页面
-	方法 删除页面(索引 为 整数)
+	方法 删除页面(索引: 整数)
 		@code
 		adapter.remove(#索引);
 		adapter.notifyDataSetChanged();
@@ -1026,7 +1026,7 @@
 	结束 方法
 
 	//切换至指定索引处页面
-	方法 显示页面(页面索引 为 整数, 是否播放切换动画 : 逻辑型 = 真)
+	方法 显示页面(页面索引: 整数, 是否播放切换动画 : 逻辑型 = 真)
 		code getView().setCurrentItem(#页面索引, #是否播放切换动画);
 	结束 方法
 	
@@ -1036,14 +1036,14 @@
 	结束 方法
 
 	//分页布局页面被改变时触发该事件，返回页面索引，索引从0开始
-	定义事件 页面被改变(索引 为 整数)
+	定义事件 页面被改变(索引: 整数)
 
 	//分页布局页面被选中时触发该事件，返回页面索引，索引从0开始
-	定义事件 页面被选中(索引 为 整数)
+	定义事件 页面被选中(索引: 整数)
 
 	//分页布局页面被滚动时触发该事件，返回页面索引，移量百分比，偏移量数值
-	定义事件 页面被滑动(索引 为 整数,移量百分比 为 小数,偏移量数值 为 小数)
+	定义事件 页面被滑动(索引: 整数,移量百分比: 小数,偏移量数值: 小数)
 
 	//分页布局滑动状态改变时触发该事件，返回滑动状态，0为什么都不做，1为开始滑动，2为结束滑动
-	定义事件 滑动状态改变(状态 为 整数)
+	定义事件 滑动状态改变(状态: 整数)
 结束 类

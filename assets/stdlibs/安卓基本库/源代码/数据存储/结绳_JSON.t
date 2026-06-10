@@ -309,7 +309,7 @@ JSON是一种数据存储格式，使用键值对的格式储存数据，如：
 	/*
 	获取JSON对象中所有键名
 	*/
-	属性读 键名() 为 文本[]
+	属性读 键名(): 文本[]
 		@code
         java.util.List<String> list = new java.util.ArrayList<>();
         java.util.Iterator<String> it = #this.keys();

@@ -10,7 +10,7 @@
 类 压缩操作
 	//压缩文件到输出路径，参数一为要压缩的文件(或目录)路径
 	@静态
-	方法 ZIP压缩(路径 为 文本, 输出路径 为 文本) 为 逻辑型
+	方法 ZIP压缩(路径: 文本, 输出路径: 文本): 逻辑型
 		@code
 		boolean flag = false;
 		ZipOutputStream out = null;
@@ -47,7 +47,7 @@
 
 	//解压指定路径的压缩包到输出路径(必须为目录)
 	@静态
-	方法 ZIP解压(路径 为 文本, 输出路径 为 文本) 为 逻辑型
+	方法 ZIP解压(路径: 文本, 输出路径: 文本): 逻辑型
 		@code
 		boolean flag = false;
 		ZipFile zipFile = null;
@@ -182,7 +182,7 @@
 类 文件操作
 
 	@静态
-	方法 重命名文件(原路径 为 文本, 新路径 为 文本) 为 逻辑型
+	方法 重命名文件(原路径: 文本, 新路径: 文本): 逻辑型
 		@code
 		if (#新路径.equals(#原路径)) {
 			return true;
@@ -203,7 +203,7 @@
 	结束 方法
 
 	@静态
-	方法 复制文件(文件路径 为 文本, 欲复制到路径 为 文本) 为 逻辑型
+	方法 复制文件(文件路径: 文本, 欲复制到路径: 文本): 逻辑型
 		@code
 		try {
 			copyTo(new File(#文件路径), new File(#欲复制到路径));
@@ -216,7 +216,7 @@
 	结束 方法
 
 	@静态
-	方法 移动文件(文件路径 为 文本, 欲移到路径 为 文本)
+	方法 移动文件(文件路径: 文本, 欲移到路径: 文本)
 		@code
 		try {
 			moveTo(new File(#文件路径), new File(#欲移到路径));
@@ -253,13 +253,13 @@
 	结束 方法
 
 	@静态
-	方法 取文件名(路径 为 文本) 为 文本
+	方法 取文件名(路径: 文本): 文本
 		变量 目标文件 : 文件 = 路径
 		返回 (目标文件.取文件名())
 	结束 方法
 
 	@静态
-	方法 取文件MD5(路径 为 文本) 为 文本
+	方法 取文件MD5(路径: 文本): 文本
 		@code
 		  try {
 			return getMD5(new File(#路径));
@@ -271,7 +271,7 @@
 	结束 方法
 
 	@静态
-	方法 取文件SHA1(路径 为 文本) 为 文本
+	方法 取文件SHA1(路径: 文本): 文本
 		@code
 		  try {
 			return getSHA1(new File(#路径));
@@ -283,7 +283,7 @@
 	结束 方法
 
 	@静态
-	方法 取文件CRC32(路径 为 文本) 为 文本
+	方法 取文件CRC32(路径: 文本): 文本
 		@code
 		try {
 			byte[] buffer = new byte[8192];
@@ -306,7 +306,7 @@
 	结束 方法
 
 	@静态
-	方法 取文件哈希值(文件路径 为 文本) 为 文本
+	方法 取文件哈希值(文件路径: 文本): 文本
 		@code
 	    try {
 		    MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -331,7 +331,7 @@
 	结束 方法
 
 	@静态
-	方法 追加文件内容(路径 为 文本, 欲追加文本 为 文本)
+	方法 追加文件内容(路径: 文本, 欲追加文本: 文本)
 		@code
 		  try {
 			append(new File(#路径), #欲追加文本);
@@ -342,28 +342,28 @@
 	结束 方法
 
 	@静态
-	方法 删除文件(路径 为 文本) 为 逻辑型
+	方法 删除文件(路径: 文本): 逻辑型
 		@code
 		return deleteFile(new File(#路径));
 		@end
 	结束 方法
 
 	@静态
-	方法 创建目录(路径 为 文本) 为 逻辑型
+	方法 创建目录(路径: 文本): 逻辑型
 		@code
 		return createDirectory(new File(#路径));
 		@end
 	结束 方法
 
 	@静态
-	方法 创建文件(路径 为 文本) 为 逻辑型
+	方法 创建文件(路径: 文本): 逻辑型
 		@code
 		return createFile(new File(#路径));
 		@end
 	结束 方法
 
 	@静态
-	方法 是否为目录(路径 为 文本) 为 逻辑型
+	方法 是否为目录(路径: 文本): 逻辑型
 		@code
 		File file = new File(#路径);
 		if (file.exists() && file.isDirectory()) {
@@ -374,7 +374,7 @@
 	结束 方法
 
 	@静态
-	方法 是否为隐藏文件(路径 为 文本) 为 逻辑型
+	方法 是否为隐藏文件(路径: 文本): 逻辑型
 		@code
 		File file = new File(#路径);
 		if (file.exists()) {
@@ -385,14 +385,14 @@
 	结束 方法
 
 	@静态
-	方法 文件是否存在(路径 为 文本) 为 逻辑型
+	方法 文件是否存在(路径: 文本): 逻辑型
 		@code
 		return new File(#路径).exists();
 		@end
 	结束 方法
 
 	@静态
-	方法 取文件编码(路径 为 文本) 为 文本
+	方法 取文件编码(路径: 文本): 文本
 		@code
 		try {
 			BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(#路径)));
@@ -421,7 +421,7 @@
 	结束 方法
 
 	@静态
-	方法 读入文本文件(路径 为 文本, 编码 为 文本 = "UTF-8") 为 文本
+	方法 读入文本文件(路径: 文本, 编码: 文本= "UTF-8"): 文本
 		@code
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(#路径), #编码));
@@ -446,7 +446,7 @@
 	结束 方法
 
 	@静态
-	方法 写出文本文件(路径 为 文本, 欲写出内容 为 文本)
+	方法 写出文本文件(路径: 文本, 欲写出内容: 文本)
 		@code
 		  try {
 			write(new File(#路径), #欲写出内容);
@@ -457,7 +457,7 @@
 	结束 方法
 
 	@静态
-	方法 读入文件字节(路径 为 文本) 为 字节[]
+	方法 读入文件字节(路径: 文本): 字节[]
 		@code
 		byte[] buffer = null;
 		if (!new File(#路径).exists()) {
@@ -477,7 +477,7 @@
 	结束 方法
 
 	@静态
-	方法 写出字节文件(路径 为 文本, 欲写出字节集 为 字节[]) 为 逻辑型
+	方法 写出字节文件(路径: 文本, 欲写出字节集: 字节[]): 逻辑型
 		@code
 		try {
 			FileOutputStream fout = new FileOutputStream(#路径);
@@ -493,13 +493,13 @@
 
 	//取文件大小，仅获取单个文件大小
 	@静态
-	方法 取文件大小(路径 为 文本) 为 长整数
+	方法 取文件大小(路径: 文本): 长整数
 		code return new File(#路径).length();
 	结束 方法
 
 	//取文件大小，如果是文件夹，会获取文件夹下所有文件的大小
 	@静态
-	方法 取文件大小2(路径 为 文本) 为 长整数
+	方法 取文件大小2(路径: 文本): 长整数
 		@code
 		File file = new File(#路径);
 		try {
@@ -516,20 +516,20 @@
 
 	//将取得的文件大小转换为带单位的大小数据,仅获取单个文件大小
 	@静态
-	方法 转换文件大小(路径 为 文本,保留位数:整数=2) : 文本
+	方法 转换文件大小(路径: 文本,保留位数:整数=2) : 文本
 		变量 size : 长整数 = 取文件大小(路径)
 		code return convertFileSize(#size,#保留位数);
 	结束 方法
 
 	//将取得的文件大小转换为带单位的大小数据,本方法在是文件夹的情况下会获取文件夹下所有文件的大小
 	@静态
-	方法 转换文件大小2(路径 为 文本,保留位数:整数=2) : 文本
+	方法 转换文件大小2(路径: 文本,保留位数:整数=2) : 文本
 		变量 size : 长整数 = 取文件大小2(路径)
 		code return convertFileSize(#size,#保留位数);
 	结束 方法
 
 	@静态
-	方法 写出资源文件(窗口环境 为 安卓环境, 文件名称 为 文本, 欲写到路径 为 文本) 为 逻辑型
+	方法 写出资源文件(窗口环境: 安卓环境, 文件名称: 文本, 欲写到路径: 文本): 逻辑型
 		@code
 		try {
 			InputStream stream = #窗口环境.getAssets().open(#文件名称);
@@ -549,7 +549,7 @@
 	结束 方法
 
 	@静态
-	方法 读入资源文件(窗口环境 为 安卓环境, 文件名称 为 文本, 编码 为 文本 = "UTF-8") 为 文本
+	方法 读入资源文件(窗口环境: 安卓环境, 文件名称: 文本, 编码: 文本= "UTF-8"): 文本
 		@code
 		try {
 			InputStream inputstream = #窗口环境.getAssets().open(#文件名称);
@@ -570,7 +570,7 @@
 	结束 方法
 
 	@静态
-	方法 寻找文件关键词(路径 为 文本, 关键词 为 文本) 为 文本
+	方法 寻找文件关键词(路径: 文本, 关键词: 文本): 文本
 		@code
 		String result = "";
 		for (File f : new File(#路径).listFiles()) {
@@ -583,7 +583,7 @@
 	结束 方法
 
 	@静态
-	方法 寻找文件后缀名(路径 为 文本, 后缀名 为 文本) 为 文本
+	方法 寻找文件后缀名(路径: 文本, 后缀名: 文本): 文本
 		@code
 		String result = "";
 		for (File f : new File(#路径).listFiles()) {
@@ -596,7 +596,7 @@
 	结束 方法
 
 	@静态
-	方法 打开文本文件_读(文件路径 为 文本, 编码 为 文本 = "UTF-8") 为 逻辑型
+	方法 打开文本文件_读(文件路径: 文本, 编码: 文本= "UTF-8"): 逻辑型
 		@code
 		if (!new File(#文件路径).exists()) {
 			return false;
@@ -614,7 +614,7 @@
 	结束 方法
 
 	@静态
-	方法 关闭读() 为 逻辑型
+	方法 关闭读(): 逻辑型
 		@code
 		try {
 			br.close();
@@ -628,7 +628,7 @@
 	结束 方法
 
 	@静态
-	方法 读一行() 为 文本
+	方法 读一行(): 文本
 		@code
 		  try {
 			String readLine = br.readLine();
@@ -642,7 +642,7 @@
 	结束 方法
 
 	@静态
-	方法 打开文本文件_写(文件路径 为 文本, 编码 为 文本 = "UTF-8") 为 逻辑型
+	方法 打开文本文件_写(文件路径: 文本, 编码: 文本= "UTF-8"): 逻辑型
 		@code
 		if (!new File(#文件路径).exists()) {
 			return false;
@@ -660,7 +660,7 @@
 	结束 方法
 
 	@静态
-	方法 关闭写() 为 逻辑型
+	方法 关闭写(): 逻辑型
 		@code
 		try {
 			bw.close();
@@ -674,7 +674,7 @@
 	结束 方法
 
 	@静态
-	方法 写一行(欲写内容 为 文本) 为 逻辑型
+	方法 写一行(欲写内容: 文本): 逻辑型
 		@code
 		try {
 			bw.newLine();
@@ -689,7 +689,7 @@
 	结束 方法
 
 	@静态
-	方法 取子目录(路径 为 文本) 为 文本[]
+	方法 取子目录(路径: 文本): 文本[]
 		@code
 		File[] ff = new File(#路径).listFiles();
 		  String[] paths = new String[ff.length];
@@ -707,13 +707,13 @@
 	禁止利用此方法进行违法行为
 	*/
 	@静态
-	方法 取所有文件路径(目标路径 为 文本,输出结果:文本集合)
-		变量 目标 为 文件 = 文件.从路径创建(目标路径)
+	方法 取所有文件路径到集合(目标路径: 文本,输出结果:集合<文本>)
+		变量 目标: 文件 = 文件.从路径创建(目标路径)
 		如果 目标.为文件夹() 则
 			变量 子文件数组 = 目标.取子文件数组()
 			如果 子文件数组 != 空 则
 				循环(子文件数组 -> 子文件)
-					取所有文件路径(子文件.取绝对路径(),输出结果)
+					取所有文件路径到集合(子文件.取绝对路径(),输出结果)
 				结束 循环
 			结束 如果
 		否则
@@ -722,18 +722,24 @@
 	结束 方法
 
 	@静态
-	常量 文件排序_时间排序 为 整数= 0
-	@静态
-	常量 文件排序_名称排序 为 整数 = 1
-	@静态
-	常量 文件排序_名称排序_忽略大小写 为 整数 = 2
-	@静态
-	常量 文件排序_名称排序_本地化优先 为 整数 = 3
-	@静态
-	常量 文件排序_大小排序 为 整数 = 4
+	@废弃使用("请使用 取所有文件路径到集合")
+	方法 取所有文件路径(目标路径: 文本,输出结果:文本集合)
+		取所有文件路径到集合(目标路径,输出结果)
+	结束 方法
 
 	@静态
-	方法 取子文件集合(路径 为 文本) 为 文本集合
+	常量 文件排序_时间排序: 整数= 0
+	@静态
+	常量 文件排序_名称排序: 整数 = 1
+	@静态
+	常量 文件排序_名称排序_忽略大小写: 整数 = 2
+	@静态
+	常量 文件排序_名称排序_本地化优先: 整数 = 3
+	@静态
+	常量 文件排序_大小排序: 整数 = 4
+
+	@静态
+	方法 取子文件路径集合(路径: 文本): 集合<文本>
 		@code
 		ArrayList<String> list = new ArrayList<>();
 		File[] ff = new File(#路径).listFiles();
@@ -745,7 +751,68 @@
 	结束 方法
 
 	@静态
-	方法 取子文件集合2(路径 为 文本,排序方式 为 整数,是否正序 为 逻辑型) 为 文本集合
+	@废弃使用("请使用 取子文件路径集合")
+	方法 取子文件集合(路径: 文本): 文本集合
+		@code
+		ArrayList<String> list = new ArrayList<>();
+		File[] ff = new File(#路径).listFiles();
+		for (int i = 0; i < ff.length; i++) {
+			list.add(ff[i].getAbsolutePath());
+		}
+		return list;
+		@end
+	结束 方法
+
+	@静态
+	方法 取子文件路径集合2(路径: 文本,排序方式: 整数,是否正序: 逻辑型): 集合<文本>
+		@code
+		ArrayList<String> list = new ArrayList<>();
+		File[] fs = new File(#路径).listFiles();
+		if (fs == null) {
+            return list; // 不执行
+        }
+        Arrays.sort(fs, new Comparator<File>() {
+            @Override
+            public int compare(File f1, File f2) {
+                boolean isDir1 = f1.isDirectory();
+                boolean isDir2 = f2.isDirectory();
+                if (isDir1 && !isDir2) {
+                    return -1; // f1是目录，优先
+                } else if (!isDir1 && isDir2) {
+                    return 1; // f2是目录，f2优先
+                }
+                int result = 0;
+                switch (#排序方式) {
+                    case #文件排序_名称排序: // 按名称排序
+                        result = f1.getName().compareTo(f2.getName());
+                        break;
+					case #文件排序_名称排序_忽略大小写: // 按名称忽略大小写，Aa-Zz规则排序，隐藏文件在最前，中文文件夹在最后
+						result = f1.getName().compareToIgnoreCase(f2.getName());
+						break;
+                     case #文件排序_名称排序_本地化优先: // 按名称排序(本地化优先)
+                        Collator collator = Collator.getInstance(Locale.getDefault());
+                        result = collator.compare(f1.getName(), f2.getName());
+                        break;
+	                case #文件排序_时间排序: // 按时间排序
+                        result = Long.compare(f1.lastModified(), f2.lastModified());
+                        break;
+                    case #文件排序_大小排序: // 按大小排序
+                        result = Long.compare(f1.length(), f2.length());
+                        break;
+                }
+                return #是否正序 ? -result : result;
+            }
+        });
+        for (File file : fs) {
+			list.add(file.getAbsolutePath());
+        }
+		return list;
+		@end
+	结束 方法
+
+	@静态
+	@废弃使用("请使用 取子文件路径集合2")
+	方法 取子文件集合2(路径: 文本,排序方式: 整数,是否正序: 逻辑型): 文本集合
 		@code
 		ArrayList<String> list = new ArrayList<>();
 		File[] fs = new File(#路径).listFiles();
@@ -792,7 +859,7 @@
 	结束 方法
 
 	@静态
-	方法 取子文件列表(路径 为 文本) 为 文本[]
+	方法 取子文件列表(路径: 文本): 文本[]
 		@code
 		List<String> list = new ArrayList<>();
 		File[] ff = new File(#路径).listFiles();
@@ -804,12 +871,12 @@
 	结束 方法
 
 	@静态
-	方法 取子文件列表2(路径 为 文本,排序方式 为 整数,是否正序 为 逻辑型) 为 文本[]
-		返回 取子文件集合2(路径,排序方式,是否正序).到数组()
+	方法 取子文件列表2(路径: 文本,排序方式: 整数,是否正序: 逻辑型): 文本[]
+		返回 取子文件路径集合2(路径,排序方式,是否正序).到数组()
 	结束 方法
 
 	@静态
-	方法 取文件修改时间(路径 为 文本) 为 文本
+	方法 取文件修改时间(路径: 文本): 文本
 		@code
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(new File(#路径).lastModified()));
 		@end

@@ -18,24 +18,24 @@
 	@end
 
 	//设置对话框的标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code builder.setTitle(#标题);
 	结束 属性
 
 	//设置对话框要显示的信息
-	属性写 信息(信息 为 文本)
+	属性写 信息(信息: 文本)
 		code builder.setMessage(#信息);
 	结束 属性
 
 	//设置对话框图标, 参数为图片资源
-	属性写 图标(图标 为 图片资源)
+	属性写 图标(图标: 图片资源)
 		@code
 		builder.setIcon(#图标);
 		@end
 	结束 属性
 
 	//设置对话框按钮1的文本
-	属性写 按钮1(按钮1文本 为 文本)
+	属性写 按钮1(按钮1文本: 文本)
 		@code
 		builder.setPositiveButton(#按钮1文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -47,7 +47,7 @@
 	结束 属性
 
 	//设置对话框按钮2的文本
-	属性写 按钮2(按钮2文本 为 文本)
+	属性写 按钮2(按钮2文本: 文本)
 		@code
 		builder.setNegativeButton(#按钮2文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -59,7 +59,7 @@
 	结束 属性
 
 	//设置对话框按钮3的文本
-	属性写 按钮3(按钮3文本 为 文本)
+	属性写 按钮3(按钮3文本: 文本)
 		@code
 		builder.setNeutralButton(#按钮3文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -71,7 +71,7 @@
 	结束 属性
 
 	//设置对话框加载组件
-	属性写 自定义布局(布局 为 组件容器)
+	属性写 自定义布局(布局: 组件容器)
 		@code
 		this.container = #布局;
 		builder.setView(container.getLayout().getView());
@@ -80,12 +80,12 @@
 	结束 属性
 
 	//获取对话框的自定义组件容器
-	属性读 自定义布局() 为 组件容器
+	属性读 自定义布局(): 组件容器
 		code return (container);
 	结束 属性
 
 	//设置对话框透明度
-	属性写 透明度(透明度 为 小数)
+	属性写 透明度(透明度: 小数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -98,7 +98,7 @@
 	结束 属性
 
 	//设置对话框动画主题
-	属性写 动画主题(主题 为 动画资源)
+	属性写 动画主题(主题: 动画资源)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -109,7 +109,7 @@
 	结束 属性
 
 	//设置对话框垂直方向的边距
-	属性写 垂直边距(垂直边距 为 整数)
+	属性写 垂直边距(垂直边距: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -122,7 +122,7 @@
 	结束 属性
 
 	//设置对话框水平方向的边距
-	属性写 水平边距(水平边距 为 整数)
+	属性写 水平边距(水平边距: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -135,7 +135,7 @@
 	结束 属性
 
 	//设置对话框对齐方式
-	属性写 对齐方式(对齐方式 为 整数)
+	属性写 对齐方式(对齐方式: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -146,7 +146,7 @@
 	结束 属性
 
 	//设置对话框高度
-	属性写 高度(高度 为 整数)
+	属性写 高度(高度: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -159,7 +159,7 @@
 	结束 属性
 
 	//设置对话框宽度
-	属性写 宽度(宽度 为 整数)
+	属性写 宽度(宽度: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -172,7 +172,7 @@
 	结束 属性
 
 	//设置对话框是否可取消，若设置为假，则不能通过返回键取消对话框，只能通过代码取消对话框
-	属性写 可取消(可取消 为 逻辑型)
+	属性写 可取消(可取消: 逻辑型)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -182,7 +182,7 @@
 	结束 属性
 
 	//设置对话框背景颜色
-	属性写 背景颜色(颜色 为 整数)
+	属性写 背景颜色(颜色: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -209,7 +209,7 @@
 	结束 属性
 
 	//设置对话框的列表项
-	方法 置列表项(列表项 为 文本[])
+	方法 置列表项(列表项: 文本[])
 		@code
 		builder.setItems(#列表项, new DialogInterface.OnClickListener(){
 			@Override
@@ -221,7 +221,7 @@
 	结束 方法
 
 	//设置对话框的单选列表项
-	方法 置单选列表项(列表项 为 文本[], 默认选中索引 为 整数)
+	方法 置单选列表项(列表项: 文本[], 默认选中索引: 整数)
 		@code
 		builder.setSingleChoiceItems(#列表项, #默认选中索引, new DialogInterface.OnClickListener(){
 			@Override
@@ -233,7 +233,7 @@
 	结束 方法
 
 	//设置对话框的多选列表项
-	方法 置多选列表项(列表项 为 文本[], 选中项数组 为 逻辑型[])
+	方法 置多选列表项(列表项: 文本[], 选中项数组: 逻辑型[])
 		@code
 		builder.setMultiChoiceItems(#列表项, #选中项数组, new DialogInterface.OnMultiChoiceClickListener(){
 			@Override
@@ -245,7 +245,7 @@
 	结束 方法
 
 	//设置对话框边距
-	方法 置对话框边距(左边 为 整数,顶边 为 整数,右边 为 整数,底边 为 整数)
+	方法 置对话框边距(左边: 整数,顶边: 整数,右边: 整数,底边: 整数)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -256,7 +256,7 @@
 	结束 方法
 
 	//设置对话框布局
-	方法 置对话框布局(欲设置组件 为 可视化组件)
+	方法 置对话框布局(欲设置组件: 可视化组件)
 		@code
 		if(dialog == null) {
 			dialog = builder.create();
@@ -295,7 +295,7 @@
 	定义事件 按钮3被单击()
 
 	//当单选列表或多选列表被选中时触发该事件
-	定义事件 项目被单击(索引 为 整数)
+	定义事件 项目被单击(索引: 整数)
 结束 类
 
 
@@ -322,69 +322,69 @@
 	常量 风格_水平进度条 : 整数 = 1
 
 	//设置进度对话框风格，0为圆形进度条，1为水平进度条
-	属性写 风格(风格 为 整数)
+	属性写 风格(风格: 整数)
 		code dialog.setProgressStyle(#风格);
 	结束 属性
 
 	//设置对话框的标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code dialog.setTitle(#标题);
 	结束 属性
 
 	//设置对话框要显示的信息
-	属性写 信息(信息 为 文本)
+	属性写 信息(信息: 文本)
 		code dialog.setMessage(#信息);
 	结束 属性
 
 	//设置进度条进度
-	属性写 进度(进度值 为 整数)
+	属性写 进度(进度值: 整数)
 		@code
 		dialog.setProgress(#进度值);
 		@end
 	结束 属性
 
 	//获取进度条进度
-	属性读 进度() 为 整数
+	属性读 进度(): 整数
 		code return dialog.getProgress();
 	结束 属性
 
 	//设置进度条的最大进度
-	属性写 最大进度(最大进度值 为 整数)
+	属性写 最大进度(最大进度值: 整数)
 		code dialog.setMax(#最大进度值);
 	结束 属性
 
 	//获取进度条的最大进度
-	属性读 最大进度() 为 整数
+	属性读 最大进度(): 整数
 		code return dialog.getMax();
 	结束 属性
 
 	//设置进度条的缓冲进度，常用于缓冲音视频时设置缓冲进度
-	属性写 缓冲进度(缓冲进度 为 整数)
+	属性写 缓冲进度(缓冲进度: 整数)
 		code dialog.setSecondaryProgress(#缓冲进度);
 	结束 属性
 
 	//获取进度条缓冲进度
-	属性读 缓冲进度() 为 整数
+	属性读 缓冲进度(): 整数
 		code return dialog.getSecondaryProgress();
 	结束 属性
 
 	//设置进度条进度是否为模糊进度，如设置为真，则不再显示进度，而是一种无限刷新加载的状态
-	属性写 模糊进度(是否不明确进度 为 逻辑型)
+	属性写 模糊进度(是否不明确进度: 逻辑型)
 		code dialog.setIndeterminate(#是否不明确进度);
 	结束 属性
 
 	//获取进度条是否为模糊进度状态
-	属性读 模糊进度() 为 逻辑型
+	属性读 模糊进度(): 逻辑型
 		code return dialog.isIndeterminate();
 	结束 属性
 
 	//设置对话框图标, 参数为res图片资源ID
-	属性写 图标(图标 为 图片资源)
+	属性写 图标(图标: 图片资源)
 		code dialog.setIcon(#图标);
 	结束 属性
 
 	//设置对话框按钮1的文本
-	属性写 按钮1(按钮1文本 为 文本)
+	属性写 按钮1(按钮1文本: 文本)
 		@code
 		dialog.setButton(#按钮1文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -396,7 +396,7 @@
 	结束 属性
 
 	//设置对话框按钮2的文本
-	属性写 按钮2(按钮2文本 为 文本)
+	属性写 按钮2(按钮2文本: 文本)
 		@code
 		dialog.setButton2(#按钮2文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -408,7 +408,7 @@
 	结束 属性
 
 	//设置对话框按钮3的文本
-	属性写 按钮3(按钮3文本 为 文本)
+	属性写 按钮3(按钮3文本: 文本)
 		@code
 		dialog.setButton3(#按钮3文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -420,12 +420,12 @@
 	结束 属性
 
 	//设置对话框是否可取消，若设置为假，则不能通过返回键取消对话框，只能通过代码取消对话框
-	属性写 可取消(可取消 为 逻辑型)
+	属性写 可取消(可取消: 逻辑型)
 		code dialog.setCancelable(#可取消);
 	结束 属性
 
 	//判断进度对话框是否在显示
-	属性读 正在显示() 为 逻辑型
+	属性读 正在显示(): 逻辑型
 		code return dialog.isShowing();
 	结束 属性
 
@@ -486,17 +486,17 @@
 	@end
 
 	//设置对话框的标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code dialog.setTitle(#标题);
 	结束 属性
 
 	//设置对话框要显示的信息
-	属性写 信息(信息 为 文本)
+	属性写 信息(信息: 文本)
 		code dialog.setMessage(#信息);
 	结束 属性
 
 	//设置对话框图标, 参数为附加图片资源名称
-	属性写 图标文件(图片名称 为 文本)
+	属性写 图标文件(图片名称: 文本)
 		@code
 		try {
 			dialog.setIcon(Drawable.createFromStream(context.getAssets().open(#图片名称), #图片名称));
@@ -507,12 +507,12 @@
 	结束 属性
 
 	//设置对话框图标, 参数为图片资源
-	属性写 图标(图片 为 图片资源)
+	属性写 图标(图片: 图片资源)
 		code dialog.setIcon(#图片);
 	结束 属性
 
 	//设置对话框按钮1的文本
-	属性写 按钮1(按钮1文本 为 文本)
+	属性写 按钮1(按钮1文本: 文本)
 		@code
 		dialog.setButton(#按钮1文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -524,7 +524,7 @@
 	结束 属性
 
 	//设置对话框按钮2的文本
-	属性写 按钮2(按钮2文本 为 文本)
+	属性写 按钮2(按钮2文本: 文本)
 		@code
 		dialog.setButton2(#按钮2文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -536,7 +536,7 @@
 	结束 属性
 
 	//设置对话框按钮3的文本
-	属性写 按钮3(按钮3文本 为 文本)
+	属性写 按钮3(按钮3文本: 文本)
 		@code
 		dialog.setButton3(#按钮3文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -548,7 +548,7 @@
 	结束 属性
 
 	//设置对话框是否可取消，若设置为假，则不能通过返回键取消对话框，只能通过代码取消对话框
-	属性写 可取消(可取消 为 逻辑型)
+	属性写 可取消(可取消: 逻辑型)
 		code dialog.setCancelable(#可取消);
 	结束 属性
 
@@ -569,9 +569,9 @@
 		code dialog.dismiss();
 	结束 方法
 
-	定义事件 日期被改变(年 为 整数,月 为 整数,日 为 整数)
+	定义事件 日期被改变(年: 整数,月: 整数,日: 整数)
 
-	定义事件 日期被确定(年 为 整数,月 为 整数,日 为 整数)
+	定义事件 日期被确定(年: 整数,月: 整数,日: 整数)
 
 	//对话框按钮1被单击触发该事件
 	定义事件 按钮1被单击()
@@ -615,17 +615,17 @@
 	@end
 
 	//设置对话框的标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code dialog.setTitle(#标题);
 	结束 属性
 
 	//设置对话框要显示的信息
-	属性写 信息(信息 为 文本)
+	属性写 信息(信息: 文本)
 		code dialog.setMessage(#信息);
 	结束 属性
 
 	//设置对话框图标, 参数为附加图片资源名称
-	属性写 图标文件(图片名称 为 文本)
+	属性写 图标文件(图片名称: 文本)
 		@code
 		try {
 			dialog.setIcon(Drawable.createFromStream(context.getAssets().open(#图片名称), #图片名称));
@@ -636,12 +636,12 @@
 	结束 属性
 
 	//设置对话框图标, 参数为图片资源
-	属性写 图标(图片 为 图片资源)
+	属性写 图标(图片: 图片资源)
 		code dialog.setIcon(#图片);
 	结束 属性
 
 	//设置对话框按钮1的文本
-	属性写 按钮1(按钮1文本 为 文本)
+	属性写 按钮1(按钮1文本: 文本)
 		@code
 		dialog.setButton(#按钮1文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -653,7 +653,7 @@
 	结束 属性
 
 	//设置对话框按钮2的文本
-	属性写 按钮2(按钮2文本 为 文本)
+	属性写 按钮2(按钮2文本: 文本)
 		@code
 		dialog.setButton2(#按钮2文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -665,7 +665,7 @@
 	结束 属性
 
 	//设置对话框按钮3的文本
-	属性写 按钮3(按钮3文本 为 文本)
+	属性写 按钮3(按钮3文本: 文本)
 		@code
 		dialog.setButton3(#按钮3文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -677,7 +677,7 @@
 	结束 属性
 
 	//设置对话框是否可取消，若设置为假，则不能通过返回键取消对话框，只能通过代码取消对话框
-	属性写 可取消(可取消 为 逻辑型)
+	属性写 可取消(可取消: 逻辑型)
 		code dialog.setCancelable(#可取消);
 	结束 属性
 
@@ -698,9 +698,9 @@
 		code dialog.dismiss();
 	结束 方法
 
-	定义事件 时间被改变(小时 为 整数,分钟 为 整数)
+	定义事件 时间被改变(小时: 整数,分钟: 整数)
 
-	定义事件 时间被确定(小时 为 整数,分钟 为 整数)
+	定义事件 时间被确定(小时: 整数,分钟: 整数)
 
 	//对话框按钮1被单击触发该事件
 	定义事件 按钮1被单击()
@@ -752,57 +752,57 @@
 	@end
 
 	//设置编辑框内容
-	属性写 内容(内容 为 文本)
+	属性写 内容(内容: 文本)
 		code et.setText(#内容);
 	结束 属性
 
 	//获取编辑框内容
-	属性读 内容() 为 文本
+	属性读 内容(): 文本
 		code return et.getText().toString();
 	结束 属性
 
 	//设置编辑框提示文本
-	属性写 提示文本(提示文本 为 文本)
+	属性写 提示文本(提示文本: 文本)
 		code et.setHint(#提示文本);
 	结束 属性
 
 	//获取编辑框提示文本
-	属性读 提示文本() 为 文本
+	属性读 提示文本(): 文本
 		code return et.getHint().toString();
 	结束 属性
 
 	//设置编辑框提示文本颜色，0xaarrggb格式
-	属性写 提示文本颜色(提示文本颜色 为 整数)
+	属性写 提示文本颜色(提示文本颜色: 整数)
 		code et.setHintTextColor(#提示文本颜色);
 	结束 属性
 
 	//获取编辑框提示文本颜色
-	属性读 提示文本颜色() 为 整数
+	属性读 提示文本颜色(): 整数
 		code return et.getHintTextColors().getDefaultColor();
 	结束 属性
 
 	//设置编辑框字体大小
-	属性写 字体大小(字体大小 为 整数)
+	属性写 字体大小(字体大小: 整数)
 		code et.setTextSize(#字体大小);
 	结束 属性
 
 	//获取编辑框字体大小
-	属性读 字体大小() 为 整数
+	属性读 字体大小(): 整数
 		code return (int)et.getTextSize();
 	结束 属性
 
 	//设置编辑框字体颜色
-	属性写 字体颜色(字体颜色 为 整数)
+	属性写 字体颜色(字体颜色: 整数)
 		code et.setTextColor(#字体颜色);
 	结束 属性
 
 	//获取编辑框字体颜色
-	属性读 字体颜色() 为 整数
+	属性读 字体颜色(): 整数
 		code return et.getTextColors().getDefaultColor();
 	结束 属性
 
 	//设置编辑框是否为密码输入模式
-	属性写 密码输入(是否密码输入 为 逻辑型)
+	属性写 密码输入(是否密码输入: 逻辑型)
 		@code
 		if (#是否密码输入) {
 			et.setInputType(0x81);
@@ -813,17 +813,17 @@
 	结束 属性
 
 	//设置对话框的标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code builder.setTitle(#标题);
 	结束 属性
 
 	//设置对话框要显示的信息
-	属性写 信息(信息 为 文本)
+	属性写 信息(信息: 文本)
 		code builder.setMessage(#信息);
 	结束 属性
 
 	//设置对话框图标, 参数为附加图片资源名称
-	属性写 图标文件(图片名称 为 文本)
+	属性写 图标文件(图片名称: 文本)
 		@code
 		try {
 			builder.setIcon(
@@ -843,7 +843,7 @@
 	结束 属性
 
 	//设置对话框按钮1的文本
-	属性写 按钮1(按钮1文本 为 文本)
+	属性写 按钮1(按钮1文本: 文本)
 		@code
 		builder.setPositiveButton(#按钮1文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -855,7 +855,7 @@
 	结束 属性
 
 	//设置对话框按钮2的文本
-	属性写 按钮2(按钮2文本 为 文本)
+	属性写 按钮2(按钮2文本: 文本)
 		@code
 		builder.setNegativeButton(#按钮2文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -867,7 +867,7 @@
 	结束 属性
 
 	//设置对话框按钮3的文本
-	属性写 按钮3(按钮3文本 为 文本)
+	属性写 按钮3(按钮3文本: 文本)
 		@code
 		builder.setNeutralButton(#按钮3文本, new DialogInterface.OnClickListener(){
 			@Override
@@ -879,7 +879,7 @@
 	结束 属性
 
 	//设置对话框是否可取消，若设置为假，则不能通过返回键取消对话框，只能通过代码取消对话框
-	属性写 可取消(可取消 为 逻辑型)
+	属性写 可取消(可取消: 逻辑型)
 		code builder.setCancelable(#可取消);
 	结束 属性
 
@@ -942,7 +942,7 @@
 	@end
 
 	//设置弹窗加载的布局
-	属性写 布局(布局 为 组件容器)
+	属性写 布局(布局: 组件容器)
 		@code
 		this.container = #布局;
 		mPopupWindow.setContentView(#mem<布局.取根布局>().getView());
@@ -951,27 +951,27 @@
 	结束 属性
 
 	//获取弹窗加载的组件容器
-	属性读 布局() 为 组件容器
+	属性读 布局(): 组件容器
 		code return container;
 	结束 属性
 
 	//设置弹窗对话风格
-	属性写 动画资源(动画 为 动画资源)
+	属性写 动画资源(动画: 动画资源)
 		code mPopupWindow.setAnimationStyle(#动画);
 	结束 属性
 
 	//设置弹窗高度
-	属性写 高度(高度 为 整数)
+	属性写 高度(高度: 整数)
 		code mPopupWindow.setHeight(#高度);
 	结束 属性
 
 	//设置弹窗宽度
-	属性写 宽度(宽度 为 整数)
+	属性写 宽度(宽度: 整数)
 		code mPopupWindow.setWidth(#宽度);
 	结束 属性
 
 	//设置弹窗背景颜色
-	属性写 背景颜色(背景颜色 为 整数)
+	属性写 背景颜色(背景颜色: 整数)
 		code mPopupWindow.setBackgroundDrawable(new ColorDrawable(#背景颜色));
 	结束 属性
 
@@ -1028,12 +1028,12 @@
 	结束 属性
 
 	//将弹窗显示在寄托组件附近
-	方法 显示(寄托组件 为 可视化组件)
+	方法 显示(寄托组件: 可视化组件)
 		code mPopupWindow.showAsDropDown(#寄托组件.getView());
 	结束 方法
 
 	//将弹窗显示在寄托组件附近, 并设置对齐方式和横纵坐标
-	方法 显示2(寄托组件 为 可视化组件, 对齐方式 为 整数, X坐标 为 整数, Y坐标 为 整数)
+	方法 显示2(寄托组件: 可视化组件, 对齐方式: 整数, X坐标: 整数, Y坐标: 整数)
 		code mPopupWindow.showAtLocation(#寄托组件.getView(), #对齐方式, #X坐标, #Y坐标);
 	结束 方法
 
@@ -1084,7 +1084,7 @@
 	结束 属性
 
 	//设置弹出式菜单显示时的对齐方式
-	属性写 对齐方式(对齐方式 为 整数)
+	属性写 对齐方式(对齐方式: 整数)
 		code mPopupMenu.setGravity(#对齐方式);
 	结束 属性
 
@@ -1098,6 +1098,6 @@
 		code mPopupMenu.dismiss();
 	结束 方法
 
-	定义事件 菜单项被单击(项目 为 菜单项)
+	定义事件 菜单项被单击(项目: 菜单项)
 
 结束 类

@@ -93,37 +93,37 @@
     @end
 
 	//设置是否显示滑块条
-	属性写 显示滑块条(是否显示 为 逻辑型)
+	属性写 显示滑块条(是否显示: 逻辑型)
 		code getView().setVerticalScrollBarEnabled(#是否显示);
 	结束 属性
 
 	//设置列表框是否支持快速滚动，即显示右边的快速滚动条
-	属性写 支持快速滚动(是否支持 为 逻辑型)
+	属性写 支持快速滚动(是否支持: 逻辑型)
 		code getView().setFastScrollEnabled(#是否支持);
 	结束 属性
 
 	//设置列表框是否始终显示快速滚动条
-	属性写 始终显示快速滚动条(是否支持 为 逻辑型)
+	属性写 始终显示快速滚动条(是否支持: 逻辑型)
 		code getView().setFastScrollAlwaysVisible(#是否支持);
 	结束 属性
 
 	//设置列表框分割线高度
-	属性写 分割线高度(高度 为 整数)
+	属性写 分割线高度(高度: 整数)
 		code getView().setDividerHeight(#高度);
 	结束 属性
 
 	//获取列表框分割线高度
-	属性读 分割线高度() 为 整数
+	属性读 分割线高度(): 整数
 		code return getView().getDividerHeight();
 	结束 属性
 
 	//设置列表框分割线颜色,参数为十六进制整数型颜色,格式：0xaarrggbb
-	属性写 分割线颜色(颜色 为 整数)
+	属性写 分割线颜色(颜色: 整数)
 		code getView().setDivider(new ColorDrawable(#颜色));
 	结束 属性
 
 	//获取列表框分割线颜色，返回整数型颜色值
-	属性读 分割线颜色() 为 整数
+	属性读 分割线颜色(): 整数
 		@code
 		Drawable d = getView().getDivider();
 		if (d instanceof ColorDrawable) {
@@ -139,7 +139,7 @@
 	结束 属性
 
 	//使列表框滚动至某一确定位置，参数为欲滚动到的位置
-	方法 滚动至(位置 为 整数)
+	方法 滚动至(位置: 整数)
 		code getView().smoothScrollToPosition(#位置);
 	结束 方法
 	
@@ -292,7 +292,7 @@
 	结束 属性
 
 	//设置是否显示滑块条
-	属性写 显示滑块条(是否显示 为 逻辑型)
+	属性写 显示滑块条(是否显示: 逻辑型)
 		code getView().setVerticalScrollBarEnabled(#是否显示);
 	结束 属性
 
@@ -375,42 +375,42 @@
     @end
 
 	//设置是否显示滑块条
-	属性写 显示滑块条(是否显示 为 逻辑型)
+	属性写 显示滑块条(是否显示: 逻辑型)
 		code getView().setVerticalScrollBarEnabled(#是否显示);
 	结束 属性
 
 	//设置列表框是否支持快速滚动，即显示右边的快速滚动条
-	属性写 支持快速滚动(是否支持 为 逻辑型)
+	属性写 支持快速滚动(是否支持: 逻辑型)
 		code getView().setFastScrollEnabled(#是否支持);
 	结束 属性
 
 	//设置列表框是否始终显示快速滚动条
-	属性写 始终显示快速滚动条(是否支持 为 逻辑型)
+	属性写 始终显示快速滚动条(是否支持: 逻辑型)
 		code getView().setFastScrollAlwaysVisible(#是否支持);
 	结束 属性
 
 	//设置宫格列表框每列的宽度
-	属性写 列宽(每列宽度 为 整数)
+	属性写 列宽(每列宽度: 整数)
 		code getView().setColumnWidth(#每列宽度);
 	结束 属性
 
 	//获取宫格列表框每列的宽度
-	属性读 列宽() 为 整数
+	属性读 列宽(): 整数
 		code return getView().getColumnWidth();
 	结束 属性
 
 	//设置宫格列表框每行的个数
-	属性写 列数(每行个数 为 整数)
+	属性写 列数(每行个数: 整数)
 		code getView().setNumColumns(#每行个数);
 	结束 属性
 
 	//获取宫格列表框每行的个数
-	属性读 列数() 为 整数
+	属性读 列数(): 整数
 		code return getView().getNumColumns();
 	结束 属性
 
 	//使列表框滚动至某一确定位置，参数为欲滚动到的位置
-	方法 滚动至(位置 为 整数)
+	方法 滚动至(位置: 整数)
 		code getView().smoothScrollToPosition(#位置);
 	结束 方法
 结束 类

@@ -11,25 +11,25 @@
 
 	//获取储存卡根目录路径
 	@静态
-	方法 取存储卡路径() 为 文本
+	方法 取存储卡路径(): 文本
 		code return (Environment.getExternalStorageDirectory().getAbsolutePath());
 	结束 方法
 
 	//获取存储卡是否挂载
 	@静态
-	方法 取存储卡状态() 为 逻辑型
+	方法 取存储卡状态(): 逻辑型
 		code return "mounted".equals(Environment.getExternalStorageState());
 	结束 方法
 
 	//判断存储卡是否可写
 	@静态
-	方法 存储卡是否可写() 为 逻辑型
+	方法 存储卡是否可写(): 逻辑型
 		code return Environment.getExternalStorageDirectory().canWrite();
 	结束 方法
 
 	//获取存储卡总容量，单位为MB
 	@静态
-	方法 取存储卡总容量() 为 长整数
+	方法 取存储卡总容量(): 长整数
 		@code
 		File path = Environment.getExternalStorageDirectory();
 		StatFs sf = new StatFs(path.getPath());
@@ -41,7 +41,7 @@
 
 	//获取储存卡剩余容量，单位为MB
 	@静态
-	方法 取存储卡剩余容量() 为 长整数
+	方法 取存储卡剩余容量(): 长整数
 		@code
 		File path = Environment.getExternalStorageDirectory();
 		StatFs statFs = new StatFs(path.getPath());
@@ -53,7 +53,7 @@
 
 	//获取内部存储卡总容量，单位为MB
 	@静态
-	方法 取内部存储卡总容量() 为 长整数
+	方法 取内部存储卡总容量(): 长整数
 		@code
 		File path = Environment.getDataDirectory();
 		StatFs stat = new StatFs(path.getPath());
@@ -65,7 +65,7 @@
 
 	//获取内部储存卡剩余容量，单位为MB
 	@静态
-	方法 取内部存储卡剩余容量() 为 长整数
+	方法 取内部存储卡剩余容量(): 长整数
 		@code
 		File path = Environment.getDataDirectory();
 		StatFs stat = new StatFs(path.getPath());
@@ -77,7 +77,7 @@
 
 	//获取手机总内存，单位为MB
 	@静态
-	方法 取手机总内存() 为 长整数
+	方法 取手机总内存(): 长整数
 		@code
 		String str1 = "/proc/meminfo";
 		long initial_memory = 0L;
@@ -97,7 +97,7 @@
 
 	//获取手机剩余内存，单位为MB
 	@静态
-	方法 取手机剩余内存(环境 为 安卓环境) 为 长整数
+	方法 取手机剩余内存(环境: 安卓环境): 长整数
 		@code
 		ActivityManager am = (ActivityManager) #环境.getSystemService("activity");
 		ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -108,7 +108,7 @@
 
 	//获取手机CPU的主频
 	@静态
-	方法 取CPU主频() 为 小数
+	方法 取CPU主频(): 小数
 		@code
 		int result = 0;
 		FileReader fr = null;

@@ -103,11 +103,11 @@
     }
     @end
 
-	属性写 ID(ID 为 整数)
+	属性写 ID(ID: 整数)
 		code view.setId(#ID);
 	结束 属性
 
-	属性读 ID() 为 整数
+	属性读 ID(): 整数
 		code return view.getId();
 	结束 属性
 
@@ -115,7 +115,7 @@
 	设置组件的宽度
 	注：本属性必须在组件被添加到布局中后才能设置
 	*/
-	属性写 宽度(宽度 为 对象)
+	属性写 宽度(宽度: 对象)
 		@code
 		ViewGroup.LayoutParams params = view.getLayoutParams();
 		if (params == null) {
@@ -131,7 +131,7 @@
 	注：本属性必须在组件被添加到布局中后才能设置
 	*/
 	@废弃使用("建议直接使用'宽度'属性设置dp")
-	属性写 宽度DP(宽度 为 整数)
+	属性写 宽度DP(宽度: 整数)
 		@code
 		ViewGroup.LayoutParams params = view.getLayoutParams();
 		if (params == null) {
@@ -151,7 +151,7 @@
 	设置组件的高度
 	注：本属性必须在组件被添加到布局中后才能设置
 	*/
-	属性写 高度(高度 为 对象)
+	属性写 高度(高度: 对象)
 		@code
 		ViewGroup.LayoutParams params = view.getLayoutParams();
 		if (params == null) {
@@ -167,7 +167,7 @@
 	注：本属性必须在组件被添加到布局中后才能设置
 	*/
 	@废弃使用("建议直接使用'高度'属性设置dp")
-	属性写 高度DP(高度 为 整数)
+	属性写 高度DP(高度: 整数)
 		@code
 		ViewGroup.LayoutParams params = view.getLayoutParams();
 		if (params == null) {
@@ -231,51 +231,51 @@
 		@end
 	结束 属性
 
-	属性写 横向偏移(偏移 为 对象)
+	属性写 横向偏移(偏移: 对象)
 		@code
 		view.setTranslationX(computeDimension(#偏移));
 		@end
 	结束 属性
 
 	@废弃使用("建议直接使用'横向偏移'属性设置dp")
-	属性写 横向偏移DP(偏移 为 整数)
+	属性写 横向偏移DP(偏移: 整数)
 		@code
 		view.setTranslationX(#mem<像素操作.DP到PX>(#偏移));
 		@end
 	结束 属性
 
-	属性读 横向偏移() 为 整数
+	属性读 横向偏移(): 整数
 		@code
 		return (int)view.getTranslationX();
 		@end
 	结束 属性
 
-	属性写 纵向偏移(偏移 为 对象)
+	属性写 纵向偏移(偏移: 对象)
 		@code
 		view.setTranslationY(computeDimension(#偏移));
 		@end
 	结束 属性
 
 	@废弃使用("建议直接使用'纵向迁移'属性设置dp")
-	属性写 纵向偏移DP(偏移 为 整数)
+	属性写 纵向偏移DP(偏移: 整数)
 		@code
 		view.setTranslationY(#mem<像素操作.DP到PX>(#偏移));
 		@end
 	结束 属性
 
-	属性读 纵向偏移() 为 整数
+	属性读 纵向偏移(): 整数
 		@code
 		return (int)view.getTranslationY();
 		@end
 	结束 属性
 
-	属性写 竖向偏移(偏移 为 整数)
+	属性写 竖向偏移(偏移: 整数)
 		@code
 		view.setTranslationZ(computeDimension(#偏移));
 		@end
 	结束 属性
 
-	属性读 竖向偏移() 为 整数
+	属性读 竖向偏移(): 整数
 		@code
 		return (int)view.getTranslationZ();
 		@end
@@ -317,7 +317,7 @@
 		@end
 	结束 属性
 
-	属性写 内边距(边距 为 对象)
+	属性写 内边距(边距: 对象)
 		@code
 		int padding = computeDimension(#边距);
 		view.setPadding(padding, padding, padding, padding);
@@ -325,90 +325,90 @@
 	结束 属性
 
 	@废弃使用("建议直接使用'内边距'属性设置dp")
-	属性写 内边距DP(边距 为 整数)
+	属性写 内边距DP(边距: 整数)
 		@code
 		int padding = #mem<像素操作.DP到PX>(#边距);
 		view.setPadding(padding, padding, padding, padding);
 		@end
 	结束 属性
 
-	属性写 左内边距(左内边距 为 对象)
+	属性写 左内边距(左内边距: 对象)
 		code view.setPadding(computeDimension(#左内边距), view.getPaddingTop(),view.getPaddingRight(),view.getPaddingBottom());
 	结束 属性
 
 	@废弃使用("建议直接使用'左内边距'属性设置dp")
-	属性写 左内边距DP(左内边距 为 整数)
+	属性写 左内边距DP(左内边距: 整数)
 		code view.setPadding(#mem<像素操作.DP到PX>(#左内边距), view.getPaddingTop(),view.getPaddingRight(),view.getPaddingBottom());
 	结束 属性
 
-	属性读 左内边距() 为 整数
+	属性读 左内边距(): 整数
 		code return view.getPaddingLeft();
 	结束 属性
 
-	属性写 上内边距(上内边距 为 对象)
+	属性写 上内边距(上内边距: 对象)
 		code view.setPadding(view.getPaddingLeft(), computeDimension(#上内边距), view.getPaddingRight(),view.getPaddingBottom());
 	结束 属性
 
 	@废弃使用("建议直接使用'上内边距'属性设置dp")
-	属性写 上内边距DP(上内边距 为 整数)
+	属性写 上内边距DP(上内边距: 整数)
 		code view.setPadding(view.getPaddingLeft(), #mem<像素操作.DP到PX>(#上内边距), view.getPaddingRight(),view.getPaddingBottom());
 	结束 属性
 
-	属性读 上内边距() 为 整数
+	属性读 上内边距(): 整数
 		code return view.getPaddingTop();
 	结束 属性
 
-	属性写 右内边距(右内边距 为 对象)
+	属性写 右内边距(右内边距: 对象)
 		code view.setPadding(view.getPaddingLeft(),view.getPaddingTop(), computeDimension(#右内边距), view.getPaddingBottom());
 	结束 属性
 
 	@废弃使用("建议直接使用'右内边距'属性设置dp")
-	属性写 右内边距DP(右内边距 为 整数)
+	属性写 右内边距DP(右内边距: 整数)
 		code view.setPadding(view.getPaddingLeft(),view.getPaddingTop(), #mem<像素操作.DP到PX>(#右内边距), view.getPaddingBottom());
 	结束 属性
 
-	属性读 右内边距() 为 整数
+	属性读 右内边距(): 整数
 		code return view.getPaddingRight();
 	结束 属性
 
-	属性写 下内边距(下内边距 为 对象)
+	属性写 下内边距(下内边距: 对象)
 		code view.setPadding(view.getPaddingLeft(),view.getPaddingTop(),view.getPaddingRight(), computeDimension(#下内边距));
 	结束 属性
 
 	@废弃使用("建议直接使用'下内边距'属性设置dp")
-	属性写 下内边距DP(下内边距 为 整数)
+	属性写 下内边距DP(下内边距: 整数)
 		code view.setPadding(view.getPaddingLeft(),view.getPaddingTop(),view.getPaddingRight(), #mem<像素操作.DP到PX>(#下内边距));
 	结束 属性
 
-	属性读 下内边距() 为 整数
+	属性读 下内边距(): 整数
 		code return view.getPaddingBottom();
 	结束 属性
 
-	属性写 阴影(阴影度 为 对象)
+	属性写 阴影(阴影度: 对象)
 		code view.setElevation(computeDimension(#阴影度));
 	结束 属性
 
-	属性读 阴影() 为 整数
+	属性读 阴影(): 整数
 		code return (int)view.getElevation();
 	结束 属性
 
-	属性写 透明度(透明度 为 小数)
+	属性写 透明度(透明度: 小数)
 		code view.setAlpha((float)#透明度);
 	结束 属性
 
-	属性读 透明度() 为 小数
+	属性读 透明度(): 小数
 		code  return (float)view.getAlpha();
 	结束 属性
 
-	属性写 可用(是否可用 为 逻辑型)
+	属性写 可用(是否可用: 逻辑型)
 		code view.setEnabled(#是否可用);
 	结束 属性
 
-	属性读 可用() 为 逻辑型
+	属性读 可用(): 逻辑型
 		code return view.isEnabled();
 	结束 属性
 
-	属性写 可视(是否可视 为 逻辑型)
+	属性写 可视(是否可视: 逻辑型)
 		@code
 		if (#是否可视) {
 			view.setVisibility(View.VISIBLE);
@@ -418,55 +418,55 @@
 		@end
 	结束 属性
 
-	属性读 可视() 为 逻辑型
+	属性读 可视(): 逻辑型
 		@code
 		return view.getVisibility() == View.VISIBLE ? true : false; 
 		@end
 	结束 属性
 
-	属性写 可视状态(状态 为 组件可视状态)
+	属性写 可视状态(状态: 组件可视状态)
 		@code
 		view.setVisibility(#状态);
 		@end
 	结束 属性
 
-	属性读 可视状态() 为 组件可视状态
+	属性读 可视状态(): 组件可视状态
 		@code
 		return view.getVisibility();
 		@end
 	结束 属性
 
 	//设置组件是否填充以占据整个系统界面，如状态栏
-	属性写 填充系统界面(是否填充 为 逻辑型)
+	属性写 填充系统界面(是否填充: 逻辑型)
 		code view.setFitsSystemWindows(#是否填充);
 	结束 属性
 
 	//获取组件是否填充以占据整个系统界面，如状态栏
-	属性读 填充系统界面() 为 逻辑型
+	属性读 填充系统界面(): 逻辑型
 		code return view.getFitsSystemWindows();
 	结束 属性
 
 	//判断是否启用硬件加速
-	属性读 硬件加速() 为 逻辑型
+	属性读 硬件加速(): 逻辑型
 		@code
 		return view.isHardwareAccelerated();
 		@end
 	结束 属性
 
 	//设置是否启用硬件加速
-	属性写 硬件加速(是否启用 为 逻辑型)
+	属性写 硬件加速(是否启用: 逻辑型)
 		@code
 		view.setLayerType(#是否启用 ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_SOFTWARE, null);
 		@end
 	结束 属性
 
-	属性写 可获取焦点(是否可获取焦点 为 逻辑型)
+	属性写 可获取焦点(是否可获取焦点: 逻辑型)
 		@code
 		view.setFocusable(#是否可获取焦点);
 		@end
 	结束 属性
 
-	属性读 可获取焦点() 为 逻辑型
+	属性读 可获取焦点(): 逻辑型
 		code return view.isFocusable();
 	结束 属性
 
@@ -486,7 +486,7 @@
 
 	//设置水波纹效果
 	@导入Java("android.util.TypedValue")
-	属性写 水波纹效果(是否开启水波纹效果 为 逻辑型)
+	属性写 水波纹效果(是否开启水波纹效果: 逻辑型)
 		如果 设备信息.安卓版本号 < 23 则
 			返回()
 		结束 如果
@@ -868,7 +868,7 @@
 	结束 方法
 
 	//移除布局中的组件
-	方法 移除组件2(索引 为 整数)
+	方法 移除组件2(索引: 整数)
 		@code
 		getView().removeViewAt(#索引);
 		@end

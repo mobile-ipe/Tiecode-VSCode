@@ -1101,7 +1101,7 @@
 @指代类("java.lang.annotation.Annotation")
 @禁止创建对象
 类 Java注解
-	方法 取类型() 为 Java类
+	方法 取类型(): Java类
 		code return #this.annotationType();
 	结束 方法
 结束 类
@@ -1692,7 +1692,7 @@
 类 dex文件
 	@静态
 	@运算符重载
-	方法 =(文件路径 为 文本) 为 dex文件
+	方法 =(文件路径: 文本): dex文件
 		@code
 		try{
 		return new DexFile(#文件路径);
@@ -1702,7 +1702,7 @@
 	结束 方法
 
 	@静态
-	方法 实例化(文件路径 为 文本) 为 dex文件
+	方法 实例化(文件路径: 文本): dex文件
 		@code
 		try{
 		return new DexFile(#文件路径);
@@ -1711,7 +1711,7 @@
 		@end
 	结束 方法
 
-	方法 取本文件所有类名() 为 类名枚举器
+	方法 取本文件所有类名(): 类名枚举器
 		code return #this.entries();
 	结束 方法
 
@@ -1727,11 +1727,11 @@
 @指代类("java.util.Enumeration")
 @禁止创建对象
 类 类名枚举器
-	方法 还有下一个() 为 逻辑型
+	方法 还有下一个(): 逻辑型
 		code return #this.hasMoreElements();
 	结束 方法
 
-	方法 取下一个对象() 为 对象
+	方法 取下一个对象(): 对象
 		code return #this.nextElement();
 	结束 方法
 结束 类

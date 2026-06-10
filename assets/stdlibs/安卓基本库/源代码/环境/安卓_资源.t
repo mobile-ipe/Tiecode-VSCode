@@ -96,15 +96,15 @@
 @指代类("android.content.res.Resources")
 类 安卓资源管理器
 
-	方法 取附加资源管理器() 为 附加资源管理器
+	方法 取附加资源管理器(): 附加资源管理器
 		code return #this.getAssets();
 	结束 方法
 
-	方法 取可绘制对象(图片资源对象 为 图片资源) 为 可绘制对象
+	方法 取可绘制对象(图片资源对象: 图片资源): 可绘制对象
 		code return #this.getDrawable(#图片资源对象);
 	结束 方法
 
-	方法 取位图对象(图片资源对象 为 图片资源) 为 位图对象
+	方法 取位图对象(图片资源对象: 图片资源): 位图对象
 		code return ((android.graphics.drawable.BitmapDrawable)#this.getDrawable(#图片资源对象)).getBitmap();
 	结束 方法
 结束 类

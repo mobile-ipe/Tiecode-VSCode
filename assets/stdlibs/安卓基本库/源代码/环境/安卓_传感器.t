@@ -36,7 +36,7 @@
 	@end
 
 	//判断手机方向传感器是否有效
-	属性读 有效() 为 逻辑型
+	属性读 有效(): 逻辑型
 		@code
 		java.util.List<Sensor> sensorList = this.sensors.getSensorList(3);
 		return sensorList != null && !sensorList.isEmpty();
@@ -44,39 +44,39 @@
 	结束 属性
 
 	//获取方向传感器是否可用
-	属性读 可用() 为 逻辑型
+	属性读 可用(): 逻辑型
 		@code
 		return this.enabled;
 		@end
 	结束 属性
 
 	//设置方向传感器是否可用
-	属性写 可用(是否可用 为 逻辑型)
+	属性写 可用(是否可用: 逻辑型)
 		code this.enabled = #是否可用;
 	结束 属性
 
 	//获取方向传感器的俯仰角
-	属性读 俯仰角() 为 小数
+	属性读 俯仰角(): 小数
 		code return pitch;
 	结束 属性
 
 	//获取方向传感器的横滚角
-	属性读 横滚角() 为 小数
+	属性读 横滚角(): 小数
 		code return roll;
 	结束 属性
 
 	//获取方向传感器的偏航角
-	属性读 偏航角() 为 小数
+	属性读 偏航角(): 小数
 		code return yaw;
 	结束 属性
 
 	//获取倾斜角
-	属性读 倾斜角() 为 小数
+	属性读 倾斜角(): 小数
 		code return Math.toDegrees(Math.atan2(pitch,roll));
 	结束 属性
 
 	//获取屏幕旋转的角度，只能返回0,90,180,270
-	方法 取屏幕旋转角度() 为 整数
+	方法 取屏幕旋转角度(): 整数
 		@code
 		  switch (((WindowManager) activity.getSystemService("window")).getDefaultDisplay().getRotation()) {
 		  	 case 0:
@@ -94,7 +94,7 @@
 	结束 方法
 
 	//方向改变时触发该事件
-	定义事件 方向改变(偏航角 为 小数,俯仰角 为 小数,横滚角 为 小数)
+	定义事件 方向改变(偏航角: 小数,俯仰角: 小数,横滚角: 小数)
 
 结束 类
 
@@ -165,43 +165,43 @@
 	@end
 
 	//判断加速度传感器是否有效
-	属性读 有效() 为 逻辑型
+	属性读 有效(): 逻辑型
 		@code
 		return this.sensor != null;
 		@end
 	结束 属性
 
 	//判断加速度传感器是否可用
-	属性读 可用() 为 逻辑型
+	属性读 可用(): 逻辑型
 		@code
 		return this.enabled;
 		@end
 	结束 属性
 
 	//设置加速度传感器是否可用
-	属性写 可用(是否可用 为 逻辑型)
+	属性写 可用(是否可用: 逻辑型)
 		@code
 		this.enabled = #是否可用;
 		@end
 	结束 属性
 
 	//获取X方向的加速度
-	属性读 X加速度() 为 小数
+	属性读 X加速度(): 小数
 		code return xAccel;
 	结束 属性
 
 	//获取Y方向的加速度
-	属性读 Y加速度() 为 小数
+	属性读 Y加速度(): 小数
 		code return yAccel;
 	结束 属性
 
 	//获取Z方向的加速度
-	属性读 Z加速度() 为 小数
+	属性读 Z加速度(): 小数
 		code return zAccel;
 	结束 属性
 
 	//加速度改变时触发该事件，并返回三个方向的加速度
-	定义事件 加速度改变(X加速度 为 小数,Y加速度 为 小数,Z加速度 为 小数)
+	定义事件 加速度改变(X加速度: 小数,Y加速度: 小数,Z加速度: 小数)
 
 	//用户摇晃手机时触发该事件
 	定义事件 摇晃手机()
@@ -238,7 +238,7 @@
 	@end
 
 	//判断方向传感器是否有效
-	属性读 有效() 为 逻辑型
+	属性读 有效(): 逻辑型
 		@code
 		List<Sensor> sensorList = this.sensors.getSensorList(5);
 		return sensorList != null && !sensorList.isEmpty();
@@ -246,7 +246,7 @@
 	结束 属性
 
 	//当手机周围光线发生变化时触发此事件，返回光线强度，单位为勒克斯
-	定义事件 光线改变(光线强度 为 小数)
+	定义事件 光线改变(光线强度: 小数)
 
 结束 类
 
@@ -306,14 +306,14 @@
     @end
 
 	//判断距离传感器是否可用
-	属性读 可用() 为 逻辑型
+	属性读 可用(): 逻辑型
 		@code
         return this.enable;
       @end
 	结束 属性
 
 	//设置距离传感器是否可用
-	属性写 可用(是否可用 为 逻辑型)
+	属性写 可用(是否可用: 逻辑型)
 		@code
         if (this.mSensor != null) {
             if (this.enable && !#是否可用) {
@@ -329,35 +329,35 @@
 	结束 属性
 
 	//获取物体靠近的距离
-	属性读 距离() 为 小数
+	属性读 距离(): 小数
 		@code
         return this.lastValue;
       @end
 	结束 属性
 
 	//获取物体靠近的最小距离
-	属性读 最小距离() 为 整数
+	属性读 最小距离(): 整数
 		@code
         return this.min;
       @end
 	结束 属性
 
 	//设置物体靠近的最小距离
-	属性写 最小距离(最小距离 为 整数)
+	属性写 最小距离(最小距离: 整数)
 		@code
         this.min = #最小距离;
       @end
 	结束 属性
 
 	//获取距离传感器的检测间隔时间
-	属性读 检测间隔() 为 整数
+	属性读 检测间隔(): 整数
 		@code
         return this.mRate;
       @end
 	结束 属性
 
 	//设置距离传感器的检测间隔时间
-	属性写 检测间隔(间隔时间 为 整数)
+	属性写 检测间隔(间隔时间: 整数)
 		@code
         this.mSensorManager.unregisterListener(this.mSensorListener);
         this.mRate = #间隔时间;
@@ -366,7 +366,7 @@
 	结束 属性
 
 	//当物体与手机的距离发生改变时触发此事件，返回两者的距离。
-	定义事件 距离改变(距离 为 小数)
+	定义事件 距离改变(距离: 小数)
 
 	//放物体靠近手机时触发该事件
 	定义事件 物体靠近()
@@ -437,7 +437,7 @@
 	@end
 
 	//判断GPS硬件是否有效
-	属性读 有效() 为 逻辑型
+	属性读 有效(): 逻辑型
 		@code
         if (this.locationManager == null) {
             return false;
@@ -451,14 +451,14 @@
 	结束 属性
 
 	//判断GPS是否已开启
-	属性读 是否已开启() 为 逻辑型
+	属性读 是否已开启(): 逻辑型
 		@code
         return locationManager.isProviderEnabled("gps");
       @end
 	结束 属性
 
 	//获取当前纬度
-	属性读 纬度() 为 小数
+	属性读 纬度(): 小数
 		@code
         if (this.location != null) {
             return this.location.getLatitude();
@@ -468,7 +468,7 @@
 	结束 属性
 
 	//获取当前经度
-	属性读 经度() 为 小数
+	属性读 经度(): 小数
 		@code
         if (this.location != null) {
             return this.location.getLongitude();
@@ -478,7 +478,7 @@
 	结束 属性
 
 	//获取当前海拔，单位为m
-	属性读 海拔() 为 小数
+	属性读 海拔(): 小数
 		@code
         if (this.location != null) {
             return this.location.getAltitude();
@@ -488,7 +488,7 @@
 	结束 属性
 
 	//获取当前速度，单位为km/h
-	属性读 速度() 为 小数
+	属性读 速度(): 小数
 		@code
         if (this.location != null) {
             return (double) this.location.getSpeed();
@@ -498,7 +498,7 @@
 	结束 属性
 
 	//获取当前方向角，为当前方向与正北方向的顺时针夹角度数
-	属性读 方向() 为 小数
+	属性读 方向(): 小数
 		@code
         if (this.location != null) {
             return (double) this.location.getBearing();
@@ -508,7 +508,7 @@
 	结束 属性
 
 	//获取当前定位精度，单位为m
-	属性读 精度() 为 小数
+	属性读 精度(): 小数
 		@code
         if (this.location == null || !this.location.hasAccuracy()) {
             return 0.0d;
@@ -518,7 +518,7 @@
 	结束 属性
 
 	//获取当前卫星时间
-	属性读 时间() 为 文本
+	属性读 时间(): 文本
 		@code
         if (this.location != null) {
             return new java.text.SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(new Date(this.location.getTime()));
@@ -578,13 +578,13 @@
 	速度的单位为km/h，
 	方向为当前方向与正北方向的顺时针夹角的度数。
 	*/
-	定义事件 位置改变(纬度 为 小数,经度 为 小数,海拔 为 小数,速度 为 小数,方向 为 小数)
+	定义事件 位置改变(纬度: 小数,经度: 小数,海拔: 小数,速度: 小数,方向: 小数)
 
 	/*
     当GPS状态发生改变时触发此事件，返回当前GPS服务状态
     状态：1、GPS服务可用 2、不在服务区 3、服务暂停。
     */
-	定义事件 状态改变(状态 为 整数)
+	定义事件 状态改变(状态: 整数)
 
 	//GPS开启时触发该事件
 	定义事件 设备开启()

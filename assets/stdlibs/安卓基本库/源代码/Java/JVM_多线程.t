@@ -56,7 +56,7 @@
 	结束 方法
 
 	@静态
-	方法 置固定线程池大小(大小 为 整数)
+	方法 置固定线程池大小(大小: 整数)
 		@code
 		#线程池大小 = ((#大小 <= 0) ? (Runtime.getRuntime().availableProcessors() * 2) : #大小);
 		#cls<线程池>.fixedThreadPool = Executors.newFixedThreadPool(#线程池大小);

@@ -4,7 +4,7 @@
 浏览框组件，提供访问网页的功能
 */
 @附加权限(安卓权限.网络权限)
-@附加清单.组件属性([[android:configChanges="orientation|screenSize|keyboardHidden|uiMode"]])
+@附加清单([[android:configChanges="orientation|screenSize|keyboardHidden|uiMode"]], 节点="component.property")
 @导入Java("android.content.Context")
 @导入Java("android.content.pm.ActivityInfo")
 @导入Java("android.content.Intent")
@@ -38,18 +38,18 @@
 	@end
 
 	//设置是否显示进度条
-	属性写 显示进度条(是否显示进度条 为 逻辑型)
+	属性写 显示进度条(是否显示进度条: 逻辑型)
 		//code this.Prv = #是否显示进度条;
 		code mProgressBar.setVisibility((this.Prv = #是否显示进度条) ? View.VISIBLE : View.GONE);
 	结束 属性
 
 	//浏览框UA
-	属性读 UA() 为 文本
+	属性读 UA(): 文本
 		code return getView().getSettings().getUserAgentString();
 	结束 属性
 
 	//设置浏览框UA
-	属性写 UA(UA 为 文本)
+	属性写 UA(UA: 文本)
 		code getView().getSettings().setUserAgentString(#UA);
 	结束 属性
 
@@ -68,22 +68,22 @@
 	@静态
 	常量 缓存_缓存_其它网络 : 整数 = -1
 
-	属性写 缓存模式(缓存模式 为 整数)
+	属性写 缓存模式(缓存模式: 整数)
 		code getView().getSettings().setCacheMode(#缓存模式);
 	结束 属性
 
 	//判断浏览框是否可后退
-	属性读 可后退() 为 逻辑型
+	属性读 可后退(): 逻辑型
 		code return getView().canGoBack();
 	结束 属性
 
 	//判断浏览框是否可前进
-	属性读 可前进() 为 逻辑型
+	属性读 可前进(): 逻辑型
 		code return getView().canGoForward();
 	结束 属性
 
 	//获取浏览框当前网址
-	属性读 网址() 为 文本
+	属性读 网址(): 文本
 		code return getView().getUrl();
 	结束 属性
 
@@ -92,37 +92,37 @@
 	结束 属性
 
 	//获取浏览框当前网页标题
-	属性读 标题() 为 文本
+	属性读 标题(): 文本
 		code return getView().getTitle();
 	结束 属性
 
 	//获取浏览框当前网页加载进度
-	属性读 进度() 为 整数
+	属性读 进度(): 整数
 		code return getView().getProgress();
 	结束 属性
 
 	//获取 HTML 内容的高度
-	属性读 页面高度() 为 整数
+	属性读 页面高度(): 整数
 		code return getView().getContentHeight();
 	结束 属性
 
 	//获取当前页面的 favicon 
-	属性读 网页图标() 为 位图对象
+	属性读 网页图标(): 位图对象
 		code return getView().getFavicon();
 	结束 属性
 
 	//获取 网页301 转跳前的原始链接
-	属性读 原始链接() 为 文本
+	属性读 原始链接(): 文本
 		code return getView().getOriginalUrl();
 	结束 属性
 
 	//加载网址
-	方法 加载网址(网址 为 文本)
+	方法 加载网址(网址: 文本)
 		code getView().loadUrl(#网址);
 	结束 方法
 
 	//加载数据
-	方法 加载数据(数据 为 文本)
+	方法 加载数据(数据: 文本)
 		@code 
 		try {
 			getView().loadDataWithBaseURL("", #数据, "text/html", "utf-8", null);
@@ -133,7 +133,7 @@
 	结束 方法
 
 	//加载数据
-	方法 加载数据2(域名 为 文本 = "", 数据 为 文本, MIME类型 为 文本 = "text/html", 编码 为 文本 = "utf-8", 链接 为 文本 = 空)
+	方法 加载数据2(域名: 文本= "", 数据: 文本, MIME类型: 文本= "text/html", 编码: 文本= "utf-8", 链接: 文本= 空)
 		@code 
 		try {
 			getView().loadDataWithBaseURL(#域名, #数据, #MIME类型, #编码, #链接);
@@ -159,7 +159,7 @@
 	结束 属性
 
 	//通过Url打开应用
-	方法 打开应用(url 为 文本)
+	方法 打开应用(url: 文本)
 		@code 
 		try {
 			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(#url));
@@ -198,18 +198,18 @@
 	结束 方法
 
 	/*//设置进度条
-	方法 置进度条(欲替代进度条组件 为 进度条)
+	方法 置进度条(欲替代进度条组件: 进度条)
 		code this.mProgressBar = #欲替代进度条组件.getView();
 	结束 方法*/
 
 	//设置某个网址的cookie
-	方法 置cookie(网址 为 文本, cookie 为 文本)
+	方法 置cookie(网址: 文本, cookie: 文本)
 		code CookieManager manager = CookieManager.getInstance();
 		code manager.setCookie(#网址, #cookie);
 	结束 方法
 
 	//获取某个网址的cookie
-	方法 取cookie(网址 为 文本) 为 文本
+	方法 取cookie(网址: 文本): 文本
 		code CookieManager manager = CookieManager.getInstance();
 		code return manager.getCookie(#网址);
 	结束 方法
@@ -248,7 +248,7 @@
 
 	//用于拦截到下载的下载，返回下载任务的id
 	@附加权限(安卓权限.文件权限_写入)
-	方法 下载(下载网址 为 文本, 保存路径 为 文本) 为 长整数
+	方法 下载(下载网址: 文本, 保存路径: 文本): 长整数
 		@code 
 		DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
 		Uri uri = Uri.parse(#下载网址);
@@ -267,7 +267,7 @@
 	结束 方法
 
 	//上传文件的回调
-	方法 回调(请求码 为 整数, 结果码 为 整数, 数据 为 启动信息)
+	方法 回调(请求码: 整数, 结果码: 整数, 数据: 启动信息)
 		@code 
 		if (#请求码 == 5173) {
 			if (null == message_upload) {
@@ -287,7 +287,7 @@
 	结束 方法
 
 	//添加一个JS接口
-	方法 添加JS接口(接口名 为 文本, 方法名 为 文本)
+	方法 添加JS接口(接口名: 文本, 方法名: 文本)
 		变量 js : 文本 = ("if(window."+ 接口名 + " == null){window."+ 接口名 + "=function (){}}window."+ 接口名 + "."+方法名 +
 		"=function (a = '', b = ''){return prompt('[JsI"+ 接口名 +"- #-"+ 方法名 + "-] _'+a,b)};")
 		执行JS(js)
@@ -295,11 +295,11 @@
 	结束 方法
 
 	/*
-	方法 保存状态(bundle 为 android.os.Bundle)
+	方法 保存状态(bundle: android.os.Bundle)
 		getView().saveState(#bundle)
 	结束 方法
 
-	方法 恢复状态(bundle 为 android.os.Bundle)
+	方法 恢复状态(bundle: android.os.Bundle)
 		getView().restoreState(bundle)
 	结束 方法*/
 
@@ -308,7 +308,7 @@
 		code htcs.cancel();
 	结束 方法
 
-	方法 执行JS(JS 为 文本)
+	方法 执行JS(JS: 文本)
 		如果 JS.为空()
 			返回
 		结束 如果
@@ -330,40 +330,40 @@
 	结束 方法
 
 	//不要在此方法内进行耗时操作
-	定义事件 JS交互事件(接口名 : 文本, 方法名 为 文本, 数据1 : 文本, 数据2 为 文本) 为 文本
+	定义事件 JS交互事件(接口名 : 文本, 方法名: 文本, 数据1 : 文本, 数据2: 文本): 文本
 
 	//执行JS 方法的回调，JS里用 return 返回数据
-	定义事件 执行JS回调(数据 为 文本)
+	定义事件 执行JS回调(数据: 文本)
 
 	//拦截到Url时触发该事件
-	定义事件 拦截到Url(url 为 文本) 为 逻辑型
+	定义事件 拦截到Url(url: 文本): 逻辑型
 
 	//拦截到Uri时触发该事件
-	定义事件 拦截到Uri(uri 为 文本)
+	定义事件 拦截到Uri(uri: 文本)
 
 	//网页开始加载时触发该事件，返回加载的网址
-	定义事件 网页开始加载(网址 为 文本)
+	定义事件 网页开始加载(网址: 文本)
 
 	//网页加载完成时触发该事件，返回加载的网址
-	定义事件 网页加载完成(网址 为 文本)
+	定义事件 网页加载完成(网址: 文本)
 
 	//网页加载进度改变时触发该事件，返回进度
-	定义事件 进度值改变(进度 为 整数)
+	定义事件 进度值改变(进度: 整数)
 
 	//接收到网页标题触发该事件，返回网页标题
-	定义事件 接收到标题(网址 为 文本)
+	定义事件 接收到标题(网址: 文本)
 
 	//接收到网页图标触发该事件，返回可绘制对象
-	定义事件 接收到图标(图标 为 位图对象)
+	定义事件 接收到图标(图标: 位图对象)
 
 	//网页拦截到网页请求时触发该事件，返回请求的网址
-	定义事件 拦截到请求(网址 为 文本)
+	定义事件 拦截到请求(网址: 文本)
 
 	//网页拦截到下载请求时触发该事件，返回下载地址,名称,类型,以及大小
-	定义事件 拦截到下载(网址 为 文本, 名称 为 文本, 类型 为 文本, 大小 为 长整数)
+	定义事件 拦截到下载(网址: 文本, 名称: 文本, 类型: 文本, 大小: 长整数)
 
 	//网页 Console Message， 等级： 0-调试, 1-错误, 2-日志, 3-异常, 4-警告
-	定义事件 控制台日志(行数 为 整数, 信息 为 文本, 等级 : 整数, 来源ID : 文本) : 逻辑型
+	定义事件 控制台日志(行数: 整数, 信息: 文本, 等级 : 整数, 来源ID : 文本) : 逻辑型
 
 	/*
 	class JsInterface {

@@ -622,13 +622,13 @@
 	当取网页源码(Get)结束时触发该事件
 	并返回取源结果和cookie
 	*/
-	定义事件 取网页源码结束(结果 为 文本, 内容 : 字节[], cookie 为 文本)
+	定义事件 取网页源码结束(结果: 文本, 内容 : 字节[], cookie: 文本)
 
 	/*
 	当发送数据(Post)结束时触发该事件
 	并返回取源结果和cookie
 	*/
-	定义事件 发送数据结束(结果 为 文本, 内容 : 字节[], cookie 为 文本)
+	定义事件 发送数据结束(结果: 文本, 内容 : 字节[], cookie: 文本)
 
 	/*
 	当正在下载文件进度改变时触发该事件
@@ -1193,7 +1193,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	检测端口对于当前主机是否开放
 	*/
 	@静态
-	方法 端口是否开放(端口 : 整数, IP地址 : 文本 = "127.0.0.1", 超时 为 整数 = 300) : 逻辑型
+	方法 端口是否开放(端口 : 整数, IP地址 : 文本 = "127.0.0.1", 超时: 整数= 300) : 逻辑型
 		提交到新线程运行()
 		是否开放 = 端口是否开放_同步(端口, IP地址, 超时)
 		结束提交到新线程()
@@ -1205,7 +1205,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	检测端口对于当前主机是否开放
 	*/
 	@静态
-	方法 端口是否开放_同步(端口 : 整数, IP地址 : 文本 = "127.0.0.1", 超时 为 整数 = 300) : 逻辑型
+	方法 端口是否开放_同步(端口 : 整数, IP地址 : 文本 = "127.0.0.1", 超时: 整数= 300) : 逻辑型
 		@code
 		Socket socket = new Socket();
 		try {
@@ -1314,7 +1314,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	private boolean isClose = true;
 	@end
 
-	属性读 监听端口() 为 整数
+	属性读 监听端口(): 整数
 		@code
 		if (channel != null) {
 			try {
@@ -1327,21 +1327,21 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		@end
 	结束 属性
 
-	属性读 是否打开() 为 逻辑型
+	属性读 是否打开(): 逻辑型
 		code return !isClose;
 	结束 属性
 
-	属性读 是否关闭() 为 逻辑型类
+	属性读 是否关闭(): 逻辑型类
 		code return isClose;
 	结束 属性
 
 	@异步方法
-	方法 开始监听(端口 为 整数 = 0)
+	方法 开始监听(端口: 整数= 0)
 		等待 开始监听_内部(端口)
 	结束 方法
 
 	@隐藏
-	方法 开始监听_内部(端口 为 整数 = 0, 缓冲区大小 为 整数 = 1024)
+	方法 开始监听_内部(端口: 整数= 0, 缓冲区大小: 整数= 1024)
 		@code
 		Handler handler = new Handler(Looper.getMainLooper());
 		try {
@@ -1394,20 +1394,20 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	结束 方法
 
 	@异步方法
-	方法 发送文本(地址 为 文本, 端口 为 整数, 内容 为 文本)
+	方法 发送文本(地址: 文本, 端口: 整数, 内容: 文本)
 		等待 发送文本_同步(地址, 端口, 内容)
 	结束 方法
 
 	@异步方法
-	方法 发送字节集(地址 为 文本, 端口 为 整数, 字节集 为 字节[])
+	方法 发送字节集(地址: 文本, 端口: 整数, 字节集: 字节[])
 		等待 发送字节集_同步(地址, 端口, 字节集)
 	结束 方法
 
-	方法 发送文本_同步(地址 为 文本, 端口 为 整数, 内容 为 文本)
+	方法 发送文本_同步(地址: 文本, 端口: 整数, 内容: 文本)
 		发送字节集_同步(地址, 端口, 内容.到字节集())
 	结束 方法
 
-	方法 发送字节集_同步(地址 为 文本, 端口 为 整数, 字节集 为 字节[])
+	方法 发送字节集_同步(地址: 文本, 端口: 整数, 字节集: 字节[])
 		@code
 		if (channel != null && !isClose) {
 			try {
@@ -1431,13 +1431,13 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 
 	定义事件 监听成功()
 
-	定义事件 收到文本(地址 为 文本, 端口 为 整数, 内容 为 文本)
+	定义事件 收到文本(地址: 文本, 端口: 整数, 内容: 文本)
 
-	定义事件 收到字节集(地址 为 文本, 端口 为 整数, 字节集 为 字节[])
+	定义事件 收到字节集(地址: 文本, 端口: 整数, 字节集: 字节[])
 
 	定义事件 监听关闭()
 
-	定义事件 发生异常(异常原因 为 异常)
+	定义事件 发生异常(异常原因: 异常)
 结束 类
 
 @导入Java("java.io.*")
@@ -1454,7 +1454,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	private Handler handler = new Handler(Looper.getMainLooper());
 	@end
 
-	属性读 监听端口() 为 整数
+	属性读 监听端口(): 整数
 		@code
 		if (client == null) return -1;
 		try {
@@ -1466,12 +1466,12 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	结束 属性
 
 	@异步方法
-	方法 连接(地址 为 文本, 端口 为 整数)
+	方法 连接(地址: 文本, 端口: 整数)
 		等待 连接_内部(地址, 端口)
 	结束 方法
 
 	@隐藏
-	方法 连接_内部(地址 为 文本, 端口 为 整数)
+	方法 连接_内部(地址: 文本, 端口: 整数)
 		@code
 		isClose = true;
 		Selector selector = null;
@@ -1548,20 +1548,20 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	结束 方法
 
 	@异步方法
-	方法 发送文本(文本 为 文本)
+	方法 发送文本(文本: 文本)
 		等待 发送文本_同步(文本)
 	结束 方法
 
 	@异步方法
-	方法 发送字节集(字节集 为 字节[])
+	方法 发送字节集(字节集: 字节[])
 		等待 发送字节集_同步(字节集)
 	结束 方法
 
-	方法 发送文本_同步(文本 为 文本) 为 逻辑型
+	方法 发送文本_同步(文本: 文本): 逻辑型
 		返回 发送字节集_同步(文本.到字节集())
 	结束 方法
 
-	方法 发送字节集_同步(字节集 为 字节[]) 为 逻辑型
+	方法 发送字节集_同步(字节集: 字节[]): 逻辑型
 		@code
 		if (client == null) return false;
 		try {
@@ -1576,7 +1576,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 
 	定义事件 连接异常(异常 : 异常)
 
-	定义事件 收到数据(文本 为 文本, 字节集 为 字节[])
+	定义事件 收到数据(文本: 文本, 字节集: 字节[])
 
 	定义事件 连接关闭()
 结束 类
@@ -1599,7 +1599,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	private Handler handler = new Handler(Looper.getMainLooper());
 	@end
 
-	属性读 监听端口() 为 整数
+	属性读 监听端口(): 整数
 		@code
 		if (server == null) return -1;
 		try {
@@ -1610,17 +1610,17 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		@end
 	结束 属性
 
-	属性读 总连接数() 为 整数
+	属性读 总连接数(): 整数
 		code return clients==null?-1:clients.size();
 	结束 属性
 
 	@异步方法
-	方法 监听(端口 为 整数 = 0)
+	方法 监听(端口: 整数= 0)
 		等待 监听_内部(端口)
 	结束 方法
 
 	@隐藏
-	方法 监听_内部(端口 为 整数)
+	方法 监听_内部(端口: 整数)
 		@code
 		isClose = true;
 		Selector selector = null;
@@ -1727,11 +1727,11 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		code isClose = true;
 	结束 方法
 
-	方法 取所有连接() 为 整数[]
+	方法 取所有连接(): 整数[]
 		code return (int[])(clients==null||clients.isEmpty()?new int[0]:clients.keySet().toArray());
 	结束 方法
 
-	方法 取客户端地址(标识 为 整数) 为 文本
+	方法 取客户端地址(标识: 整数): 文本
 		@code
 		if (clients == null || clients.isEmpty() || !clients.containsKey(#标识)) return "";
 		try {
@@ -1742,7 +1742,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		@end
 	结束 方法
 
-	方法 取客户端端口(标识 为 整数) 为 整数
+	方法 取客户端端口(标识: 整数): 整数
 		@code
 		if (clients == null || clients.isEmpty() || !clients.containsKey(#标识)) return -1;
 		try {
@@ -1754,20 +1754,20 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	结束 方法
 
 	@异步方法
-	方法 发送文本(标识 为 整数, 文本 为 文本)
+	方法 发送文本(标识: 整数, 文本: 文本)
 		等待 发送文本_同步(标识, 文本)
 	结束 方法
 
 	@异步方法
-	方法 发送字节集(标识 为 整数, 字节集 为 字节[])
+	方法 发送字节集(标识: 整数, 字节集: 字节[])
 		等待 发送字节集_同步(标识, 字节集)
 	结束 方法
 
-	方法 发送文本_同步(标识 为 整数, 文本 为 文本) 为 逻辑型
+	方法 发送文本_同步(标识: 整数, 文本: 文本): 逻辑型
 		返回 发送字节集_同步(标识, 文本.到字节集())
 	结束 方法
 
-	方法 发送字节集_同步(标识 为 整数, 字节集 为 字节[]) 为 逻辑型
+	方法 发送字节集_同步(标识: 整数, 字节集: 字节[]): 逻辑型
 		@code
 		if (clients == null || clients.isEmpty() || !clients.containsKey(#标识) || #字节集.length == 0) return false;
 		try {
@@ -1779,20 +1779,20 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 	结束 方法
 
 	@异步方法
-	方法 广播文本(文本 为 文本)
+	方法 广播文本(文本: 文本)
 		等待 广播文本_同步(文本)
 	结束 方法
 
 	@异步方法
-	方法 广播字节集(字节集 为 字节[])
+	方法 广播字节集(字节集: 字节[])
 		等待 广播字节集_同步(字节集)
 	结束 方法
 
-	方法 广播文本_同步(文本 为 文本) 为 逻辑型
+	方法 广播文本_同步(文本: 文本): 逻辑型
 		返回 广播字节集_同步(文本.到字节集())
 	结束 方法
 
-	方法 广播字节集_同步(字节集 为 字节[]) 为 逻辑型
+	方法 广播字节集_同步(字节集: 字节[]): 逻辑型
 		@code
 		if (clients == null || clients.isEmpty() || #字节集.length == 0) return false;
 		try {
@@ -1807,7 +1807,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		@end
 	结束 方法
 
-	方法 关闭连接(标识 为 整数) 为 逻辑型
+	方法 关闭连接(标识: 整数): 逻辑型
 		@code
 		if (clients == null || clients.isEmpty() || !clients.containsKey(#标识)) return false;
 		SocketChannel client = clients.get(#标识);
@@ -1829,7 +1829,7 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		@end
 	结束 方法
 
-	方法 关闭所有连接() 为 逻辑型
+	方法 关闭所有连接(): 逻辑型
 		@code
 		if (clients == null || clients.isEmpty()) return false;
 		try {
@@ -1848,11 +1848,11 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 
 	定义事件 监听异常(异常 : 异常)
 
-	定义事件 有新连接(标识 为 整数)
+	定义事件 有新连接(标识: 整数)
 
-	定义事件 收到数据(标识 为 整数, 文本 为 文本, 字节集 为 字节[])
+	定义事件 收到数据(标识: 整数, 文本: 文本, 字节集: 字节[])
 
-	定义事件 连接断开(标识 为 整数)
+	定义事件 连接断开(标识: 整数)
 
 	定义事件 监听关闭()
 结束 类
@@ -1944,11 +1944,16 @@ if (#cls<网络请求>.cachedThreadPool == null) {
 		code return (String[])#this.getQueryParameterNames().toArray();
 	结束 方法
 
-	方法 取路径片段():文本集合
-		code return (java.util.ArrayList)#this.getPathSegments();
+	方法 取路径片段集合():集合<文本>
+		code return new java.util.ArrayList<String>(#this.getPathSegments());
 	结束 方法
 
-	方法 获取最后路径片段() 为 文本
+	@废弃使用("请使用 取路径片段集合")
+	方法 取路径片段():文本集合
+		code return new java.util.ArrayList<String>(#this.getPathSegments());
+	结束 方法
+
+	方法 获取最后路径片段(): 文本
 		code return #this.getLastPathSegment();
 	结束 方法
 

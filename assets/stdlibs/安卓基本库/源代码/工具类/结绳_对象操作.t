@@ -36,7 +36,7 @@
 	*/
 	@附加权限(安卓权限.文件权限_读取)
 	@静态
-	方法 读入对象(路径 为 文本)  为 对象
+	方法 读入对象(路径: 文本): 对象
 		@code
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(#路径));
@@ -56,7 +56,7 @@
 	*/
 	@附加权限(安卓权限.文件权限_写入)
 	@静态
-	方法 写出对象(欲写出对象 为 对象, 欲写到路径 为 文本)
+	方法 写出对象(欲写出对象: 对象, 欲写到路径: 文本)
 		@code
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(#欲写到路径));

@@ -52,27 +52,27 @@
 	结束 属性
 
 	//设置窗口标题
-	属性写 标题(标题 为 文本)
+	属性写 标题(标题: 文本)
 		code #this.setTitle(#标题);
 	结束 属性
 
 	//读取窗口标题
-	属性读 标题() 为 文本
+	属性读 标题(): 文本
 		code return (#this.getTitle().toString());
 	结束 属性
 
 	//设置窗口标题颜色
-	属性写 标题颜色(颜色 为 整数)
+	属性写 标题颜色(颜色: 整数)
 		code #this.setTitleColor(#颜色);
 	结束 属性
 
 	//读取窗口标题颜色
-	属性读 标题颜色() 为 整数
+	属性读 标题颜色(): 整数
 		code return (#this.getTitleColor());
 	结束 属性
 
 	//设置是否显示标题栏
-	属性写 显示标题栏(是否显示标题栏 为 逻辑型)
+	属性写 显示标题栏(是否显示标题栏: 逻辑型)
 		@code
 		ActionBar actionBar = #this.getActionBar();
 		if (actionBar == null) {
@@ -87,7 +87,7 @@
 	结束 属性
 
 	//设置是否显示标题栏返回键
-	属性写 显示标题栏返回键(是否显示 为 逻辑型)
+	属性写 显示标题栏返回键(是否显示: 逻辑型)
 		@code
 		ActionBar actionBar = #this.getActionBar();
 		if (actionBar == null) {
@@ -104,7 +104,7 @@
 	结束 属性
 
 	//设置状态栏颜色
-	属性写 状态栏颜色(颜色 为 整数)
+	属性写 状态栏颜色(颜色: 整数)
 		@code
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			#this.getWindow().setStatusBarColor(#颜色);
@@ -113,7 +113,7 @@
 	结束 属性
 
 	//读取状态栏颜色
-	属性读 状态栏颜色() 为 整数
+	属性读 状态栏颜色(): 整数
 		@code
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			return #this.getWindow().getStatusBarColor();
@@ -123,7 +123,7 @@
 	结束 属性
 
 	//设置导航栏颜色
-	属性写 导航栏颜色(颜色 为 整数)
+	属性写 导航栏颜色(颜色: 整数)
 		@code
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			#this.getWindow().setNavigationBarColor(#颜色);
@@ -132,7 +132,7 @@
 	结束 属性
 
 	//读取导航栏颜色
-	属性读 导航栏颜色() 为 整数
+	属性读 导航栏颜色(): 整数
 		@code
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			return #this.getWindow().getNavigationBarColor();
@@ -142,7 +142,7 @@
 	结束 属性
 
 	//设置状态栏字体颜色是否为黑色
-	属性写 状态栏字体黑色(是否黑色 为 逻辑型)
+	属性写 状态栏字体黑色(是否黑色: 逻辑型)
 		@code
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (#是否黑色 == true) {
@@ -155,7 +155,7 @@
 	结束 属性
 
 	//设置是否处于沉浸式体验模式
-	属性写 沉浸模式(是否启用 为 逻辑型)
+	属性写 沉浸模式(是否启用: 逻辑型)
 		@code
 		#this.setImmersive(#是否启用);
 		if (#是否启用) {
@@ -169,7 +169,7 @@
 	结束 属性
 
 	//设置是否处于沉浸式体验模式，和"沉浸模式"不同，该属性不会隐藏导航栏
-	属性写 沉浸模式2(是否启用 为 逻辑型)
+	属性写 沉浸模式2(是否启用: 逻辑型)
 		@code
 		#this.setImmersive(#是否启用);
 		if (#是否启用) {
@@ -181,7 +181,7 @@
 	结束 属性
 
 	//设置全屏模式
-	属性写 全屏模式(是否启用 为 逻辑型)
+	属性写 全屏模式(是否启用: 逻辑型)
 		@code
 		if (#this.getWindow() != null) {
 			#this.getWindow().setFlags(#是否启用 ? WindowManager.LayoutParams.FLAG_FULLSCREEN : 0,WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -190,7 +190,7 @@
 	结束 属性
 
 	//设置常亮模式
-	属性写 常亮模式(是否启用 为 逻辑型)
+	属性写 常亮模式(是否启用: 逻辑型)
 		@code
 		if (#是否启用) {
 			#this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -201,7 +201,7 @@
 	结束 属性
 
 	//设置窗口亮度
-	属性写 亮度(欲设置亮度 为 小数)
+	属性写 亮度(欲设置亮度: 小数)
 		@code
 		final Window window = #this.getWindow();
 		WindowManager.LayoutParams params = window.getAttributes();
@@ -211,7 +211,7 @@
 	结束 属性
 
 	//获取窗口亮度
-	属性读 亮度() 为 小数
+	属性读 亮度(): 小数
 		@code
 		final Window window = #this.getWindow();
 		WindowManager.LayoutParams params = window.getAttributes();
@@ -220,7 +220,7 @@
 	结束 属性
 
 	//设置屏幕方向
-	属性写 屏幕方向(屏幕方向 为 整数)
+	属性写 屏幕方向(屏幕方向: 整数)
 		@code
 		#this.setRequestedOrientation(#屏幕方向);
 		@end
@@ -236,7 +236,7 @@
 	//启动服务
 	@嵌入式代码
 	@导入Java("android.content.Intent")
-	方法 启动服务(欲启动服务 为 安卓服务)
+	方法 启动服务(欲启动服务: 安卓服务)
 		@code
 		Intent intent = new Intent(#this, #欲启动服务.class);
 		#this.startService(intent)
@@ -246,7 +246,7 @@
 	//绑定服务
 	@嵌入式代码
 	@导入Java("android.content.Intent")
-	方法 绑定服务(欲绑定服务 为 安卓服务,连接 为 服务连接,标志 为 整数=0x01)
+	方法 绑定服务(欲绑定服务: 安卓服务,连接: 服务连接,标志: 整数=0x01)
 		@code
 		Intent intent = new Intent(#this, #欲绑定服务.class);
 		#this.bindService(intent,#连接,#标志)
@@ -256,7 +256,7 @@
 	//关闭指定服务类
 	@嵌入式代码
 	@导入Java("android.content.Intent")
-	方法 关闭服务(欲关闭服务 为 安卓服务)
+	方法 关闭服务(欲关闭服务: 安卓服务)
 		@code
 		Intent intent = new Intent(#this, #欲关闭服务.class);
 		#this.stopService(intent)
@@ -331,13 +331,13 @@
 	结束 方法
 
 	@静态
-	常量 从右往左 为 整数 = 0
+	常量 从右往左: 整数 = 0
 	@静态
-	常量 从左往右 为 整数 = 1
+	常量 从左往右: 整数 = 1
 	@静态
-	常量 淡入淡出 为 整数 = 2
+	常量 淡入淡出: 整数 = 2
 	@静态
-	常量 淡出淡入 为 整数 = 3
+	常量 淡出淡入: 整数 = 3
 
 	//播放安卓系统自带的一些窗口切换动画
 	方法 播放默认切换动画(动画类型 : 整数)
@@ -371,14 +371,14 @@
 	结束 方法
 
 	//如果上一个窗口启动本窗口时要求返回数据，可使用本方法进行返回
-	方法 置返回数据(结果码 为 整数, 欲返回数据 为 启动信息)
+	方法 置返回数据(结果码: 整数, 欲返回数据: 启动信息)
 		@code
 		#this.setResult(#结果码, #欲返回数据);
 		@end
 	结束 方法
 
 	//申请权限
-	方法 申请权限(请求码 为 整数,欲申请权限 为 文本[])
+	方法 申请权限(请求码: 整数,欲申请权限: 文本[])
 		code #this.requestPermissions(#欲申请权限,#请求码);
 	结束 方法
 
@@ -420,13 +420,13 @@
 	结束 方法
 
 	@导入Java("android.provider.MediaStore")
-	方法 选择图片(请求码 为 整数)
+	方法 选择图片(请求码: 整数)
 		code #this.startActivityForResult(new #ncls<启动信息>(#ncls<启动信息>.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI), #请求码);
 	结束 方法
 
 	@导入Java("android.net.Uri")
 	@导入Java("android.database.Cursor")
-	方法 解析图片地址(数据 为 启动信息) 为 文本
+	方法 解析图片地址(数据: 启动信息): 文本
 		@code
        if (null != #数据) {
             Uri selectedImage = #数据.getData();
@@ -441,7 +441,7 @@
 		return "";
        @end
 	结束 方法
-	方法 选择文件(请求码 为 整数)
+	方法 选择文件(请求码: 整数)
 		@code
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
@@ -449,7 +449,7 @@
 		#this.startActivityForResult(intent, #请求码);
         @end
 	结束 方法
-	方法 解析文件地址(数据 为 启动信息) 为 文本
+	方法 解析文件地址(数据: 启动信息): 文本
 		@code
         if (null != #数据) {
 			return FileChooseUtil.getInstance(#this).getChooseFileResultPath(#数据.getData());
@@ -617,7 +617,7 @@
 	}
    @end
 	//打开指定Uri链接
-	方法 打开Uri(uri文本 为 文本) 为 逻辑型
+	方法 打开Uri(uri文本: 文本): 逻辑型
 		@code
 		try {
 			android.net.Uri uri = android.net.Uri.parse(#uri文本);
@@ -631,7 +631,7 @@
 	结束 方法
 
 	//打开QQ进行临时会话，第一个参数为当前窗口环境，第二个参数为要会话的QQ号，注意:这里的QQ号码不能为自己的QQ号码
-	方法 打开QQ聊天(QQ号码 为 文本) 为 逻辑型
+	方法 打开QQ聊天(QQ号码: 文本): 逻辑型
 		@code
 		try {
 			android.net.Uri uri = android.net.Uri.parse("mqqwpa://im/chat?chat_type=wpa&uin=" + #QQ号码 + "&version=1");
@@ -659,7 +659,7 @@
 	结束 方法
 
 	//打开系统分享，分享图片与文本
-	方法 一键分享(内容 为 文本, 图片路径 为 文本 = 空)
+	方法 一键分享(内容: 文本, 图片路径: 文本= 空)
 		@code
 		#ncls<启动信息> intent = new #ncls<启动信息>("android.intent.action.SEND");
 		if (#图片路径 == null) {
@@ -836,7 +836,6 @@
 	窗口创建完毕时触发该事件
 	*/
 	@虚拟事件
-	@自动订阅事件
 	方法 创建完毕()
 	结束 方法
 
@@ -920,7 +919,18 @@
 	/*
 	设置窗口布局内容
 	*/
+	@废弃使用("请使用 置窗口容器")
 	方法 置窗口布局2(布局 : 组件容器)
+		@code
+		setLayout(#mem<布局.取根布局>());
+		#mem<布局.创建完毕>();
+		@end
+	结束 方法
+
+	/*
+	设置窗口容器内容
+	*/
+	方法 置窗口容器(布局 : 组件容器)
 		@code
 		setLayout(#mem<布局.取根布局>());
 		#mem<布局.创建完毕>();
@@ -968,7 +978,7 @@
 	参数三: 子菜单项的序号
 	参数四: 子菜单项的标题
 	*/
-	方法 添加子菜单(组ID 为 整数, ID 为 整数, 序号 为 整数, 标题 为 文本)
+	方法 添加子菜单(组ID: 整数, ID: 整数, 序号: 整数, 标题: 文本)
 		code #this.addSubMenu(#组ID, #ID, #序号, #标题);
 	结束 方法
 结束 类

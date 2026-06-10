@@ -221,7 +221,7 @@
 	//设置播放视频的路径，可以为本地路径，也可以为网络路径,第二个参数为是否自动播放，表示视频加载完成后是否自动播放
 	@附加权限(安卓权限.文件权限_读取)
 	@附加权限(安卓权限.网络权限)
-	方法 置播放路径(路径 为 文本, 是否自动播放 为 逻辑型 = 真)
+	方法 置播放路径(路径: 文本, 是否自动播放: 逻辑型= 真)
 		@code
 		if (#路径.startsWith("http")) {
 			getView().setVideoURI(android.net.Uri.parse(#路径));
@@ -248,17 +248,17 @@
 	结束 方法
 
 	//获取视频总时长
-	方法 取视频总时长() 为 整数
+	方法 取视频总时长(): 整数
 		code return getView().getDuration();
 	结束 方法
 
 	//获取当前播放位置
-	方法 取当前播放位置() 为 整数
+	方法 取当前播放位置(): 整数
 		code return getView().getCurrentPosition();
 	结束 方法
 
 	//快进至指定位置
-	方法 快进至(位置 为 整数)
+	方法 快进至(位置: 整数)
 		code getView().seekTo(#位置);
 	结束 方法
 
@@ -268,7 +268,7 @@
 	结束 方法
 
 	//判断视频播放器是否在播放视频
-	方法 是否在播放() 为 逻辑型
+	方法 是否在播放(): 逻辑型
 		code return getView().isPlaying();
 	结束 方法
 
@@ -305,7 +305,7 @@ GIF动画框
     @end
 
 	//设置GIF动画框的资源路径，文件路径可以为assets资源名称，也可以为sd卡路径
-	属性写 动画路径(GIF文件路径 为 文本)
+	属性写 动画路径(GIF文件路径: 文本)
 		如果 GIF文件路径.开头为("/")
 			code getView().setMovieResource(#GIF文件路径);
 		否则
@@ -323,19 +323,19 @@ GIF动画框
 		code getView().setMovieResource(#动画输入流);
 	结束 属性
 
-	属性读 播放状态() 为 逻辑型
+	属性读 播放状态(): 逻辑型
 		code return !getView().isPaused();
 	结束 属性
 
-	属性写 播放状态(是否播放 为 逻辑型)
+	属性写 播放状态(是否播放: 逻辑型)
 		code getView().setPaused(!#是否播放);
 	结束 属性
 
-	属性读 动画时长() 为 整数
+	属性读 动画时长(): 整数
 		code return getView().getMovieTime();
 	结束 属性
 
-	属性写 动画时长(动画时长 为 整数)
+	属性写 动画时长(动画时长: 整数)
 		code getView().setMovieTime(#动画时长);
 	结束 属性
 结束 类
@@ -362,32 +362,32 @@ GIF动画框
     @end
 
 	//设置圆形图片框阴影
-	属性写 圆角阴影(阴影度 为 整数)
+	属性写 圆角阴影(阴影度: 整数)
 		code getView().setElevation2(#阴影度);
 	结束 属性
 
 	//设置圆形图片框边框宽度
-	属性写 边框宽度(边框宽度 为 整数)
+	属性写 边框宽度(边框宽度: 整数)
 		code getView().setBorderWidth(#边框宽度);
 	结束 属性
 
 	//获取圆形图片框边框宽度
-	属性读 边框宽度() 为 整数
+	属性读 边框宽度(): 整数
 		code return getView().getBorderWidth();
 	结束 属性
 
 	//设置圆形图片框边框颜色
-	属性写 边框颜色(边框颜色 为 整数)
+	属性写 边框颜色(边框颜色: 整数)
 		code getView().setBorderColor(#边框颜色);
 	结束 属性
 
 	//设置圆形图片框边框颜色
-	属性写 边框颜色2(边框颜色 为 文本)
+	属性写 边框颜色2(边框颜色: 文本)
 		code getView().setBorderColor(android.graphics.Color.parseColor(#边框颜色));
 	结束 属性
 
 	//获取圆形图片框边框颜色
-	属性读 边框颜色() 为 整数
+	属性读 边框颜色(): 整数
 		code return getView().getBorderColor();
 	结束 属性
 结束 类

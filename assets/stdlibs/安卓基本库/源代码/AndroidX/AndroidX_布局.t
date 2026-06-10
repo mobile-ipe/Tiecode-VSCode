@@ -43,8 +43,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.topToTop = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.topToTop = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.topToTop = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -61,8 +61,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.topToBottom = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.topToBottom = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.topToBottom = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.topToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -79,8 +79,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.bottomToTop = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.bottomToTop = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.bottomToTop = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.bottomToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -97,8 +97,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.bottomToBottom = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.bottomToBottom = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.bottomToBottom = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -115,8 +115,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.leftToLeft = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.leftToLeft = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.leftToLeft = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -133,8 +133,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.leftToRight = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.leftToRight = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.leftToRight = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.leftToRight = ConstraintLayout.LayoutParams.PARENT_ID;
         }
@@ -151,8 +151,8 @@
         }
         if (#目标对象 instanceof Integer) {
             params.rightToLeft = (int)#目标对象;
-        } else if (#目标对象 instanceof 可视化组件) {
-            params.rightToLeft = ((可视化组件)#目标对象).getView().getId();
+        } else if (#目标对象 instanceof #cls<可视化组件>) {
+            params.rightToLeft = ((#cls<可视化组件>)#目标对象).getView().getId();
         } else if (PARENT.equals(#目标对象)) {
             params.rightToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
         }

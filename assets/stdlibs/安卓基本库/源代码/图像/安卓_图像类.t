@@ -10,7 +10,7 @@
 	方法 =(文件路径:文本): 可绘制对象
 		code return #ncls<可绘制对象>.createFromPath(#文件路径);
 	结束 方法
-	
+
 	@静态
 	方法 从路径创建(文件路径:文本):可绘制对象
 		code return Drawable.createFromPath(#文件路径);
@@ -116,7 +116,7 @@
 
 /*@指代类("android.graphics.ColorFilter")
 类 颜色过滤器
-	
+
 结束 类*/
 
 @指代类("android.graphics.Rect")
@@ -266,6 +266,302 @@
 
 结束 类
 
+@导入Java("android.graphics.RectF")
+@指代类("android.graphics.RectF")
+类 浮点矩形
+
+	@静态
+	@运算符重载
+	方法 =(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数): 浮点矩形
+		code return new RectF(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	@静态
+	方法 从矩形创建(矩形对象:矩形):浮点矩形
+		code return new RectF(#矩形对象);
+	结束 方法
+
+	属性读 上():单精度小数
+		code return #this.top;
+	结束 属性
+
+	属性写 上(位置:单精度小数)
+		code #this.top=#位置;
+	结束 属性
+
+	属性读 下():单精度小数
+		code return #this.bottom;
+	结束 属性
+
+	属性写 下(位置:单精度小数)
+		code #this.bottom=#位置;
+	结束 属性
+
+	属性读 左():单精度小数
+		code return #this.left;
+	结束 属性
+
+	属性写 左(位置:单精度小数)
+		code #this.left=#位置;
+	结束 属性
+
+	属性读 右():单精度小数
+		code return #this.right;
+	结束 属性
+
+	属性写 右(位置:单精度小数)
+		code #this.right=#位置;
+	结束 属性
+
+	方法 是否为空():逻辑型
+		code return #this.isEmpty();
+	结束 方法
+
+	方法 清空()
+		code #this.setEmpty();
+	结束 方法
+
+	方法 宽度():单精度小数
+		code return #this.width();
+	结束 方法
+
+	方法 高度():单精度小数
+		code return #this.height();
+	结束 方法
+
+	方法 中心横坐标():单精度小数
+		code return #this.centerX();
+	结束 方法
+
+	方法 中心纵坐标():单精度小数
+		code return #this.centerY();
+	结束 方法
+
+	方法 设置(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数)
+		code #this.set(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	方法 拷贝矩形(被拷贝对象:浮点矩形)
+		code #this.set(#被拷贝对象);
+	结束 方法
+
+	方法 拷贝整数矩形(被拷贝对象:矩形)
+		code #this.set(#被拷贝对象);
+	结束 方法
+
+	方法 位置移动(横向距离:单精度小数,纵向距离:单精度小数)
+		code #this.offset(#横向距离,#纵向距离);
+	结束 方法
+
+	方法 位置偏移(左边:单精度小数,上边:单精度小数)
+		code #this.offsetTo(#左边,#上边);
+	结束 方法
+
+	方法 尺寸修改(左边:单精度小数,上边:单精度小数)
+		code #this.inset(#左边,#上边);
+	结束 方法
+
+	方法 是否包含坐标(横向坐标:单精度小数,纵向坐标:单精度小数):逻辑型
+		code return #this.contains(#横向坐标,#纵向坐标);
+	结束 方法
+
+	方法 是否包含矩形(被判断对象:浮点矩形):逻辑型
+		code return #this.contains(#被判断对象);
+	结束 方法
+
+	方法 是否包含矩形区域(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数):逻辑型
+		code return #this.contains(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	方法 矩形相交(被判断对象:浮点矩形):逻辑型
+		code return #this.intersect(#被判断对象);
+	结束 方法
+
+	方法 多个矩形相交(被判断对象1:浮点矩形,被判断对象2:浮点矩形):逻辑型
+		code return #this.setIntersect(#被判断对象1,#被判断对象2);
+	结束 方法
+
+	方法 矩形区域相交(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数):逻辑型
+		code return #this.intersect(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	方法 矩形区域是否相交(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数):逻辑型
+		code return #this.intersects(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	方法 合并矩形坐标(横向坐标:单精度小数,纵向坐标:单精度小数)
+		code #this.union(#横向坐标,#纵向坐标);
+	结束 方法
+
+	方法 合并矩形(被合并对象:浮点矩形)
+		code #this.union(#被合并对象);
+	结束 方法
+
+	方法 合并矩形区域(左边:单精度小数,上边:单精度小数,右边:单精度小数,下边:单精度小数)
+		code #this.union(#左边,#上边,#右边,#下边);
+	结束 方法
+
+	方法 转矩形():矩形
+		@code
+		android.graphics.Rect rect = new android.graphics.Rect();
+		#this.round(rect);
+		return rect;
+		@end
+	结束 方法
+
+	方法 转外接矩形():矩形
+		@code
+		android.graphics.Rect rect = new android.graphics.Rect();
+		#this.roundOut(rect);
+		return rect;
+		@end
+	结束 方法
+
+	方法 规范化()
+		code #this.sort();
+	结束 方法
+
+结束 类
+
+@导入Java("android.graphics.Matrix")
+@指代类("android.graphics.Matrix")
+类 变换矩阵
+
+	@静态
+	方法 创建矩阵():变换矩阵
+		code return new Matrix();
+	结束 方法
+
+	@静态
+	方法 从矩阵创建(矩阵对象:变换矩阵):变换矩阵
+		code return new Matrix(#矩阵对象);
+	结束 方法
+
+	方法 重置()
+		code #this.reset();
+	结束 方法
+
+	方法 是否单位矩阵():逻辑型
+		code return #this.isIdentity();
+	结束 方法
+
+	方法 设置(矩阵对象:变换矩阵)
+		code #this.set(#矩阵对象);
+	结束 方法
+
+	方法 设为平移(x:单精度小数,y:单精度小数)
+		code #this.setTranslate(#x,#y);
+	结束 方法
+
+	方法 设为缩放(x:单精度小数,y:单精度小数)
+		code #this.setScale(#x,#y);
+	结束 方法
+
+	方法 设为中心缩放(x:单精度小数,y:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.setScale(#x,#y,#中心x,#中心y);
+	结束 方法
+
+	@废弃使用("请使用 设为中心缩放")
+	方法 设为缩放2(x:单精度小数,y:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.setScale(#x,#y,#中心x,#中心y);
+	结束 方法
+
+	方法 设为旋转(角度:单精度小数)
+		code #this.setRotate(#角度);
+	结束 方法
+
+	方法 设为中心旋转(角度:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.setRotate(#角度,#中心x,#中心y);
+	结束 方法
+
+	@废弃使用("请使用 设为中心旋转")
+	方法 设为旋转2(角度:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.setRotate(#角度,#中心x,#中心y);
+	结束 方法
+
+	方法 设为倾斜(x:单精度小数,y:单精度小数)
+		code #this.setSkew(#x,#y);
+	结束 方法
+
+	方法 平移(x:单精度小数,y:单精度小数)
+		code #this.postTranslate(#x,#y);
+	结束 方法
+
+	方法 缩放(x:单精度小数,y:单精度小数)
+		code #this.postScale(#x,#y);
+	结束 方法
+
+	方法 中心缩放(x:单精度小数,y:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.postScale(#x,#y,#中心x,#中心y);
+	结束 方法
+
+	@废弃使用("请使用 中心缩放")
+	方法 缩放2(x:单精度小数,y:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.postScale(#x,#y,#中心x,#中心y);
+	结束 方法
+
+	方法 旋转(角度:单精度小数)
+		code #this.postRotate(#角度);
+	结束 方法
+
+	方法 中心旋转(角度:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.postRotate(#角度,#中心x,#中心y);
+	结束 方法
+
+	@废弃使用("请使用 中心旋转")
+	方法 旋转2(角度:单精度小数,中心x:单精度小数,中心y:单精度小数)
+		code #this.postRotate(#角度,#中心x,#中心y);
+	结束 方法
+
+	方法 倾斜(x:单精度小数,y:单精度小数)
+		code #this.postSkew(#x,#y);
+	结束 方法
+
+	方法 前置拼接(矩阵对象:变换矩阵):逻辑型
+		code return #this.preConcat(#矩阵对象);
+	结束 方法
+
+	方法 后置拼接(矩阵对象:变换矩阵):逻辑型
+		code return #this.postConcat(#矩阵对象);
+	结束 方法
+
+	方法 映射点(x:单精度小数,y:单精度小数):单精度小数[]
+		@code
+		float[] points = new float[]{#x,#y};
+		#this.mapPoints(points);
+		return points;
+		@end
+	结束 方法
+
+	方法 映射点组(点组:单精度小数[])
+		code #this.mapPoints(#点组);
+	结束 方法
+
+	方法 映射矩形(矩形对象:浮点矩形):逻辑型
+		code return #this.mapRect(#矩形对象);
+	结束 方法
+
+	方法 求逆(输出矩阵:变换矩阵):逻辑型
+		code return #this.invert(#输出矩阵);
+	结束 方法
+
+	方法 取数值():单精度小数[]
+		@code
+		float[] values = new float[9];
+		#this.getValues(values);
+		return values;
+		@end
+	结束 方法
+
+	方法 设置数值(数值:单精度小数[])
+		@code
+		if (#数值 == null || #数值.length < 9) return;
+		#this.setValues(#数值);
+		@end
+	结束 方法
+
+结束 类
+
 @禁止创建对象
 @导入Java("android.graphics.Color")
 @导入Java("android.graphics.Bitmap")
@@ -316,22 +612,53 @@
 	结束 方法
 
 	@静态
+	方法 创建空位图(宽度:整数,高度:整数,配置:位图配置):位图对象
+		code return Bitmap.createBitmap(#宽度,#高度,#配置);
+	结束 方法
+
+	@静态
+	@废弃使用("请使用 创建空位图")
 	方法 创建位图2(宽度:整数,高度:整数,配置:位图配置):位图对象
 		code return Bitmap.createBitmap(#宽度,#高度,#配置);
 	结束 方法
 
 	@静态
+	方法 创建透明位图(宽度:整数,高度:整数,配置:位图配置,存在透明度:逻辑型):位图对象
+		code return Bitmap.createBitmap(#宽度,#高度,#配置,#存在透明度);
+	结束 方法
+
+	@静态
+	@废弃使用("请使用 创建透明位图")
 	方法 创建位图3(宽度:整数,高度:整数,配置:位图配置,存在透明度:逻辑型):位图对象
 		code return Bitmap.createBitmap(#宽度,#高度,#配置,#存在透明度);
 	结束 方法
 	
 	@静态
+	方法 从颜色组创建位图(颜色组:整数[],宽度:整数,高度:整数,配置:位图配置):位图对象
+		code return Bitmap.createBitmap(#颜色组,#宽度,#高度,#配置);
+	结束 方法
+
+	@静态
+	@废弃使用("请使用 从颜色组创建位图")
 	方法 创建位图4(颜色组:整数[],宽度:整数,高度:整数,配置:位图配置):位图对象
 		code return Bitmap.createBitmap(#颜色组,#宽度,#高度,#配置);
 	结束 方法
 	
 	@静态
 	@导入Java("android.graphics.Canvas")
+	方法 从可绘制对象创建位图(转换对象:可绘制对象,配置:位图配置):位图对象
+		@code
+		Bitmap 位图 = Bitmap.createBitmap(#转换对象.getIntrinsicWidth(),#转换对象.getIntrinsicHeight(),#配置);
+		Canvas 画布 = new Canvas(位图);
+		#转换对象.setBounds(0, 0, 画布.getWidth(), 画布.getHeight());
+		#转换对象.draw(画布);
+		return 位图;
+		@end
+	结束 方法
+
+	@静态
+	@导入Java("android.graphics.Canvas")
+	@废弃使用("请使用 从可绘制对象创建位图")
 	方法 创建位图5(转换对象:可绘制对象,配置:位图配置):位图对象
 		@code
 		// 创建一个Bitmap对象，尺寸与Drawable一致
@@ -489,7 +816,7 @@
 				结束 循环
 			结束 循环
 		结束 循环
-		变量 新图片 : 位图对象 = 位图对象.创建位图2(新高度,新宽度,图片.配置)
+		变量 新图片 : 位图对象 = 位图对象.创建空位图(新宽度,新高度,图片.配置)
 		code #新图片.setPixels(#新像素数据组, 0, #新宽度, 0, 0, #新宽度, #新高度);
 		返回 新图片
 	结束 方法

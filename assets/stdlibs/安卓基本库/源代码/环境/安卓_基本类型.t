@@ -146,93 +146,93 @@
 	结束 方法
 
 	//设置启动信息将报告的动作
-	方法 设置动作(动作 为 文本)
+	方法 设置动作(动作: 文本)
 		code #this.setAction(#动作);
 	结束 方法
 
 	//获取已设置的动作
-	方法 获取动作() 为 文本
+	方法 获取动作(): 文本
 		code return #this.getAction();
 	结束 方法
 
 	//报告将显示一些数据给用户
 	@静态
-	常量 显示动作 为 文本 = "android.intent.action.VIEW"
+	常量 显示动作: 文本 = "android.intent.action.VIEW"
 
 	//报告将发送数据，且未指定接受者
 	@静态
-	常量 发送数据_不定目标动作 为 文本 = "android.intent.action.SEND"
+	常量 发送数据_不定目标动作: 文本 = "android.intent.action.SEND"
 
 	//报告将发送数据，且指定接受者
 	@静态
-	常量 发送数据_指定目标动作 为 文本 = "android.intent.action.SENDTO"
+	常量 发送数据_指定目标动作: 文本 = "android.intent.action.SENDTO"
 
 	//报告将呼出电话界面
 	@静态
-	常量 呼出电话动作 为 文本 = "android.intent.action.CALL"
+	常量 呼出电话动作: 文本 = "android.intent.action.CALL"
 
 	//报告将直接拨打电话
 	@静态
-	常量 拨打电话动作 为 文本 = "android.intent.action.DIAL"
+	常量 拨打电话动作: 文本 = "android.intent.action.DIAL"
 
 	//报告将显示数据以让用户编辑
 	@静态
-	常量 编辑数据动作 为 文本 = "android.intent.action.EDIT"
+	常量 编辑数据动作: 文本 = "android.intent.action.EDIT"
 
 	//单独设置数据的uri部分
-	方法 设置URI(URI 为 安卓资源标识符)
+	方法 设置URI(URI: 安卓资源标识符)
 		code #this.setData(#URI);
 	结束 方法
 
 	//单独设置数据的uri部分，参数会自动解析为uri
-	方法 设置URI文本(URI文本 为 文本)
+	方法 设置URI文本(URI文本: 文本)
 		code #this.setData(android.net.Uri.parse(#URI文本));
 	结束 方法
 
 	//单独设置数据的mime部分，mime俗称文件的后缀名即文件类型
-	方法 设置MIME(MIME文本 为 文本)
+	方法 设置MIME(MIME文本: 文本)
 		code #this.setType(#MIME文本);
 	结束 方法
 
 	//同时设置URI与MIME
-	方法 设置URI与MIME(URI 为 安卓资源标识符,MIME文本 为 文本)
+	方法 设置URI与MIME(URI: 安卓资源标识符,MIME文本: 文本)
 		code #this.setDataAndType(#URI,#MIME文本);
 	结束 方法
 
 	//同时设置URI与MIME，第一个参数会自动解析为uri
-	方法 设置URI文本与MIME(URI文本 为 文本,MIME文本 为 文本)
+	方法 设置URI文本与MIME(URI文本: 文本,MIME文本: 文本)
 		code #this.setDataAndType(android.net.Uri.parse(#URI文本),#MIME文本);
 	结束 方法
 
 	//获取已设置的URI，如果想获取URI本身的文本可以使用 到文本()
-	方法 获取URI() 为 安卓资源标识符
+	方法 获取URI(): 安卓资源标识符
 		code return #this.getData();
 	结束 方法
 
 	//获取已设置的MIME
-	方法 获取MIME() 为 文本
+	方法 获取MIME(): 文本
 		code return #this.getType();
 	结束 方法
 
 	//文本文件，如txt
 	@静态
-	常量 文本文件 为 文本 = "text/*"
+	常量 文本文件: 文本 = "text/*"
 
 	//图片文件，如jpg/jpeg,png
 	@静态
-	常量 图片文件 为 文本 = "image/*"
+	常量 图片文件: 文本 = "image/*"
 
 	//视频文件，如mp4,aiv
 	@静态
-	常量 视频文件 为 文本 = "video/*"
+	常量 视频文件: 文本 = "video/*"
 
 	//音频文件，如mp3,wav,ogg
 	@静态
-	常量 音频文件 为 文本 = "audio/*"
+	常量 音频文件: 文本 = "audio/*"
 
 	//应用文件，如apk,exe,app
 	@静态
-	常量 应用文件 为 文本 = "application/*"
+	常量 应用文件: 文本 = "application/*"
 
 	方法 设置类(环境:安卓环境 ,java类:Java类)
 		code #this.setClass(#环境,#java类);
@@ -240,47 +240,47 @@
 	
 	/* category(种类)区 */
 	//添加一个种类进入启动信息
-	方法 添加种类(新种类 为 文本)
+	方法 添加种类(新种类: 文本)
 		code #this.addCategory(#新种类);
 	结束 方法
 
 	//删除启动信息中一个指定种类
-	方法 删除种类(种类 为 文本)
+	方法 删除种类(种类: 文本)
 		code #this.removeCategory(#种类);
 	结束 方法
 
 	//获取启动信息的所有种类
-	方法 获取种类() 为 文本[]
+	方法 获取种类(): 文本[]
 		code return #this.getCategories().toArray(new String[0]);
 	结束 方法
 
 	//默认的种类
 	@静态
-	常量 默认种类 为 文本 = "android.intent.category.DEFAULT"
+	常量 默认种类: 文本 = "android.intent.category.DEFAULT"
 
 	/* flags(标记)区 */
 	//设置标记，当需要设置多个标记时，请使用位或运算符|来整合(如: 标记1 | 标记2 | 标记3)
-	方法 设置标记(标记 为 整数)
+	方法 设置标记(标记: 整数)
 		code #this.setFlags(#标记);
 	结束 方法
 
 	//获取标记
-	方法 获取标记() 为 整数
+	方法 获取标记(): 整数
 		code return #this.getFlags();
 	结束 方法
 
 	//启动窗口时禁用动画效果
 	@静态
-	常量 禁用切换窗口动画标记 为 整数 = 65536
+	常量 禁用切换窗口动画标记: 整数 = 65536
 
 	/* 行为方法区 */
 	//不指定需要切换的窗口，在全手机中寻找可用的窗口并且切换
-	方法 隐式启动窗口(环境 为 安卓环境)
+	方法 隐式启动窗口(环境: 安卓环境)
 		code #环境.startActivity(#this);
 	结束 方法
 
 	//如果手机中有可响应切换的窗口则返回真，否则返回假
-	方法 有可响应切换窗口(环境 为 安卓环境) 为 逻辑型
+	方法 有可响应切换窗口(环境: 安卓环境): 逻辑型
 		code return (#this.resolveActivity(#环境.getPackageManager()) != null);
 	结束 方法
 结束 类
@@ -499,12 +499,12 @@
 		code #this.unregisterReceiver(#接收器);
 	结束 方法
 
-	方法 取自身包名() 为 文本
+	方法 取自身包名(): 文本
 		code return #this.getPackageName();
 	结束 方法
 
 	@导入Java("android.content.pm.*")
-	方法 取自身版本号() 为 整数
+	方法 取自身版本号(): 整数
 		@code
 		  try {
 			PackageManager packageManager = #this.getPackageManager();
@@ -645,7 +645,7 @@
 @指代类("android.content.ContentValues")
 类 内容数据包
 
-	方法 置入(键名 为 文本, 值 为 对象)
+	方法 置入(键名: 文本, 值: 对象)
 		@code
 		if (#值 instanceof Integer) {
 			#this.put(#键名, (Integer)#值);

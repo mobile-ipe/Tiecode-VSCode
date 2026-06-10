@@ -1217,6 +1217,26 @@ export namespace tiec {
         basicProperties: ViewEditablePropertyList;
 
         /**
+         * 可视化组件运行时类名，反射时以该名称为准
+         */
+        componentClassName: string;
+
+        /**
+         * 布局组件运行时类名，反射时以该名称为准
+         */
+        layoutClassName: string;
+
+        /**
+         * 布局组件添加子组件方法运行时名称，反射时以该名称为准
+         */
+        layoutAddMethodName: string;
+
+        /**
+         * 未知组件运行时类名，反射时以该名称为准
+         */
+        unknownClassName: string;
+
+        /**
          * 将结果转为json
          */
         toJson(): string;
