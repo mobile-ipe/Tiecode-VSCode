@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { createProject } from "./templates";
 import { ToolchainItemStatus, ToolchainService } from "./toolchain";
 import { BuildMode, DefineValue, ProjectKind, TiecodeProjectConfig } from "./types";
 import {
@@ -57,7 +58,12 @@ interface RepairToolchainMessage {
   command: "repairToolchain";
 }
 
-type ConfigViewMessage = SaveMessage | PickIconMessage | RefreshMessage | RepairToolchainMessage;
+interface CreateProjectMessage {
+  command: "createProject";
+  kind: ProjectKind;
+}
+
+type ConfigViewMessage = SaveMessage | PickIconMessage | RefreshMessage | RepairToolchainMessage | CreateProjectMessage;
 
 export function registerConfigView(context: vscode.ExtensionContext, toolchain: ToolchainService, onDidSave?: () => void): void {
   const provider = new TiecodeConfigViewProvider(toolchain, onDidSave);
@@ -103,6 +109,10 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     }
     if (message.command === "repairToolchain") {
       await this.repairToolchain();
+      return;
+    }
+    if (message.command === "createProject") {
+      await this.createProject(message.kind);
       return;
     }
     if (message.command === "save") {
@@ -186,6 +196,10 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
 
     await this.toolchain.repairAndroidToolchain(project);
     this.refresh();
+  }
+
+  private async createProject(kind: ProjectKind): Promise<void> {
+    await createProject(kind, { forcePickBaseRoot: true, openAfterCreate: true });
   }
 
   private createHtml(webview: vscode.Webview, state: ConfigViewState): string {
@@ -285,6 +299,12 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     .empty {
       color: var(--vscode-descriptionForeground);
       line-height: 1.45;
+      display: grid;
+      gap: 10px;
+    }
+    .empty-actions {
+      display: grid;
+      gap: 8px;
     }
     .toolchain {
       display: grid;
@@ -410,7 +430,14 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
       <button class="secondary" id="refresh" type="button">刷新</button>
     </div>
   </form>
-  <div class="empty" id="empty" hidden>没有打开结绳工作区。</div>
+  <div class="empty" id="empty" hidden>
+    <div>没有打开结绳工作区。</div>
+    <div class="empty-actions">
+      <button id="createAndroid" type="button">创建安卓工程</button>
+      <button class="secondary" id="createCxx" type="button">创建 CXX 工程</button>
+      <button class="secondary" id="createHtml" type="button">创建网页工程</button>
+    </div>
+  </div>
   <script nonce="${nonce}">
     const vscode = acquireVsCodeApi();
     const state = ${stateJson};
@@ -484,6 +511,9 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     document.getElementById("pickIcon").addEventListener("click", () => vscode.postMessage({ command: "pickIcon" }));
     document.getElementById("repairToolchain").addEventListener("click", () => vscode.postMessage({ command: "repairToolchain" }));
     document.getElementById("refresh").addEventListener("click", () => vscode.postMessage({ command: "refresh" }));
+    document.getElementById("createAndroid").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "android" }));
+    document.getElementById("createCxx").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "cxx" }));
+    document.getElementById("createHtml").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "html" }));
     form.addEventListener("submit", event => {
       event.preventDefault();
       vscode.postMessage({ command: "save", payload: collect() });

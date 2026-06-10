@@ -12,8 +12,13 @@ export function registerTemplateCommands(context: vscode.ExtensionContext): void
   );
 }
 
-export async function createProject(kind: ProjectKind): Promise<void> {
-  const baseRoot = await pickBaseRoot();
+export interface CreateProjectOptions {
+  forcePickBaseRoot?: boolean;
+  openAfterCreate?: boolean;
+}
+
+export async function createProject(kind: ProjectKind, options: CreateProjectOptions = {}): Promise<void> {
+  const baseRoot = await pickBaseRoot(options.forcePickBaseRoot);
   if (!baseRoot) {
     return;
   }
@@ -44,6 +49,11 @@ export async function createProject(kind: ProjectKind): Promise<void> {
     writeTemplateFiles(rootPath, kind, name);
   } catch (error) {
     void vscode.window.showErrorMessage(`创建结绳工程失败: ${String(error instanceof Error ? error.message : error)}`);
+    return;
+  }
+
+  if (options.openAfterCreate) {
+    await vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(rootPath), false);
     return;
   }
 
@@ -81,9 +91,9 @@ function copyProjectBasicLibrary(rootPath: string, kind: ProjectKind): void {
   fs.cpSync(libraryRoot, targetRoot, { recursive: true });
 }
 
-async function pickBaseRoot(): Promise<string | undefined> {
+async function pickBaseRoot(forcePick = false): Promise<string | undefined> {
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (workspaceRoot) {
+  if (workspaceRoot && !forcePick) {
     return workspaceRoot;
   }
 
