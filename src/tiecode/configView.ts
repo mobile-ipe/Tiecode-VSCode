@@ -63,7 +63,11 @@ interface CreateProjectMessage {
   kind: ProjectKind;
 }
 
-type ConfigViewMessage = SaveMessage | PickIconMessage | RefreshMessage | RepairToolchainMessage | CreateProjectMessage;
+interface ImportTspProjectMessage {
+  command: "importTspProject";
+}
+
+type ConfigViewMessage = SaveMessage | PickIconMessage | RefreshMessage | RepairToolchainMessage | CreateProjectMessage | ImportTspProjectMessage;
 
 export function registerConfigView(context: vscode.ExtensionContext, toolchain: ToolchainService, onDidSave?: () => void): void {
   const provider = new TiecodeConfigViewProvider(toolchain, onDidSave);
@@ -113,6 +117,10 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     }
     if (message.command === "createProject") {
       await this.createProject(message.kind);
+      return;
+    }
+    if (message.command === "importTspProject") {
+      await vscode.commands.executeCommand("tiecode.importTspProject");
       return;
     }
     if (message.command === "save") {
@@ -436,6 +444,7 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
       <button id="createAndroid" type="button">创建安卓工程</button>
       <button class="secondary" id="createCxx" type="button">创建 CXX 工程</button>
       <button class="secondary" id="createHtml" type="button">创建网页工程</button>
+      <button class="secondary" id="importTsp" type="button">导入 TSP 工程包</button>
     </div>
   </div>
   <script nonce="${nonce}">
@@ -514,6 +523,7 @@ class TiecodeConfigViewProvider implements vscode.WebviewViewProvider {
     document.getElementById("createAndroid").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "android" }));
     document.getElementById("createCxx").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "cxx" }));
     document.getElementById("createHtml").addEventListener("click", () => vscode.postMessage({ command: "createProject", kind: "html" }));
+    document.getElementById("importTsp").addEventListener("click", () => vscode.postMessage({ command: "importTspProject" }));
     form.addEventListener("submit", event => {
       event.preventDefault();
       vscode.postMessage({ command: "save", payload: collect() });

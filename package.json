@@ -34,12 +34,14 @@
     "onCommand:tiecode.createAndroidProject",
     "onCommand:tiecode.createCxxProject",
     "onCommand:tiecode.createHtmlProject",
+    "onCommand:tiecode.importTspProject",
     "onCommand:tiecode.generateEvent",
     "onCommand:tiecode.smartEnter",
     "onCommand:tiecode.scanUiClasses",
     "onCommand:tiecode.showSyncedSource",
     "onCommand:tiecode.exportTlyLayout",
     "onCommand:tiecode.applyTlyLayout",
+    "onCustomEditor:tiecode.tspProject",
     "onDebug:tiecode",
     "onView:tiecode.configView"
   ],
@@ -96,6 +98,18 @@
         "path": "./snippets/tly.json"
       }
     ],
+    "customEditors": [
+      {
+        "viewType": "tiecode.tspProject",
+        "displayName": "结绳 TSP 工程包",
+        "selector": [
+          {
+            "filenamePattern": "*.tsp"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
     "commands": [
       {
         "command": "tiecode.reloadProject",
@@ -136,6 +150,10 @@
       {
         "command": "tiecode.createHtmlProject",
         "title": "结绳: 创建网页工程"
+      },
+      {
+        "command": "tiecode.importTspProject",
+        "title": "结绳: 导入 TSP 工程包"
       },
       {
         "command": "tiecode.generateEvent",
@@ -282,6 +300,9 @@
           "command": "tiecode.createHtmlProject"
         },
         {
+          "command": "tiecode.importTspProject"
+        },
+        {
           "command": "tiecode.generateEvent"
         },
         {
@@ -315,6 +336,13 @@
         {
           "command": "tiecode.exportTlyLayout",
           "when": "editorLangId == tiecode",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "tiecode.importTspProject",
+          "when": "resourceExtname == .tsp",
           "group": "navigation"
         }
       ]
@@ -353,6 +381,11 @@
           "default": true,
           "description": "是否启用结绳代码诊断。"
         },
+        "tiecode.import.directory": {
+          "type": "string",
+          "default": "",
+          "description": "TSP 工程包默认导入父目录，工程会解压到该目录下的同名子目录。为空时首次导入会提示选择。"
+        },
         "tiecode.highlight.engine": {
           "type": "string",
           "default": "hybrid",
@@ -374,11 +407,13 @@
     }
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^20.14.10",
     "@types/vscode": "1.89.0",
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "adm-zip": "^0.5.17",
     "pinyin-pro": "^3.28.1"
   }
 }

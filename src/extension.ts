@@ -12,6 +12,7 @@ import { SourceMappingService } from "./tiecode/sourceMapping";
 import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
 import { ToolchainService } from "./tiecode/toolchain";
+import { registerTspImport } from "./tiecode/tspImport";
 import { TiecodeWasmBuildService } from "./tiecode/wasmBuild";
 import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from "./tiecode/workspace";
 
@@ -38,6 +39,7 @@ export function activate(context: vscode.ExtensionContext): void {
     void openTiecodeProject(compilerService, diagnostics, vscode.window.activeTextEditor?.document.uri, "reload");
   });
   registerTemplateCommands(context);
+  registerTspImport(context);
 
   context.subscriptions.push(
     vscode.commands.registerCommand("tiecode.reloadProject", async () => {
