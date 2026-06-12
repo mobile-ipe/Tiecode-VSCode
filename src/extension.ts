@@ -10,6 +10,7 @@ import { openTiecodeProject } from "./tiecode/projectLifecycle";
 import { generateEventAtCursor, registerTiecodeProviders, scanUiClasses, showSyncedSource, smartEnterAtCursor } from "./tiecode/providers";
 import { registerRunCommands } from "./tiecode/run";
 import { SourceMappingService } from "./tiecode/sourceMapping";
+import { initializeBundledStdlibs } from "./tiecode/stdlibAssets";
 import { SweetLineService } from "./tiecode/sweetlineService";
 import { registerTemplateCommands } from "./tiecode/templates";
 import { ToolchainService } from "./tiecode/toolchain";
@@ -19,6 +20,12 @@ import { isProjectConfigUri, isTiecodeDocument, isTiecodeRelatedDocument } from 
 
 export function activate(context: vscode.ExtensionContext): void {
   const output = vscode.window.createOutputChannel("结绳");
+  try {
+    initializeBundledStdlibs(context);
+  } catch (error) {
+    void vscode.window.showErrorMessage(`结绳基本库初始化失败: ${String(error instanceof Error ? error.message : error)}`);
+  }
+
   const compilerService = new TiecodeCompilerService(context, output);
   const sweetLineService = new SweetLineService(context, output);
   const toolchainService = new ToolchainService(context, output);

@@ -301,7 +301,11 @@ export function resolveBundledStdlibSourceRoot(kind: ProjectKind): string | unde
 }
 
 export function getBundledStdlibsPath(): string {
-  return path.join(getExtensionRoot(), "assets", "stdlibs");
+  return bundledStdlibsPath ?? path.join(getExtensionRoot(), "assets", "stdlibs");
+}
+
+export function setBundledStdlibsPath(stdlibsPath: string): void {
+  bundledStdlibsPath = stdlibsPath;
 }
 
 export function getExtensionRoot(): string {
@@ -641,3 +645,5 @@ function shouldSkipDirectory(name: string): boolean {
 function dedupe(values: string[]): string[] {
   return Array.from(new Set(values.map(value => path.normalize(value))));
 }
+
+let bundledStdlibsPath: string | undefined;

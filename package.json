@@ -3,7 +3,7 @@
   "displayName": "结绳开发工具",
   "description": "为结绳语言提供 VSCode 语言服务、工程模板和构建命令。",
   "version": "0.1.0",
-  "publisher": "tiecode",
+  "publisher": "Scave",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -50,7 +50,8 @@
   "scripts": {
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "vscode:prepublish": "npm run compile"
+    "pack:stdlibs": "node scripts/pack-stdlibs.mjs",
+    "vscode:prepublish": "npm run pack:stdlibs && npm run compile"
   },
   "contributes": {
     "languages": [
